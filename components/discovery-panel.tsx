@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useRef } from "react"
 import { Search } from "lucide-react"
 
 import { CompanyCard } from "@/components/company-card"
@@ -29,6 +30,23 @@ export function DiscoveryPanel({
   onCategoryChange,
   onSelectCompany,
 }: DiscoveryPanelProps) {
+  const activeItemRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    const activeItem = activeItemRef.current
+    const isSelectedVisible = companies.some((company) => company.slug === selectedCompany.slug)
+
+    if (!activeItem || !isSelectedVisible) {
+      return
+    }
+
+    activeItem.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "nearest",
+    })
+  }, [companies, selectedCompany.slug])
+
   return (
     <aside className="flex min-h-0 h-full flex-col gap-4 overflow-y-auto border border-border bg-card p-5">
       <div className="space-y-4">
@@ -95,13 +113,17 @@ export function DiscoveryPanel({
         {companies.length > 0 ? (
           <div className="grid gap-3 pr-1">
             {companies.map((company) => (
-              <CompanyCard
+              <div
                 key={company.slug}
-                company={company}
-                compact
-                active={company.slug === selectedCompany.slug}
-                onSelect={onSelectCompany}
-              />
+                ref={company.slug === selectedCompany.slug ? activeItemRef : null}
+              >
+                <CompanyCard
+                  company={company}
+                  compact
+                  active={company.slug === selectedCompany.slug}
+                  onSelect={onSelectCompany}
+                />
+              </div>
             ))}
           </div>
         ) : (
