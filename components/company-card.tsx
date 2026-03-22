@@ -1,8 +1,9 @@
 "use client"
 
+import { useState } from "react"
 import { ArrowUpRight, Flame, MapPin } from "lucide-react"
 
-import type { Company } from "@/lib/companies"
+import { getCompanyLogoUrl, getCompanyMonogram, type Company } from "@/lib/companies"
 import { cn } from "@/lib/utils"
 
 type CompanyCardProps = {
@@ -24,6 +25,8 @@ export function CompanyCard({
   compact = false,
   onSelect,
 }: CompanyCardProps) {
+  const monogram = getCompanyMonogram(company)
+
   const body = (
     <article
       className={cn(
@@ -34,7 +37,7 @@ export function CompanyCard({
       )}
     >
       <div className="flex items-start justify-between gap-3">
-        <div>
+        <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 text-xs font-medium uppercase text-muted-foreground">
             <span className="bg-secondary px-2.5 py-1 text-[10px] tracking-[0.16em] text-secondary-foreground">
               {company.category}
@@ -48,9 +51,12 @@ export function CompanyCard({
               <span>{tierLabel[company.featuredTier]}</span>
             )}
           </div>
-          <h3 className="mt-3 text-xl font-semibold tracking-[-0.03em] text-foreground">
-            {company.name}
-          </h3>
+          <div className="mt-3 flex items-center gap-3">
+            <CompanyLogo company={company} monogram={monogram} />
+            <h3 className="min-w-0 text-xl font-semibold tracking-[-0.03em] text-foreground">
+              {company.name}
+            </h3>
+          </div>
         </div>
         <a
           href={company.website}
@@ -100,6 +106,32 @@ export function CompanyCard({
       className="w-full text-left outline-none"
     >
       {body}
+    </div>
+  )
+}
+
+function CompanyLogo({
+  company,
+  monogram,
+}: {
+  company: Company
+  monogram: string
+}) {
+  const [showFallback, setShowFallback] = useState(false)
+
+  return (
+    <div className="flex size-10 shrink-0 items-center justify-center border border-border bg-white">
+      {showFallback ? (
+        <span className="text-sm font-semibold text-foreground">{monogram}</span>
+      ) : (
+        <img
+          src={getCompanyLogoUrl(company)}
+          alt={`${company.name} logo`}
+          className="size-6 object-contain"
+          loading="lazy"
+          onError={() => setShowFallback(true)}
+        />
+      )}
     </div>
   )
 }

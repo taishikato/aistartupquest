@@ -26,6 +26,33 @@ export type Company = {
   featuredTier: FeaturedTier
 }
 
+export function getCompanyMonogram(company: Company) {
+  if (company.name === "11x") {
+    return "11"
+  }
+
+  const parts = company.name
+    .replace(/[^a-zA-Z0-9 ]/g, " ")
+    .split(" ")
+    .filter(Boolean)
+
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+  }
+
+  return company.name.slice(0, 2).toUpperCase()
+}
+
+export function getCompanyDomain(company: Company) {
+  return new URL(company.website).hostname
+}
+
+export function getCompanyLogoUrl(company: Company) {
+  const domain = getCompanyDomain(company)
+
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`
+}
+
 // Curated, not exhaustive: these companies are chosen to make the current
 // San Francisco AI scene legible and enjoyable to browse in a map format.
 export const COMPANIES: Company[] = [
