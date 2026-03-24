@@ -1,7 +1,11 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import maplibregl, { type Map as MapLibreMap, type Marker } from "maplibre-gl"
+import maplibregl, {
+  type ExpressionSpecification,
+  type Map as MapLibreMap,
+  type Marker,
+} from "maplibre-gl"
 
 import {
   getCompanyLogoUrl,
@@ -19,148 +23,272 @@ type MapShellProps = {
 const SF_CENTER: [number, number] = [-122.4167, 37.7793]
 const MAP_STYLE =
   "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
+const MAP_PITCH = 46
+const MAP_BEARING = -18
 
 const CATEGORY_COLORS: Record<CompanyCategory, string> = {
-  "Core Labs": "#ff6b6b",
-  "Consumer AI": "#4ecdc4",
-  Devtools: "#ffe66d",
-  Infra: "#a855f7",
-  Agents: "#3b82f6",
-  "Vertical AI": "#ff9f43",
+  "Core Labs": "#bb5a3c",
+  "Consumer AI": "#5a9b6e",
+  Devtools: "#d1ae4f",
+  Infra: "#8b79b8",
+  Agents: "#5e8dc7",
+  "Vertical AI": "#c77e3d",
 }
 
-// Apply toy-city 3D style — Silicon Valley opening vibe
-function apply3DStyle(map: MapLibreMap) {
-  // Background — warm sandy ground like a model diorama
-  map.setPaintProperty("background", "background-color", "#e6d8b8")
+function setPaintPropertyIfLayerExists(
+  map: MapLibreMap,
+  layerId: string,
+  property: string,
+  value: unknown
+) {
+  if (!map.getLayer(layerId)) {
+    return
+  }
 
-  // Landcover — vivid cartoon grass
-  map.setPaintProperty("landcover", "fill-color", "#7cc866")
-  map.setPaintProperty("landcover", "fill-opacity", 0.9)
+  map.setPaintProperty(layerId, property, value)
+}
 
-  // Parks — bright lush green (toy trees / astroturf vibe)
-  map.setPaintProperty("park_national_park", "fill-color", "#4db848")
-  map.setPaintProperty("park_national_park", "fill-opacity", 0.85)
-  map.setPaintProperty("park_nature_reserve", "fill-color", "#4db848")
-  map.setPaintProperty("park_nature_reserve", "fill-opacity", 0.85)
+function addVoxelCityLayers(map: MapLibreMap) {
+  if (!map.getSource("carto") || map.getLayer("minecraft-buildings")) {
+    return
+  }
 
-  // Residential — light warm sand
-  map.setPaintProperty("landuse_residential", "fill-color", "#ede0c8")
+  const rawHeight: ExpressionSpecification = [
+    "coalesce",
+    ["to-number", ["get", "render_height"]],
+    ["to-number", ["get", "height"]],
+    12,
+  ]
+  const snappedHeight: ExpressionSpecification = [
+    "max",
+    8,
+    ["min", 180, ["*", ["round", ["/", rawHeight, 8]], 8]],
+  ]
 
-  // Other landuse — pale warm
-  map.setPaintProperty("landuse", "fill-color", "#f0e8d4")
+  map.addLayer(
+    {
+      id: "minecraft-buildings",
+      type: "fill-extrusion",
+      source: "carto",
+      "source-layer": "building",
+      minzoom: 11,
+      paint: {
+        "fill-extrusion-color": [
+          "interpolate",
+          ["linear"],
+          snappedHeight,
+          8,
+          "#92633d",
+          32,
+          "#af7b4f",
+          72,
+          "#c79668",
+          140,
+          "#e0bf91",
+        ],
+        "fill-extrusion-height": snappedHeight,
+        "fill-extrusion-base": 0,
+        "fill-extrusion-opacity": 0.96,
+        "fill-extrusion-vertical-gradient": false,
+      },
+    },
+    "boundary_country_outline"
+  )
+}
 
-  // Water — rich saturated teal (like the SV opening)
-  map.setPaintProperty("water", "fill-color", "#2ba5b5")
-  map.setPaintProperty("water_shadow", "fill-color", "#1e8a98")
+// Apply a blocky voxel-like palette without changing the data layers.
+function applyMinecraftStyle(map: MapLibreMap) {
+  setPaintPropertyIfLayerExists(
+    map,
+    "background",
+    "background-color",
+    "#a5c76e"
+  )
 
-  // Waterway
-  map.setPaintProperty("waterway", "line-color", "#2ba5b5")
-  map.setPaintProperty("waterway", "line-width", 2)
+  setPaintPropertyIfLayerExists(map, "landcover", "fill-color", "#7ea64a")
+  setPaintPropertyIfLayerExists(map, "landcover", "fill-opacity", 0.96)
 
-  // Flat buildings — toy colored
-  map.setPaintProperty("building", "fill-color", "#d4bfa8")
-  map.setPaintProperty("building", "fill-opacity", 0.8)
-  map.setPaintProperty("building-top", "fill-color", "#e0d0bc")
-  map.setPaintProperty("building-top", "fill-opacity", 0.9)
+  ;["park_national_park", "park_nature_reserve"].forEach((id) => {
+    setPaintPropertyIfLayerExists(map, id, "fill-color", "#5f9235")
+    setPaintPropertyIfLayerExists(map, id, "fill-opacity", 0.92)
+  })
 
-  // Roads — dark asphalt with light sidewalks (toy road feel)
+  setPaintPropertyIfLayerExists(
+    map,
+    "landuse_residential",
+    "fill-color",
+    "#cfbc8c"
+  )
+  setPaintPropertyIfLayerExists(map, "landuse", "fill-color", "#c6b17b")
+  setPaintPropertyIfLayerExists(map, "landuse", "fill-opacity", 0.92)
+
+  setPaintPropertyIfLayerExists(map, "water", "fill-color", "#4b83c2")
+  setPaintPropertyIfLayerExists(map, "water_shadow", "fill-color", "#325f97")
+  setPaintPropertyIfLayerExists(map, "waterway", "line-color", "#4479b1")
+  setPaintPropertyIfLayerExists(map, "waterway", "line-width", 2.4)
+
+  setPaintPropertyIfLayerExists(map, "building", "fill-color", "#aa8461")
+  setPaintPropertyIfLayerExists(map, "building", "fill-opacity", 0.26)
+  setPaintPropertyIfLayerExists(map, "building-top", "fill-color", "#d6b08a")
+  setPaintPropertyIfLayerExists(map, "building-top", "fill-opacity", 0)
+
   const roadCases = [
-    "road_service_case", "road_minor_case",
+    "road_service_case",
+    "road_minor_case",
     "road_pri_case_ramp", "road_trunk_case_ramp", "road_mot_case_ramp",
     "road_sec_case_noramp", "road_pri_case_noramp",
     "road_trunk_case_noramp", "road_mot_case_noramp",
   ]
-  roadCases.forEach((id) => map.setPaintProperty(id, "line-color", "#555555"))
+  roadCases.forEach((id) =>
+    setPaintPropertyIfLayerExists(map, id, "line-color", "#3f3427")
+  )
 
   const roadFills = [
-    "road_service_fill", "road_minor_fill",
+    "road_service_fill",
+    "road_minor_fill",
     "road_pri_fill_ramp", "road_trunk_fill_ramp", "road_mot_fill_ramp",
     "road_sec_fill_noramp", "road_pri_fill_noramp",
   ]
-  roadFills.forEach((id) => map.setPaintProperty(id, "line-color", "#888888"))
+  roadFills.forEach((id) =>
+    setPaintPropertyIfLayerExists(map, id, "line-color", "#8f856a")
+  )
 
-  // Main roads — slightly yellow-tinted (like toy road mats)
-  map.setPaintProperty("road_trunk_fill_noramp", "line-color", "#999999")
-  map.setPaintProperty("road_mot_fill_noramp", "line-color", "#777777")
+  setPaintPropertyIfLayerExists(
+    map,
+    "road_trunk_fill_noramp",
+    "line-color",
+    "#a79b76"
+  )
+  setPaintPropertyIfLayerExists(
+    map,
+    "road_mot_fill_noramp",
+    "line-color",
+    "#8a7c5b"
+  )
 
-  map.setPaintProperty("road_path", "line-color", "#c0a880")
+  setPaintPropertyIfLayerExists(map, "road_path", "line-color", "#735d3a")
 
-  map.setPaintProperty("rail", "line-color", "#666666")
-  map.setPaintProperty("rail_dash", "line-color", "#e6d8b8")
+  setPaintPropertyIfLayerExists(map, "rail", "line-color", "#5a5650")
+  setPaintPropertyIfLayerExists(map, "rail_dash", "line-color", "#b1aa94")
 
-  // Tunnels
   const tunnelCases = [
-    "tunnel_service_case", "tunnel_minor_case", "tunnel_sec_case",
+    "tunnel_service_case",
+    "tunnel_minor_case",
+    "tunnel_sec_case",
     "tunnel_pri_case", "tunnel_trunk_case", "tunnel_mot_case",
   ]
-  tunnelCases.forEach((id) => map.setPaintProperty(id, "line-color", "#888888"))
+  tunnelCases.forEach((id) =>
+    setPaintPropertyIfLayerExists(map, id, "line-color", "#645642")
+  )
 
   const tunnelFills = [
-    "tunnel_service_fill", "tunnel_minor_fill", "tunnel_sec_fill",
+    "tunnel_service_fill",
+    "tunnel_minor_fill",
+    "tunnel_sec_fill",
     "tunnel_pri_fill", "tunnel_trunk_fill", "tunnel_mot_fill",
   ]
-  tunnelFills.forEach((id) => map.setPaintProperty(id, "line-color", "#aaaaaa"))
+  tunnelFills.forEach((id) =>
+    setPaintPropertyIfLayerExists(map, id, "line-color", "#887a5d")
+  )
 
-  // Bridges
   const bridgeCases = [
-    "bridge_service_case", "bridge_minor_case", "bridge_sec_case",
+    "bridge_service_case",
+    "bridge_minor_case",
+    "bridge_sec_case",
     "bridge_pri_case", "bridge_trunk_case", "bridge_mot_case",
   ]
-  bridgeCases.forEach((id) => map.setPaintProperty(id, "line-color", "#444444"))
+  bridgeCases.forEach((id) =>
+    setPaintPropertyIfLayerExists(map, id, "line-color", "#473c2e")
+  )
 
   const bridgeFills = [
-    "bridge_service_fill", "bridge_minor_fill", "bridge_sec_fill",
+    "bridge_service_fill",
+    "bridge_minor_fill",
+    "bridge_sec_fill",
     "bridge_pri_fill", "bridge_trunk_fill", "bridge_mot_fill",
   ]
-  bridgeFills.forEach((id) => map.setPaintProperty(id, "line-color", "#999999"))
+  bridgeFills.forEach((id) =>
+    setPaintPropertyIfLayerExists(map, id, "line-color", "#978567")
+  )
 
-  // Boundaries
-  map.setPaintProperty("boundary_county", "line-color", "#c8a888")
-  map.setPaintProperty("boundary_state", "line-color", "#b09070")
+  setPaintPropertyIfLayerExists(
+    map,
+    "boundary_county",
+    "line-color",
+    "#8d6c49"
+  )
+  setPaintPropertyIfLayerExists(
+    map,
+    "boundary_state",
+    "line-color",
+    "#725536"
+  )
 
-  // Labels — dark warm
   const placeLabels = [
-    "place_hamlet", "place_suburbs", "place_villages",
+    "place_hamlet",
+    "place_suburbs",
+    "place_villages",
     "place_town", "place_city_r6", "place_city_r5",
   ]
   placeLabels.forEach((id) => {
-    map.setPaintProperty(id, "text-color", "#4a3a2a")
-    map.setPaintProperty(id, "text-halo-color", "#e6d8b8")
-    map.setPaintProperty(id, "text-halo-width", 1.5)
+    setPaintPropertyIfLayerExists(map, id, "text-color", "#3d2e1f")
+    setPaintPropertyIfLayerExists(map, id, "text-halo-color", "#d9cb97")
+    setPaintPropertyIfLayerExists(map, id, "text-halo-width", 1.5)
   })
 
   const cityDots = [
-    "place_city_dot_r7", "place_city_dot_r4", "place_city_dot_r2",
+    "place_city_dot_r7",
+    "place_city_dot_r4",
+    "place_city_dot_r2",
     "place_city_dot_z7", "place_capital_dot_z7",
   ]
   cityDots.forEach((id) => {
-    map.setPaintProperty(id, "text-color", "#3a2a1a")
-    map.setPaintProperty(id, "text-halo-color", "#e6d8b8")
-    map.setPaintProperty(id, "text-halo-width", 1.5)
+    setPaintPropertyIfLayerExists(map, id, "text-color", "#2e2418")
+    setPaintPropertyIfLayerExists(map, id, "text-halo-color", "#d9cb97")
+    setPaintPropertyIfLayerExists(map, id, "text-halo-width", 1.5)
   })
 
-  map.setPaintProperty("place_state", "text-color", "#7a6a5a")
-  map.setPaintProperty("place_country_1", "text-color", "#5a4a3a")
-  map.setPaintProperty("place_country_2", "text-color", "#5a4a3a")
+  setPaintPropertyIfLayerExists(map, "place_state", "text-color", "#6b5a46")
+  setPaintPropertyIfLayerExists(
+    map,
+    "place_country_1",
+    "text-color",
+    "#4f3f2d"
+  )
+  setPaintPropertyIfLayerExists(
+    map,
+    "place_country_2",
+    "text-color",
+    "#4f3f2d"
+  )
 
   const waterLabels = [
-    "watername_ocean", "watername_sea", "watername_lake",
+    "watername_ocean",
+    "watername_sea",
+    "watername_lake",
     "watername_lake_line", "waterway_label",
   ]
   waterLabels.forEach((id) => {
-    map.setPaintProperty(id, "text-color", "#1a6a78")
-    map.setPaintProperty(id, "text-halo-color", "#2ba5b5")
-    map.setPaintProperty(id, "text-halo-width", 1)
+    setPaintPropertyIfLayerExists(map, id, "text-color", "#244e82")
+    setPaintPropertyIfLayerExists(map, id, "text-halo-color", "#78a7db")
+    setPaintPropertyIfLayerExists(map, id, "text-halo-width", 1)
   })
 
-  map.setPaintProperty("poi_park", "text-color", "#2a7a2a")
-  map.setPaintProperty("poi_stadium", "text-color", "#5a4a3a")
+  setPaintPropertyIfLayerExists(map, "poi_park", "text-color", "#346a28")
+  setPaintPropertyIfLayerExists(map, "poi_stadium", "text-color", "#5a4a3a")
 
-  // Aeroway
-  map.setPaintProperty("aeroway-runway", "line-color", "#999999")
-  map.setPaintProperty("aeroway-taxiway", "line-color", "#aaaaaa")
-
+  setPaintPropertyIfLayerExists(
+    map,
+    "aeroway-runway",
+    "line-color",
+    "#8b8371"
+  )
+  setPaintPropertyIfLayerExists(
+    map,
+    "aeroway-taxiway",
+    "line-color",
+    "#9d927e"
+  )
 }
 
 function createSignMarker(
@@ -169,30 +297,41 @@ function createSignMarker(
   dense: boolean
 ) {
   const monogram = getCompanyMonogram(company)
-  const size = dense ? (active ? 30 : 22) : active ? 34 : 26
-  const logoSize = dense ? (active ? 18 : 12) : active ? 22 : 16
-  const legH = dense ? (active ? 5 : 3) : active ? 7 : 4
+  const accent = CATEGORY_COLORS[company.category]
+  const frameSize = dense ? (active ? 30 : 24) : active ? 36 : 28
+  const logoSize = dense ? (active ? 16 : 12) : active ? 20 : 15
+  const baseWidth = dense ? (active ? 26 : 22) : active ? 30 : 24
+  const baseHeight = dense ? (active ? 12 : 10) : active ? 14 : 12
+  const postHeight = dense ? (active ? 10 : 8) : active ? 12 : 9
 
   const wrapper = document.createElement("div")
   wrapper.style.display = "flex"
   wrapper.style.flexDirection = "column"
   wrapper.style.alignItems = "center"
+  wrapper.style.gap = "0"
 
-  // White sign panel — logo only
-  const face = document.createElement("div")
-  face.style.width = `${size}px`
-  face.style.height = `${size}px`
-  face.style.background = "#ffffff"
-  face.style.borderRadius = "4px 4px 0 0"
-  face.style.display = "flex"
-  face.style.alignItems = "center"
-  face.style.justifyContent = "center"
-  face.style.boxShadow = active
-    ? "0 2px 12px rgba(0,0,0,0.35)"
-    : "0 1px 6px rgba(0,0,0,0.2)"
-  if (active) {
-    face.style.outline = "2px solid rgba(0,0,0,0.12)"
-  }
+  const frame = document.createElement("div")
+  frame.style.width = `${frameSize}px`
+  frame.style.height = `${frameSize}px`
+  frame.style.border = "3px solid #342414"
+  frame.style.background = "#f4ecd2"
+  frame.style.display = "flex"
+  frame.style.alignItems = "center"
+  frame.style.justifyContent = "center"
+  frame.style.boxShadow = active
+    ? "0 0 0 3px rgba(255, 242, 199, 0.65), 4px 4px 0 #342414"
+    : "3px 3px 0 #342414"
+  frame.style.position = "relative"
+
+  const frameAccent = document.createElement("div")
+  frameAccent.style.position = "absolute"
+  frameAccent.style.top = "0"
+  frameAccent.style.left = "0"
+  frameAccent.style.right = "0"
+  frameAccent.style.height = `${Math.max(5, Math.round(frameSize * 0.18))}px`
+  frameAccent.style.background = accent
+  frameAccent.style.borderBottom = "2px solid #342414"
+  frame.appendChild(frameAccent)
 
   const image = document.createElement("img")
   image.src = getCompanyLogoUrl(company)
@@ -200,43 +339,47 @@ function createSignMarker(
   image.style.width = `${logoSize}px`
   image.style.height = `${logoSize}px`
   image.style.objectFit = "contain"
+  image.style.position = "relative"
+  image.style.zIndex = "1"
 
   image.addEventListener("error", () => {
     image.replaceWith(createFallback(monogram, active, dense))
   })
-  face.appendChild(image)
+  frame.appendChild(image)
 
-  // Bottom edge — thin dark strip for depth
-  const bottom = document.createElement("div")
-  bottom.style.width = `${size}px`
-  bottom.style.height = `${active ? 3 : 2}px`
-  bottom.style.background = "#888"
-  bottom.style.borderRadius = "0 0 1px 1px"
+  const grassTop = document.createElement("div")
+  grassTop.style.width = `${baseWidth}px`
+  grassTop.style.height = `${Math.max(5, Math.round(baseHeight * 0.42))}px`
+  grassTop.style.border = "2px solid #342414"
+  grassTop.style.borderBottom = "0"
+  grassTop.style.background =
+    "repeating-linear-gradient(90deg, #7fa64c 0 5px, #6d9242 5px 10px)"
 
-  // Two support legs
-  const legs = document.createElement("div")
-  legs.style.display = "flex"
-  legs.style.justifyContent = "center"
-  legs.style.gap = `${Math.round(size * 0.45)}px`
-  for (let i = 0; i < 2; i++) {
-    const leg = document.createElement("div")
-    leg.style.width = "2px"
-    leg.style.height = `${legH}px`
-    leg.style.background = "#999"
-    legs.appendChild(leg)
-  }
+  const dirt = document.createElement("div")
+  dirt.style.width = `${baseWidth}px`
+  dirt.style.height = `${baseHeight}px`
+  dirt.style.border = "2px solid #342414"
+  dirt.style.background =
+    "repeating-linear-gradient(90deg, #8b5a34 0 6px, #754626 6px 12px)"
+  dirt.style.boxShadow = "3px 3px 0 rgba(52, 36, 20, 0.45)"
 
-  // Ground shadow
+  const post = document.createElement("div")
+  post.style.width = `${dense ? 6 : 7}px`
+  post.style.height = `${postHeight}px`
+  post.style.background = "#6d4a2b"
+  post.style.borderLeft = "2px solid #342414"
+  post.style.borderRight = "2px solid #342414"
+
   const shadow = document.createElement("div")
-  shadow.style.width = `${Math.round(size * 0.6)}px`
-  shadow.style.height = "3px"
-  shadow.style.background = "rgba(0,0,0,0.12)"
-  shadow.style.borderRadius = "50%"
+  shadow.style.width = `${Math.round(baseWidth * 0.9)}px`
+  shadow.style.height = "4px"
+  shadow.style.background = "rgba(52, 36, 20, 0.22)"
   shadow.style.filter = "blur(1px)"
 
-  wrapper.appendChild(face)
-  wrapper.appendChild(bottom)
-  wrapper.appendChild(legs)
+  wrapper.appendChild(frame)
+  wrapper.appendChild(post)
+  wrapper.appendChild(grassTop)
+  wrapper.appendChild(dirt)
   wrapper.appendChild(shadow)
 
   return wrapper
@@ -250,7 +393,7 @@ function createFallback(monogram: string, active: boolean, dense: boolean) {
     : active ? "12px" : "9px"
   el.style.fontWeight = "700"
   el.style.lineHeight = "1"
-  el.style.color = "#333"
+  el.style.color = "#342414"
   return el
 }
 
@@ -275,10 +418,13 @@ export function MapShell({
       container: containerRef.current,
       style: MAP_STYLE,
       center: SF_CENTER,
-      zoom: 12.15,
+      zoom: 11.95,
+      pitch: MAP_PITCH,
+      bearing: MAP_BEARING,
       minZoom: 11.1,
       maxZoom: 15.8,
       attributionControl: false,
+      renderWorldCopies: false,
     })
 
     map.dragRotate.disable()
@@ -288,7 +434,8 @@ export function MapShell({
       "top-right"
     )
     map.on("load", () => {
-      apply3DStyle(map)
+      applyMinecraftStyle(map)
+      addVoxelCityLayers(map)
       map.resize()
     })
     mapRef.current = map
@@ -364,7 +511,9 @@ export function MapShell({
 
     map.flyTo({
       center: selectedCompany.coordinates,
-      zoom: 13.35,
+      zoom: 13.05,
+      pitch: MAP_PITCH,
+      bearing: MAP_BEARING,
       speed: 0.65,
       curve: 1.2,
       essential: true,
@@ -372,18 +521,29 @@ export function MapShell({
   }, [selectedCompany])
 
   return (
-    <div className="relative h-full overflow-hidden bg-[#e8ddd0] lg:min-h-160">
+    <div className="relative h-full overflow-hidden bg-[#cdb98b] lg:min-h-160">
       <div ref={containerRef} className="h-full w-full" />
-      <div className="pointer-events-none absolute top-4 left-4 rounded-xl bg-white/90 px-4 py-3 shadow-lg backdrop-blur-sm">
-        <div className="font-[family-name:var(--font-pixel)] text-[8px] uppercase tracking-wider text-[#ff6b6b]">
+      <div className="pointer-events-none absolute inset-0 opacity-30">
+        <div
+          className="h-full w-full"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(53,37,20,0.14) 1px, transparent 1px), linear-gradient(90deg, rgba(53,37,20,0.14) 1px, transparent 1px)",
+            backgroundSize: "24px 24px",
+          }}
+        />
+      </div>
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#fff3cf]/35 to-transparent" />
+      <div className="pointer-events-none absolute top-4 left-4 border-[3px] border-[#342414] bg-[#f4ecd2] px-4 py-3 shadow-[4px_4px_0px_#342414]">
+        <div className="font-[family-name:var(--font-pixel)] text-[8px] uppercase tracking-wider text-[#9a4d30]">
           SF AI Startup Map
         </div>
-        <p className="mt-1 max-w-[200px] text-[11px] leading-4 text-[#5a4a3a]">
-          Source-backed locations only.
+        <p className="mt-1 max-w-[220px] text-[11px] leading-4 text-[#4c3926]">
+          Voxel-style view of source-backed SF office locations.
         </p>
       </div>
-      <div className="pointer-events-none absolute right-4 bottom-4 rounded-lg bg-white/90 px-3 py-1.5 shadow-md backdrop-blur-sm">
-        <span className="font-[family-name:var(--font-pixel)] text-[7px] text-[#5a4a3a]">
+      <div className="pointer-events-none absolute right-4 bottom-4 border-[3px] border-[#342414] bg-[#f4ecd2] px-3 py-2 shadow-[4px_4px_0px_#342414]">
+        <span className="font-[family-name:var(--font-pixel)] text-[7px] text-[#4c3926]">
           ► {selectedCompany.name}
         </span>
       </div>
@@ -391,28 +551,43 @@ export function MapShell({
         {Object.entries(CATEGORY_COLORS).map(([cat, color]) => (
           <div
             key={cat}
-            className="flex items-center gap-1.5 rounded-md bg-white/80 px-2 py-0.5 backdrop-blur-sm"
+            className="flex items-center gap-1.5 border-2 border-[#342414] bg-[#f4ecd2] px-2 py-1 shadow-[3px_3px_0px_rgba(52,36,20,0.75)]"
           >
             <div
-              className="size-2.5 rounded-sm"
-              style={{ backgroundColor: color }}
+              className="size-2.5 border border-[#342414]"
+              style={{ backgroundColor: color, boxShadow: "1px 1px 0 #342414" }}
             />
-            <span className="text-[9px] font-medium text-[#5a4a3a]">
+            <span className="text-[9px] font-medium text-[#4c3926]">
               {cat}
             </span>
           </div>
         ))}
       </div>
       <style jsx global>{`
+        .maplibregl-canvas {
+          image-rendering: pixelated;
+        }
+
         .maplibregl-ctrl-group {
-          border-radius: 8px !important;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
-          border: none !important;
+          border-radius: 0 !important;
+          box-shadow: 4px 4px 0 #342414 !important;
+          border: 3px solid #342414 !important;
+          background: #f4ecd2 !important;
           overflow: hidden;
         }
 
         .maplibregl-ctrl-group button {
           border-radius: 0 !important;
+          background: #f4ecd2 !important;
+          color: #4c3926 !important;
+        }
+
+        .maplibregl-ctrl-group button:hover {
+          background: #e0d2ab !important;
+        }
+
+        .maplibregl-ctrl-icon {
+          filter: sepia(1) saturate(0.8) brightness(0.45);
         }
       `}</style>
     </div>

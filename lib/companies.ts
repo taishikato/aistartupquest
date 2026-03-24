@@ -545,4 +545,337 @@ export const COMPANIES: Company[] = [
     sourceUrl: "https://craft.co/bland-ai/locations",
     sourceLabel: "Craft locations page",
   },
+  {
+    slug: "databricks",
+    name: "Databricks",
+    website: "https://www.databricks.com",
+    shortDescription:
+      "Unified data and AI platform combining data warehousing, engineering, and ML at scale.",
+    whyItMatters:
+      "The anchor of SF's data-AI infrastructure, building foundation models and powering enterprise AI.",
+    category: "Infra",
+    locationLabel: "160 Spear St, San Francisco",
+    coordinates: [-122.3936, 37.7912],
+    founded: 2013,
+    featuredTier: "core",
+    sourceUrl:
+      "https://www.databricks.com/company/contact/office-locations",
+    sourceLabel: "Databricks official office locations",
+  },
+  {
+    slug: "glean",
+    name: "Glean",
+    website: "https://www.glean.com",
+    shortDescription:
+      "AI-powered enterprise search platform connecting all company data for instant answers.",
+    whyItMatters:
+      "One of the fastest-growing enterprise AI companies, valued at $7.2B.",
+    category: "Vertical AI",
+    locationLabel: "255 California St, San Francisco",
+    coordinates: [-122.3997, 37.7932],
+    founded: 2019,
+    featuredTier: "hot",
+    sourceUrl:
+      "https://salestools.io/en/report/glean-headquarters",
+    sourceLabel: "Salestools headquarters listing",
+  },
+  {
+    slug: "mercor",
+    name: "Mercor",
+    website: "https://www.mercor.com",
+    shortDescription:
+      "AI-powered hiring platform that matches talent to jobs using AI interviews and evaluation.",
+    whyItMatters:
+      "Redefining hiring with AI-driven talent evaluation from 181 Fremont.",
+    category: "Vertical AI",
+    locationLabel: "181 Fremont St, San Francisco",
+    coordinates: [-122.3953, 37.7901],
+    founded: 2023,
+    featuredTier: "hot",
+    sourceUrl:
+      "https://www.builtinsf.com/company/mercor",
+    sourceLabel: "Built In SF company profile",
+  },
+  {
+    slug: "luma",
+    name: "Luma AI",
+    website: "https://lumalabs.ai",
+    shortDescription:
+      "AI platform for 3D and video generation, creators of Dream Machine.",
+    whyItMatters:
+      "Pushing the frontier of AI-generated visual content with Dream Machine.",
+    category: "Consumer AI",
+    locationLabel: "457 Bryant St, San Francisco",
+    coordinates: [-122.3969, 37.7823],
+    founded: 2021,
+    featuredTier: "hot",
+    sourceUrl:
+      "https://talent.amplifypartners.com/jobs/luma-ai",
+    sourceLabel: "Amplify Partners job listing",
+  },
+  {
+    slug: "magic",
+    name: "Magic",
+    website: "https://magic.dev",
+    shortDescription:
+      "AI coding company building frontier models with long context for software development.",
+    whyItMatters:
+      "Building AI that can reason across entire codebases with massive context windows.",
+    category: "Devtools",
+    locationLabel: "580 California St, San Francisco",
+    coordinates: [-122.4044, 37.7926],
+    founded: 2022,
+    featuredTier: "hot",
+    sourceUrl:
+      "https://exa.ai/websets/directory/magic-ai-offices",
+    sourceLabel: "Exa directory listing",
+  },
+  {
+    slug: "hebbia",
+    name: "Hebbia",
+    website: "https://www.hebbia.com",
+    shortDescription:
+      "AI platform for knowledge work that reasons across millions of documents for finance and law.",
+    whyItMatters:
+      "Enterprise AI that automates deep document analysis for the world's largest institutions.",
+    category: "Vertical AI",
+    locationLabel: "575 Market St, San Francisco",
+    coordinates: [-122.4005, 37.7893],
+    founded: 2020,
+    featuredTier: "hot",
+    sourceUrl:
+      "https://www.hebbia.com/newsroom/hebbia-opens-doors-in-san-francisco-and-welcomes-new-cto",
+    sourceLabel: "Hebbia newsroom",
+  },
+  {
+    slug: "replicate",
+    name: "Replicate",
+    website: "https://replicate.com",
+    shortDescription:
+      "Cloud API for running open-source ML models with simple deployment.",
+    whyItMatters:
+      "Key infrastructure making open-source AI models accessible to any developer.",
+    category: "Infra",
+    locationLabel: "2261 Market St, San Francisco",
+    coordinates: [-122.4318, 37.765],
+    founded: 2019,
+    featuredTier: "scene",
+    sourceUrl: "https://replicate.com/privacy",
+    sourceLabel: "Replicate privacy policy",
+  },
+  {
+    slug: "modal",
+    name: "Modal",
+    website: "https://modal.com",
+    shortDescription:
+      "Serverless cloud platform for running AI and data workloads on GPUs.",
+    whyItMatters:
+      "Fast-growing compute infrastructure for AI teams who need scalable GPU access.",
+    category: "Infra",
+    locationLabel: "156 2nd St, San Francisco",
+    coordinates: [-122.3975, 37.7871],
+    founded: 2021,
+    featuredTier: "scene",
+    sourceUrl: "https://www.cbinsights.com/company/modal-1",
+    sourceLabel: "CB Insights company profile",
+  },
+  {
+    slug: "chroma",
+    name: "Chroma",
+    website: "https://www.trychroma.com",
+    shortDescription:
+      "Open-source vector database for building AI applications with embeddings.",
+    whyItMatters:
+      "The leading open-source embedding database powering AI search and RAG pipelines.",
+    category: "Infra",
+    locationLabel: "2261 Market St, San Francisco",
+    coordinates: [-122.432, 37.7644],
+    founded: 2022,
+    featuredTier: "scene",
+    sourceUrl:
+      "https://opengovus.com/san-francisco-business/1304237-05-221",
+    sourceLabel: "SF business filing via OpenGovUS",
+  },
+  {
+    slug: "jasper",
+    name: "Jasper",
+    website: "https://www.jasper.ai",
+    shortDescription:
+      "AI content generation platform for marketing teams and enterprises.",
+    whyItMatters:
+      "One of the earliest breakout AI content tools with strong enterprise adoption.",
+    category: "Consumer AI",
+    locationLabel: "575 Market St, San Francisco",
+    coordinates: [-122.4001, 37.7897],
+    founded: 2021,
+    featuredTier: "scene",
+    sourceUrl: "https://www.jasper.ai/legal/terms",
+    sourceLabel: "Jasper Terms of Service",
+  },
+  {
+    slug: "cresta",
+    name: "Cresta",
+    website: "https://cresta.com",
+    shortDescription:
+      "Real-time AI platform for contact centers providing agent assist and coaching.",
+    whyItMatters:
+      "Founded by Sebastian Thrun, applying real-time AI to transform customer service.",
+    category: "Agents",
+    locationLabel: "235 Pine St, San Francisco",
+    coordinates: [-122.3998, 37.7922],
+    founded: 2017,
+    featuredTier: "scene",
+    sourceUrl:
+      "https://salestools.io/en/report/cresta-headquarters",
+    sourceLabel: "Salestools headquarters listing",
+  },
+  {
+    slug: "primer",
+    name: "Primer",
+    website: "https://primer.ai",
+    shortDescription:
+      "AI platform automating intelligence analysis and report generation for defense and security.",
+    whyItMatters:
+      "Pioneer in applying NLP to national security and intelligence workflows.",
+    category: "Vertical AI",
+    locationLabel: "244 Jackson St, San Francisco",
+    coordinates: [-122.3999, 37.7969],
+    founded: 2015,
+    featuredTier: "scene",
+    sourceUrl: "https://craft.co/primer-ai/locations",
+    sourceLabel: "Craft locations page",
+  },
+  {
+    slug: "abridge",
+    name: "Abridge",
+    website: "https://www.abridge.com",
+    shortDescription:
+      "Generative AI platform for clinical documentation used by 150+ health systems.",
+    whyItMatters:
+      "Leading AI healthcare company with one of SF's largest recent office leases.",
+    category: "Vertical AI",
+    locationLabel: "208 Utah St, San Francisco",
+    coordinates: [-122.4043, 37.7632],
+    founded: 2018,
+    featuredTier: "scene",
+    sourceUrl:
+      "https://sfstandard.com/2025/10/07/abridge-ai-san-francisco-office-leasing/",
+    sourceLabel: "SF Standard office lease report",
+  },
+  {
+    slug: "distyl",
+    name: "Distyl AI",
+    website: "https://distyl.ai",
+    shortDescription:
+      "Enterprise AI orchestration platform rebuilding business processes with autonomous agents.",
+    whyItMatters:
+      "Building AI-native enterprise automation for telecom, healthcare, and manufacturing.",
+    category: "Agents",
+    locationLabel: "55 Hawthorne St, San Francisco",
+    coordinates: [-122.3985, 37.7862],
+    founded: 2022,
+    featuredTier: "scene",
+    sourceUrl: "https://www.builtinsf.com/company/distyl-ai",
+    sourceLabel: "Built In SF company profile",
+  },
+  {
+    slug: "nightfall",
+    name: "Nightfall AI",
+    website: "https://www.nightfall.ai",
+    shortDescription:
+      "AI-native data loss prevention platform protecting sensitive data across cloud apps.",
+    whyItMatters:
+      "First DLP platform built on generative AI for the enterprise cloud era.",
+    category: "Vertical AI",
+    locationLabel: "425 California St, San Francisco",
+    coordinates: [-122.4018, 37.7929],
+    founded: 2019,
+    featuredTier: "scene",
+    sourceUrl:
+      "https://www.cbinsights.com/company/nightfall-ai",
+    sourceLabel: "CB Insights company profile",
+  },
+  {
+    slug: "adept",
+    name: "Adept AI",
+    website: "https://www.adept.ai",
+    shortDescription:
+      "AI research lab building agents that take actions in software for users.",
+    whyItMatters:
+      "Notable AI agent company with a novel approach to human-computer interaction.",
+    category: "Agents",
+    locationLabel: "350 Rhode Island St, San Francisco",
+    coordinates: [-122.4031, 37.766],
+    founded: 2022,
+    featuredTier: "scene",
+    sourceUrl:
+      "https://therealdeal.com/san-francisco/2023/08/10/adept-ai-labs-to-lease-35k-sf-in-san-franciscos-area-ai/",
+    sourceLabel: "The Real Deal lease record",
+  },
+  {
+    slug: "deepgram",
+    name: "Deepgram",
+    website: "https://deepgram.com",
+    shortDescription:
+      "Speech AI platform providing fast, accurate transcription and speech understanding APIs.",
+    whyItMatters:
+      "Major speech AI infrastructure powering real-time voice applications at scale.",
+    category: "Infra",
+    locationLabel: "548 Market St, San Francisco",
+    coordinates: [-122.3998, 37.7899],
+    founded: 2015,
+    featuredTier: "scene",
+    sourceUrl: "https://craft.co/deepgram/locations",
+    sourceLabel: "Craft locations page",
+  },
+  {
+    slug: "woebot",
+    name: "Woebot Health",
+    website: "https://woebothealth.com",
+    shortDescription:
+      "AI-powered mental health platform delivering evidence-based therapy at scale.",
+    whyItMatters:
+      "Pioneering AI-delivered mental health support backed by clinical research.",
+    category: "Vertical AI",
+    locationLabel: "650 5th St, San Francisco",
+    coordinates: [-122.3972, 37.7759],
+    founded: 2017,
+    featuredTier: "scene",
+    sourceUrl:
+      "https://www.bbb.org/us/ca/san-francisco/profile/lab/woebot-labs-inc-1116-889119",
+    sourceLabel: "Better Business Bureau listing",
+  },
+  {
+    slug: "rad-ai",
+    name: "Rad AI",
+    website: "https://www.radai.com",
+    shortDescription:
+      "Generative AI models trained specifically for radiology to automate clinical reporting.",
+    whyItMatters:
+      "Leading AI company reducing radiologist burnout with purpose-built healthcare AI.",
+    category: "Vertical AI",
+    locationLabel: "548 Market St, San Francisco",
+    coordinates: [-122.4003, 37.7903],
+    founded: 2018,
+    featuredTier: "scene",
+    sourceUrl: "https://www.cbinsights.com/company/rad-ai",
+    sourceLabel: "CB Insights company profile",
+  },
+  {
+    slug: "assemblyai",
+    name: "AssemblyAI",
+    website: "https://www.assemblyai.com",
+    shortDescription:
+      "AI platform for speech recognition, speaker detection, and audio intelligence APIs.",
+    whyItMatters:
+      "Major speech AI provider offering developer-friendly transcription and audio understanding.",
+    category: "Infra",
+    locationLabel: "320 Judah St, San Francisco",
+    coordinates: [-122.4606, 37.7612],
+    founded: 2017,
+    featuredTier: "scene",
+    sourceUrl:
+      "https://www.cbinsights.com/company/assemblyai",
+    sourceLabel: "CB Insights company profile",
+  },
 ]
