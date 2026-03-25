@@ -292,96 +292,181 @@ function applyMinecraftStyle(map: MapLibreMap) {
   )
 }
 
-function createSignMarker(
+// Helper to create a styled div
+function sd(styles: Partial<CSSStyleDeclaration>) {
+  const el = document.createElement("div")
+  Object.assign(el.style, styles)
+  return el
+}
+
+// Small logo badge that floats above any sprite
+function makeLogoBadge(
   company: Company,
   active: boolean,
   dense: boolean
 ) {
-  const monogram = getCompanyMonogram(company)
-  const accent = CATEGORY_COLORS[company.category]
-  const frameSize = dense ? (active ? 30 : 24) : active ? 36 : 28
-  const logoSize = dense ? (active ? 16 : 12) : active ? 20 : 15
-  const baseWidth = dense ? (active ? 26 : 22) : active ? 30 : 24
-  const baseHeight = dense ? (active ? 12 : 10) : active ? 14 : 12
-  const postHeight = dense ? (active ? 10 : 8) : active ? 12 : 9
-
-  const wrapper = document.createElement("div")
-  wrapper.style.display = "flex"
-  wrapper.style.flexDirection = "column"
-  wrapper.style.alignItems = "center"
-  wrapper.style.gap = "0"
-
-  const frame = document.createElement("div")
-  frame.style.width = `${frameSize}px`
-  frame.style.height = `${frameSize}px`
-  frame.style.border = "3px solid #342414"
-  frame.style.background = "#f4ecd2"
-  frame.style.display = "flex"
-  frame.style.alignItems = "center"
-  frame.style.justifyContent = "center"
-  frame.style.boxShadow = active
-    ? "0 0 0 3px rgba(255, 242, 199, 0.65), 4px 4px 0 #342414"
-    : "3px 3px 0 #342414"
-  frame.style.position = "relative"
-
-  const frameAccent = document.createElement("div")
-  frameAccent.style.position = "absolute"
-  frameAccent.style.top = "0"
-  frameAccent.style.left = "0"
-  frameAccent.style.right = "0"
-  frameAccent.style.height = `${Math.max(5, Math.round(frameSize * 0.18))}px`
-  frameAccent.style.background = accent
-  frameAccent.style.borderBottom = "2px solid #342414"
-  frame.appendChild(frameAccent)
-
-  const image = document.createElement("img")
-  image.src = getCompanyLogoUrl(company)
-  image.alt = `${company.name} logo`
-  image.style.width = `${logoSize}px`
-  image.style.height = `${logoSize}px`
-  image.style.objectFit = "contain"
-  image.style.position = "relative"
-  image.style.zIndex = "1"
-
-  image.addEventListener("error", () => {
-    image.replaceWith(createFallback(monogram, active, dense))
+  const OL = "#342414"
+  const sz = dense ? (active ? 20 : 16) : active ? 24 : 20
+  const logoSz = dense ? (active ? 14 : 10) : active ? 18 : 14
+  const badge = sd({
+    width: `${sz}px`,
+    height: `${sz}px`,
+    border: `2px solid ${OL}`,
+    background: "#f4ecd2",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: active
+      ? `0 0 0 2px rgba(255,242,199,0.7), 2px 2px 0 ${OL}`
+      : `2px 2px 0 ${OL}`,
+    marginBottom: "2px",
+    position: "relative",
+    zIndex: "5",
   })
-  frame.appendChild(image)
+  const img = document.createElement("img")
+  img.src = getCompanyLogoUrl(company)
+  img.alt = company.name
+  Object.assign(img.style, {
+    width: `${logoSz}px`,
+    height: `${logoSz}px`,
+    objectFit: "contain",
+  })
+  const monogram = getCompanyMonogram(company)
+  img.addEventListener("error", () => {
+    img.replaceWith(createFallback(monogram, active, dense))
+  })
+  badge.appendChild(img)
+  return badge
+}
 
-  const grassTop = document.createElement("div")
-  grassTop.style.width = `${baseWidth}px`
-  grassTop.style.height = `${Math.max(5, Math.round(baseHeight * 0.42))}px`
-  grassTop.style.border = "2px solid #342414"
-  grassTop.style.borderBottom = "0"
-  grassTop.style.background =
-    "repeating-linear-gradient(90deg, #7fa64c 0 5px, #6d9242 5px 10px)"
+function createSpriteMarker(
+  company: Company,
+  active: boolean,
+  dense: boolean
+) {
+  const accent = CATEGORY_COLORS[company.category]
+  const OL = "#342414"
+  // Sprite body sizes — much bigger than before
+  const w = dense ? (active ? 36 : 28) : active ? 44 : 36
+  const h = dense ? (active ? 42 : 32) : active ? 52 : 42
+  const bw = active ? 3 : 2
 
-  const dirt = document.createElement("div")
-  dirt.style.width = `${baseWidth}px`
-  dirt.style.height = `${baseHeight}px`
-  dirt.style.border = "2px solid #342414"
-  dirt.style.background =
-    "repeating-linear-gradient(90deg, #8b5a34 0 6px, #754626 6px 12px)"
-  dirt.style.boxShadow = "3px 3px 0 rgba(52, 36, 20, 0.45)"
+  const wrapper = sd({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  })
 
-  const post = document.createElement("div")
-  post.style.width = `${dense ? 6 : 7}px`
-  post.style.height = `${postHeight}px`
-  post.style.background = "#6d4a2b"
-  post.style.borderLeft = "2px solid #342414"
-  post.style.borderRight = "2px solid #342414"
+  // Logo badge on top
+  wrapper.appendChild(makeLogoBadge(company, active, dense))
 
-  const shadow = document.createElement("div")
-  shadow.style.width = `${Math.round(baseWidth * 0.9)}px`
-  shadow.style.height = "4px"
-  shadow.style.background = "rgba(52, 36, 20, 0.22)"
-  shadow.style.filter = "blur(1px)"
+  // === ROBOT SPRITE (all companies) ===
+  // Antenna
+  const dotSz = Math.max(6, Math.round(w * 0.18))
+  const antenna = sd({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    marginBottom: "-2px",
+    position: "relative",
+    zIndex: "2",
+  })
+  antenna.appendChild(
+    sd({
+      width: `${dotSz}px`,
+      height: `${dotSz}px`,
+      background: accent,
+      border: `2px solid ${OL}`,
+    })
+  )
+  antenna.appendChild(
+    sd({
+      width: `${Math.max(3, Math.round(w * 0.08))}px`,
+      height: `${Math.round(h * 0.2)}px`,
+      background: "#8a8a9a",
+      borderLeft: `2px solid ${OL}`,
+      borderRight: `2px solid ${OL}`,
+    })
+  )
+  wrapper.appendChild(antenna)
 
-  wrapper.appendChild(frame)
-  wrapper.appendChild(post)
-  wrapper.appendChild(grassTop)
-  wrapper.appendChild(dirt)
-  wrapper.appendChild(shadow)
+  // Robot head
+  const head = sd({
+    width: `${w}px`,
+    height: `${Math.round(h * 0.5)}px`,
+    background: `linear-gradient(180deg, #c0c8d8 0%, #a0a8b8 100%)`,
+    border: `${bw}px solid ${OL}`,
+    boxShadow: `3px 3px 0 ${OL}`,
+    position: "relative",
+  })
+  // Eyes (category colored)
+  const eSz = Math.max(5, Math.round(w * 0.16))
+  for (const side of ["left", "right"] as const) {
+    head.appendChild(
+      sd({
+        position: "absolute",
+        top: `${Math.round(h * 0.06)}px`,
+        [side]: `${Math.round(w * 0.14)}px`,
+        width: `${eSz}px`,
+        height: `${eSz}px`,
+        background: accent,
+        border: `2px solid ${OL}`,
+      })
+    )
+  }
+  // Mouth
+  head.appendChild(
+    sd({
+      position: "absolute",
+      bottom: `${Math.round(h * 0.06)}px`,
+      left: "50%",
+      transform: "translateX(-50%)",
+      width: `${Math.round(w * 0.45)}px`,
+      height: `${Math.max(3, Math.round(h * 0.05))}px`,
+      background: OL,
+    })
+  )
+  wrapper.appendChild(head)
+
+  // Robot body
+  wrapper.appendChild(
+    sd({
+      width: `${Math.round(w * 0.75)}px`,
+      height: `${Math.round(h * 0.3)}px`,
+      background: "#8a92a2",
+      border: `${bw}px solid ${OL}`,
+      marginTop: "-2px",
+    })
+  )
+
+  // Feet
+  const feet = sd({
+    display: "flex",
+    gap: `${Math.round(w * 0.15)}px`,
+    marginTop: "-1px",
+  })
+  for (let i = 0; i < 2; i++) {
+    feet.appendChild(
+      sd({
+        width: `${Math.round(w * 0.28)}px`,
+        height: `${Math.round(h * 0.1)}px`,
+        background: "#6a6a7a",
+        border: `2px solid ${OL}`,
+      })
+    )
+  }
+  wrapper.appendChild(feet)
+
+  // Ground shadow
+  wrapper.appendChild(
+    sd({
+      width: `${Math.round(w * 0.8)}px`,
+      height: "4px",
+      background: "rgba(52,36,20,0.22)",
+      filter: "blur(1px)",
+      marginTop: "2px",
+    })
+  )
 
   return wrapper
 }
@@ -477,7 +562,7 @@ export function MapShell({
       element.style.outline = "none"
       element.style.background = "none"
       element.style.border = "none"
-      element.appendChild(createSignMarker(company, active, dense))
+      element.appendChild(createSpriteMarker(company, active, dense))
       element.addEventListener("click", () => onSelectCompany(company.slug))
 
       const marker = new maplibregl.Marker({ element, anchor: "bottom" })
@@ -496,7 +581,7 @@ export function MapShell({
 
       button.style.zIndex = active ? "10" : "1"
       if (company) {
-        button.replaceChildren(createSignMarker(company, active, dense))
+        button.replaceChildren(createSpriteMarker(company, active, dense))
       }
     })
   }, [companies, dense, selectedCompany])
