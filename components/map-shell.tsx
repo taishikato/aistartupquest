@@ -79,17 +79,17 @@ function addVoxelCityLayers(map: MapLibreMap) {
           ["linear"],
           snappedHeight,
           8,
-          "#92633d",
+          "#c9a87c",
           32,
-          "#af7b4f",
+          "#d4b88e",
           72,
-          "#c79668",
+          "#dfc8a2",
           140,
-          "#e0bf91",
+          "#ebd8b8",
         ],
         "fill-extrusion-height": snappedHeight,
         "fill-extrusion-base": 0,
-        "fill-extrusion-opacity": 0.96,
+        "fill-extrusion-opacity": 0.88,
         "fill-extrusion-vertical-gradient": false,
       },
     },
@@ -118,19 +118,19 @@ function applyMinecraftStyle(map: MapLibreMap) {
     map,
     "landuse_residential",
     "fill-color",
-    "#cfbc8c"
+    "#ddd2ac"
   )
-  setPaintPropertyIfLayerExists(map, "landuse", "fill-color", "#c6b17b")
-  setPaintPropertyIfLayerExists(map, "landuse", "fill-opacity", 0.92)
+  setPaintPropertyIfLayerExists(map, "landuse", "fill-color", "#d6c99a")
+  setPaintPropertyIfLayerExists(map, "landuse", "fill-opacity", 0.88)
 
   setPaintPropertyIfLayerExists(map, "water", "fill-color", "#4b83c2")
   setPaintPropertyIfLayerExists(map, "water_shadow", "fill-color", "#325f97")
   setPaintPropertyIfLayerExists(map, "waterway", "line-color", "#4479b1")
   setPaintPropertyIfLayerExists(map, "waterway", "line-width", 2.4)
 
-  setPaintPropertyIfLayerExists(map, "building", "fill-color", "#aa8461")
-  setPaintPropertyIfLayerExists(map, "building", "fill-opacity", 0.26)
-  setPaintPropertyIfLayerExists(map, "building-top", "fill-color", "#d6b08a")
+  setPaintPropertyIfLayerExists(map, "building", "fill-color", "#c4a87a")
+  setPaintPropertyIfLayerExists(map, "building", "fill-opacity", 0.2)
+  setPaintPropertyIfLayerExists(map, "building-top", "fill-color", "#e0cca0")
   setPaintPropertyIfLayerExists(map, "building-top", "fill-opacity", 0)
 
   const roadCases = [
