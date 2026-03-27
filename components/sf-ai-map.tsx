@@ -1,6 +1,6 @@
 "use client"
 
-import { useDeferredValue, useMemo, useState } from "react"
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react"
 
 import { CompanyCard } from "@/components/company-card"
 import { DiscoveryPanel } from "@/components/discovery-panel"
@@ -13,8 +13,59 @@ export function SfAiMap() {
   const [search, setSearch] = useState("")
   const [category, setCategory] = useState<CompanyCategory | "All">("All")
   const [selectedSlug, setSelectedSlug] = useState("openai")
+  const [isAudioMuted, setIsAudioMuted] = useState(true)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const deferredSearch = useDeferredValue(search)
+
+  useEffect(() => {
+    const audio = new Audio("/audio/sf-ai-startup-map-theme.mp3")
+    audio.loop = true
+    audio.preload = "auto"
+    audio.volume = 0.42
+    audio.muted = true
+    audioRef.current = audio
+
+    audio.play().catch(() => {
+      // Browsers usually allow muted autoplay, but failing closed is fine here.
+    })
+
+    return () => {
+      audio.pause()
+      audioRef.current = null
+    }
+  }, [])
+
+  useEffect(() => {
+    const audio = audioRef.current
+
+    if (!audio) {
+      return
+    }
+
+    audio.muted = isAudioMuted
+  }, [isAudioMuted])
+
+  const handleToggleMute = async () => {
+    const audio = audioRef.current
+
+    if (!audio) {
+      return
+    }
+
+    const nextMuted = !isAudioMuted
+    audio.muted = nextMuted
+    setIsAudioMuted(nextMuted)
+
+    if (!nextMuted) {
+      try {
+        await audio.play()
+      } catch {
+        setIsAudioMuted(true)
+        audio.muted = true
+      }
+    }
+  }
 
   const filteredCompanies = useMemo(() => {
     const query = deferredSearch.trim().toLowerCase()
@@ -76,6 +127,8 @@ export function SfAiMap() {
               companies={mapCompanies}
               selectedCompany={selectedCompany}
               onSelectCompany={setSelectedSlug}
+              isAudioMuted={isAudioMuted}
+              onToggleMute={handleToggleMute}
             />
             <div className="grid gap-3 bg-[#1a1a2e] p-3 lg:hidden">
               <div className="flex items-center justify-between">

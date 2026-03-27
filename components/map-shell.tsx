@@ -1,12 +1,14 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { Volume2, VolumeX } from "lucide-react"
 import maplibregl, {
   type ExpressionSpecification,
   type Map as MapLibreMap,
   type Marker,
 } from "maplibre-gl"
 
+import { Button } from "@/components/ui/button"
 import {
   getCompanyLogoUrl,
   getCompanyMonogram,
@@ -19,6 +21,8 @@ type MapShellProps = {
   companies: Company[]
   selectedCompany: Company
   onSelectCompany: (slug: string) => void
+  isAudioMuted: boolean
+  onToggleMute: () => void
 }
 
 const SF_CENTER: [number, number] = [-122.4167, 37.7793]
@@ -306,8 +310,8 @@ function makeLogoBadge(
   dense: boolean
 ) {
   const OL = "#342414"
-  const sz = dense ? (active ? 20 : 16) : active ? 24 : 20
-  const logoSz = dense ? (active ? 14 : 10) : active ? 18 : 14
+  const sz = dense ? (active ? 24 : 20) : active ? 28 : 24
+  const logoSz = dense ? (active ? 18 : 14) : active ? 22 : 18
   const badge = sd({
     width: `${sz}px`,
     height: `${sz}px`,
@@ -346,9 +350,9 @@ function createSpriteMarker(
 ) {
   const accent = CATEGORY_COLORS[company.category]
   const OL = "#342414"
-  // Sprite body sizes — much bigger than before
-  const w = dense ? (active ? 36 : 28) : active ? 44 : 36
-  const h = dense ? (active ? 42 : 32) : active ? 52 : 42
+  // Robot body sizes
+  const w = dense ? (active ? 28 : 22) : active ? 34 : 28
+  const h = dense ? (active ? 34 : 26) : active ? 42 : 34
   const bw = active ? 3 : 2
 
   const wrapper = sd({
@@ -487,6 +491,8 @@ export function MapShell({
   companies,
   selectedCompany,
   onSelectCompany,
+  isAudioMuted,
+  onToggleMute,
 }: MapShellProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<MapLibreMap | null>(null)
@@ -630,6 +636,16 @@ export function MapShell({
         <p className="mt-1 max-w-[220px] text-[11px] leading-4 text-[#4c3926]">
           Voxel-style view of source-backed SF office locations.
         </p>
+      </div>
+      <div className="absolute top-24 left-4 z-10">
+        <Button
+          type="button"
+          onClick={onToggleMute}
+          className="h-10 border-[3px] border-[#342414] bg-[#f4ecd2] px-3 text-[10px] font-[family-name:var(--font-pixel)] text-[#4c3926] shadow-[4px_4px_0px_#342414] hover:bg-[#e7d8ae]"
+        >
+          {isAudioMuted ? <VolumeX className="size-3.5" /> : <Volume2 className="size-3.5" />}
+          <span>{isAudioMuted ? "Unmute" : "Mute"}</span>
+        </Button>
       </div>
       <div className="pointer-events-none absolute right-4 bottom-4 border-[3px] border-[#342414] bg-[#f4ecd2] px-3 py-2 shadow-[4px_4px_0px_#342414]">
         <span className="font-[family-name:var(--font-pixel)] text-[7px] text-[#4c3926]">

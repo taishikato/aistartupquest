@@ -71,10 +71,6 @@ export function DiscoveryPanel({
           <div className="font-[family-name:var(--font-pixel)] text-[8px] text-[#4ecdc4]">
             {companies.length} players on the board
           </div>
-          <p className="max-w-md text-xs leading-5 text-[#f0f7e6]/70">
-            Only source-backed SF office locations are shown. Companies without
-            a reliable public location source stay off the map.
-          </p>
         </div>
       </div>
 

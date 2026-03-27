@@ -96,7 +96,6 @@ function createCloudElement(
   el.style.height = `${size}px`
   el.style.boxShadow = buildBoxShadow(SHAPES[shapeIndex], size, "#fff")
   el.style.opacity = String(opacity)
-  el.style.zIndex = "0"
   return el
 }
 
@@ -193,6 +192,9 @@ export function PixelClouds({ map }: PixelCloudsProps) {
       const marker = new maplibregl.Marker({ element, anchor: "center" })
         .setLngLat([config.lng, config.lat])
         .addTo(map)
+
+      marker.getElement().style.zIndex = "30"
+      marker.getElement().style.pointerEvents = "none"
 
       return { ...config, currentLng: config.lng, marker }
     })
