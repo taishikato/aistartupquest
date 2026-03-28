@@ -4,10 +4,11 @@ import { useState } from "react"
 import { ArrowUpRight, Flame, MapPin } from "lucide-react"
 
 import {
+  CATEGORY_COLORS,
+  categoryPillForeground,
   getCompanyLogoUrl,
   getCompanyMonogram,
   type Company,
-  type CompanyCategory,
 } from "@/lib/companies"
 import { cn } from "@/lib/utils"
 
@@ -22,15 +23,6 @@ const tierLabel: Record<Company["featuredTier"], string> = {
   core: "★ Core",
   hot: "🔥 Hot",
   scene: "● Scene",
-}
-
-const CATEGORY_COLORS: Record<CompanyCategory, string> = {
-  "Core Labs": "#ff6b6b",
-  "Consumer AI": "#4ecdc4",
-  Devtools: "#ffe66d",
-  Infra: "#a855f7",
-  Agents: "#3b82f6",
-  "Vertical AI": "#ff9f43",
 }
 
 export function CompanyCard({
@@ -118,11 +110,7 @@ export function CompanyCard({
               style={{
                 borderColor: categoryColor,
                 backgroundColor: categoryColor,
-                color:
-                  company.category === "Devtools" ||
-                  company.category === "Vertical AI"
-                    ? "#1a1a2e"
-                    : "#ffffff",
+                color: categoryPillForeground(company.category),
               }}
             >
               {company.category}

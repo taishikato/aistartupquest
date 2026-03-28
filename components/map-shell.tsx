@@ -10,10 +10,10 @@ import maplibregl, {
 
 import { Button } from "@/components/ui/button"
 import {
+  CATEGORY_COLORS,
   getCompanyLogoUrl,
   getCompanyMonogram,
   type Company,
-  type CompanyCategory,
 } from "@/lib/companies"
 import { PixelClouds } from "@/components/pixel-clouds"
 import { cn } from "@/lib/utils"
@@ -32,15 +32,6 @@ const MAP_STYLE =
 // Oblique camera reads closer to isometric / retro city builders.
 const MAP_PITCH = 54
 const MAP_BEARING = -24
-
-const CATEGORY_COLORS: Record<CompanyCategory, string> = {
-  "Core Labs": "#bb5a3c",
-  "Consumer AI": "#5a9b6e",
-  Devtools: "#d1ae4f",
-  Infra: "#8b79b8",
-  Agents: "#5e8dc7",
-  "Vertical AI": "#c77e3d",
-}
 
 function setPaintPropertyIfLayerExists(
   map: MapLibreMap,
@@ -305,29 +296,45 @@ function sd(styles: Partial<CSSStyleDeclaration>) {
   return el
 }
 
-// Small logo badge that floats above any sprite
+// Logo badge: category-colored frame + light inner pad so logos stay readable.
 function makeLogoBadge(
   company: Company,
   active: boolean,
-  dense: boolean
+  dense: boolean,
+  categoryColor: string
 ) {
   const OL = "#342414"
   const sz = dense ? (active ? 24 : 20) : active ? 28 : 24
-  const logoSz = dense ? (active ? 18 : 14) : active ? 22 : 18
+  // border-box: inner pad = sz - borders - padding
+  const innerSz = Math.max(8, sz - 8)
+  const rawLogoSz = dense ? (active ? 18 : 14) : active ? 22 : 18
+  const logoSz = Math.min(rawLogoSz, Math.max(6, innerSz - 2))
   const badge = sd({
     width: `${sz}px`,
     height: `${sz}px`,
     border: `2px solid ${OL}`,
-    background: "#f4ecd2",
+    background: categoryColor,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    padding: "2px",
+    boxSizing: "border-box",
     boxShadow: active
       ? `0 0 0 2px rgba(255,242,199,0.7), 2px 2px 0 ${OL}`
       : `2px 2px 0 ${OL}`,
     marginBottom: "2px",
     position: "relative",
     zIndex: "5",
+  })
+  const inner = sd({
+    width: `${innerSz}px`,
+    height: `${innerSz}px`,
+    background: "#fffefc",
+    border: `1px solid ${OL}`,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxSizing: "border-box",
   })
   const img = document.createElement("img")
   img.src = getCompanyLogoUrl(company)
@@ -341,7 +348,8 @@ function makeLogoBadge(
   img.addEventListener("error", () => {
     img.replaceWith(createFallback(monogram, active, dense))
   })
-  badge.appendChild(img)
+  inner.appendChild(img)
+  badge.appendChild(inner)
   return badge
 }
 
@@ -356,6 +364,7 @@ function createSpriteMarker(
   const w = dense ? (active ? 28 : 22) : active ? 34 : 28
   const h = dense ? (active ? 34 : 26) : active ? 42 : 34
   const bw = active ? 3 : 2
+  const badgeW = dense ? (active ? 24 : 20) : active ? 28 : 24
 
   const wrapper = sd({
     display: "flex",
@@ -364,7 +373,22 @@ function createSpriteMarker(
   })
 
   // Logo badge on top
-  wrapper.appendChild(makeLogoBadge(company, active, dense))
+  wrapper.appendChild(makeLogoBadge(company, active, dense, accent))
+
+  // High-contrast category bar (readable when markers overlap)
+  wrapper.appendChild(
+    sd({
+      width: `${badgeW}px`,
+      height: "5px",
+      background: accent,
+      border: `2px solid ${OL}`,
+      marginTop: "-1px",
+      marginBottom: "2px",
+      boxShadow: `2px 2px 0 ${OL}`,
+      position: "relative",
+      zIndex: "4",
+    })
+  )
 
   // === ROBOT SPRITE (all companies) ===
   // Antenna
@@ -396,11 +420,11 @@ function createSpriteMarker(
   )
   wrapper.appendChild(antenna)
 
-  // Robot head (flat fills — reads clearer when the map is pixel-crisp)
+  // Robot head — cool gray so category accent pops on land and water.
   const head = sd({
     width: `${w}px`,
     height: `${Math.round(h * 0.5)}px`,
-    background: "#b4bcc8",
+    background: "#9aa3b0",
     border: `${bw}px solid ${OL}`,
     boxShadow: `4px 4px 0 ${OL}`,
     position: "relative",
@@ -667,8 +691,8 @@ export function MapShell({
             className="flex items-center gap-1.5 border-2 border-[#342414] bg-[#f4ecd2] px-2 py-1 shadow-[3px_3px_0px_rgba(52,36,20,0.75)]"
           >
             <div
-              className="size-2.5 border border-[#342414]"
-              style={{ backgroundColor: color, boxShadow: "1px 1px 0 #342414" }}
+              className="size-3 border-2 border-[#342414]"
+              style={{ backgroundColor: color, boxShadow: "2px 2px 0 #342414" }}
             />
             <span className="text-[9px] font-medium text-[#4c3926]">
               {cat}

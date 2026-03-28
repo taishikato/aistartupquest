@@ -6,6 +6,7 @@ import { Github, Search } from "lucide-react"
 import { CompanyCard } from "@/components/company-card"
 import {
   COMPANY_CATEGORIES,
+  CATEGORY_COLORS,
   type Company,
   type CompanyCategory,
 } from "@/lib/companies"
@@ -21,15 +22,7 @@ type DiscoveryPanelProps = {
   onSelectCompany: (slug: string) => void
 }
 
-const CATEGORY_COLORS: Record<string, string> = {
-  All: "#1a1a2e",
-  "Core Labs": "#ff6b6b",
-  "Consumer AI": "#4ecdc4",
-  Devtools: "#ffe66d",
-  Infra: "#a855f7",
-  Agents: "#3b82f6",
-  "Vertical AI": "#ff9f43",
-}
+const FILTER_ALL_COLOR = "#1a1a2e"
 
 export function DiscoveryPanel({
   companies,
@@ -116,7 +109,7 @@ export function DiscoveryPanel({
             <FilterPill
               active={category === "All"}
               label="All"
-              color={CATEGORY_COLORS["All"]}
+              color={FILTER_ALL_COLOR}
               onClick={() => onCategoryChange("All")}
             />
             {COMPANY_CATEGORIES.map((item) => (

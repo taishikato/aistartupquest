@@ -9,6 +9,24 @@ export const COMPANY_CATEGORIES = [
 
 export type CompanyCategory = (typeof COMPANY_CATEGORIES)[number]
 
+/**
+ * Distinct, saturated hues for map + UI so categories read clearly against
+ * green/tan terrain and blue water (avoid muted earth tones that blend in).
+ */
+export const CATEGORY_COLORS: Record<CompanyCategory, string> = {
+  "Core Labs": "#d32f2f",
+  "Consumer AI": "#00897b",
+  Devtools: "#fbc02d",
+  Infra: "#7b1fa2",
+  Agents: "#1565c0",
+  "Vertical AI": "#e65100",
+}
+
+/** Text on filled category pills in the dark sidebar (high contrast). */
+export function categoryPillForeground(category: CompanyCategory): "#ffffff" | "#1a1a2e" {
+  return category === "Devtools" ? "#1a1a2e" : "#ffffff"
+}
+
 export const FEATURED_TIERS = ["core", "hot", "scene"] as const
 
 export type FeaturedTier = (typeof FEATURED_TIERS)[number]
