@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useEffect, useRef } from "react"
 import { Search } from "lucide-react"
 
@@ -56,11 +57,21 @@ export function DiscoveryPanel({
     <aside className="flex h-full min-h-0 flex-col gap-4 overflow-y-auto border-r-3 border-[#1a1a2e] bg-[#1a1a2e] p-5 text-[#f0f7e6]">
       <div className="space-y-4">
         <div className="space-y-3">
-          <h1 className="font-[family-name:var(--font-pixel)] text-lg leading-relaxed tracking-tight text-[#ffe66d]">
-            SF AI
-            <br />
-            Startup Map
-          </h1>
+          <div className="flex items-start gap-3">
+            <Image
+              src="/brand-mark.svg"
+              alt=""
+              width={40}
+              height={40}
+              className="shrink-0"
+              priority
+            />
+            <h1 className="font-[family-name:var(--font-pixel)] text-lg leading-relaxed tracking-tight text-[#ffe66d]">
+              SF AI
+              <br />
+              Startup Map
+            </h1>
+          </div>
           <div className="font-[family-name:var(--font-pixel)] text-[8px] text-[#4ecdc4]">
             {companies.length} players on the board
           </div>

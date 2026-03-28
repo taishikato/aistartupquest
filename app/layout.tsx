@@ -1,10 +1,21 @@
 import "maplibre-gl/dist/maplibre-gl.css"
 
+import type { Metadata } from "next"
 import { Geist_Mono, Inter, Press_Start_2P } from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils"
+
+export const metadata: Metadata = {
+  title: "SF AI Startup Map",
+  description:
+    "Explore San Francisco AI startups on an interactive map — retro quest style.",
+  icons: {
+    icon: [{ url: "/brand-mark.svg", type: "image/svg+xml" }],
+    apple: "/brand-mark.svg",
+  },
+}
 
 const fontSans = Inter({
   subsets: ["latin"],
