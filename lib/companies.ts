@@ -159,6 +159,22 @@ export const COMPANIES: Company[] = [
     sourceLabel: "Craft locations page",
   },
   {
+    slug: "fin",
+    name: "Fin",
+    website: "https://fin.ai",
+    shortDescription:
+      "Fin is an AI Agent system for customer service: a fully configurable AI-powered customer agent that resolves complex support, success, and sales queries.",
+    whyItMatters:
+      "Fin's mission is to make perfect customer experiences the new standard, by using AI to deliver unbelievably brilliant customer service every single time.",
+    category: "Vertical AI",
+    locationLabel: "55 Second St, San Francisco",
+    coordinates: [-122.40029289081181, 37.78882824961475],
+    founded: 2011,
+    sourceUrl:
+      "https://www.intercom.com/about",
+    sourceLabel: "Intercom about page",
+  },
+  {
     slug: "harvey",
     name: "Harvey",
     website: "https://www.harvey.ai",
