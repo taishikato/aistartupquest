@@ -1,41 +1,41 @@
 # Company Selection Criteria
 
-このドキュメントは、`SF AI startup map` に掲載する会社の選定基準を定義する。
+This document defines the selection criteria for companies included in the `SF AI startup map`.
 
-目的は次の3つ。
+It has three goals:
 
-1. 掲載基準をぶらさないこと
-2. 推測ではなく、確認できる情報だけを載せること
-3. 将来データを増やすときも、同じルールで判断できるようにすること
+1. Keep the inclusion standard consistent
+2. Include only verifiable information, not guesses
+3. Make future additions follow the same rules
 
-## 基本方針
+## Core Policy
 
-このプロダクトは「SFのAIシーンを見やすく見せる curated map」である。
+This product is a curated map designed to make the SF AI scene easy to understand.
 
-ただし、掲載情報は `source-backed only` とする。
-つまり、雰囲気・噂・Xでの存在感・YC掲載だけでは載せない。
+However, all listed information must be `source-backed only`.
+That means vibe, rumors, presence on X, or YC listing alone are not enough.
 
-公開ページに表示してよいのは、以下を満たす会社のみ。
+Only companies that meet all of the following may appear on the public page:
 
-1. `AI-native` または AI が事業の中心である
-2. `San Francisco` に拠点があると公開ソースで確認できる
-3. 会社名、公式サイト、所在地の根拠が確認できる
-4. 掲載するカテゴリや説明文が、推測ではなく公開情報と整合する
+1. They are `AI-native`, or AI is central to the business
+2. Their presence in `San Francisco` can be verified through a public source
+3. Their company name, official website, and location evidence can all be verified
+4. Their category and description can be supported by public information rather than guesswork
 
-ここでいう `AI-native` とは、AI が製品の付加機能ではなく、事業の中心そのものであることを指す。
+Here, `AI-native` means AI is the core of the business itself, not just an added feature.
 
-例:
+Examples:
 
-1. `OpenAI` は掲載対象
-2. `Perplexity` は掲載対象
-3. `Scale AI` は掲載対象
-4. `Notion` は除外
+1. `OpenAI` should be included
+2. `Perplexity` should be included
+3. `Scale AI` should be included
+4. `Notion` should be excluded
 
-`Notion AI` のように AI 機能を持っていても、会社全体が AI-native でない場合は掲載しない。
+Even if a company has AI features, like `Notion AI`, it should not be included unless the company itself is AI-native.
 
-## 掲載に必要な情報
+## Required Fields
 
-1社を掲載するために最低限必要なのは以下。
+The minimum required fields for including one company are:
 
 1. `name`
 2. `website`
@@ -47,61 +47,61 @@
 8. `sourceUrl`
 9. `sourceLabel`
 
-このうち、特に重要なのは `locationLabel`, `coordinates`, `sourceUrl`, `sourceLabel`。
+Among these, the most important are `locationLabel`, `coordinates`, `sourceUrl`, and `sourceLabel`.
 
-## ソース要件
+## Source Requirements
 
-所在地の根拠として使えるのは、原則として次のいずれか。
+As a rule, location evidence must come from one of the following:
 
-1. 公式サイトの会社情報ページ
-2. 公式PDF、利用規約、プライバシーポリシー、レターヘッドなどの公式文書
-3. 信頼できる会社プロフィールサービスの location page
-4. 公的登記・企業データベースなど、会社所在地を示す公開ソース
+1. An official company information page on the official website
+2. An official document such as a PDF, terms of service, privacy policy, or letterhead
+3. A trusted company profile service's location page
+4. A public source showing company location, such as an official registry or company database
 
-優先順位は次の通り。
+Use the following source priority:
 
 1. `official source`
 2. `public company profile / registry`
 3. `secondary source`
 
-`YC に載っている`、`X で見た`、`求人に San Francisco と書いてある` だけでは不十分。
-それだけでは、地図に載せるための正確な拠点情報とはみなさない。
+`Listed on YC`, `seen on X`, or `San Francisco` written in a job post is not enough on its own.
+That is not considered reliable enough location data for placing a company on the map.
 
-## 掲載してよい会社
+## Companies That Can Be Included
 
-次の条件を満たす会社は掲載対象。
+A company may be included only if it meets all of the following:
 
-1. AI企業である
-2. 現在のプロダクト文脈に合っている
-3. SF拠点が公開ソースで確認できる
-4. 住所または十分に具体的な location が確認できる
-5. 地図上に置く座標を、その住所から導出できる
+1. It is an AI company
+2. It fits the current product context
+3. Its SF presence can be verified through a public source
+4. Its address or a sufficiently specific location can be verified
+5. The map coordinates can be derived from that address
 
-## 掲載しない会社
+## Companies That Should Not Be Included
 
-次に当てはまる会社は掲載しない。
+Do not include companies that match any of the following:
 
-1. SF拠点が推測しかできない会社
-2. 「San Francisco, CA」とだけ出ていて、住所や location source が弱い会社
-3. AIが主事業ではない会社
-4. 明らかに古い大企業で、このプロダクトの主旨から外れる会社
-5. 所在地、カテゴリ、説明文のいずれかが推測に依存する会社
-6. AI機能はあるが、会社そのものは AI-native ではない会社
+1. Companies whose SF presence can only be inferred
+2. Companies that only say `San Francisco, CA` without a strong address or location source
+3. Companies whose primary business is not AI
+4. Clearly older large companies that fall outside the product's focus
+5. Companies whose location, category, or description depends on guesswork
+6. Companies that have AI features but are not themselves AI-native
 
-## 保留にする会社
+## Companies to Hold
 
-以下の会社は「除外」ではなく「保留」とする。
+The following companies should be treated as `pending`, not excluded:
 
-1. 会社としては載せたいが、所在地ソースが弱い
-2. 公式サイトはあるが住所確認が取れない
-3. SFとの関係は強そうだが、現時点で公開ソースが不足している
+1. Companies you want to include, but whose location source is weak
+2. Companies with an official website but no confirmed address yet
+3. Companies that seem strongly connected to SF, but do not yet have enough public evidence
 
-保留会社は公開データには入れない。
-必要なら別ファイルで `pending` 管理するか、コード内でコメントアウトして保持する。
+Pending companies should not be added to the public dataset.
+If needed, manage them in a separate `pending` file or keep them commented out in code.
 
-## カテゴリ付けのルール
+## Categorization Rules
 
-カテゴリは以下の固定セットを使う。
+Use the following fixed category set:
 
 1. `Core Labs`
 2. `Consumer AI`
@@ -110,77 +110,77 @@
 5. `Agents`
 6. `Vertical AI`
 
-カテゴリは見た目の雰囲気で決めない。
-以下を見て判断する。
+Do not choose categories based on surface-level vibes.
+Use the following to decide:
 
-1. 公式サイトのトップコピー
-2. プロダクト説明
-3. 会社プロフィールの説明
-4. 公開ソース上の事業内容
+1. The homepage headline or top copy on the official site
+2. The product description
+3. The company profile description
+4. The business description found in public sources
 
-判断が割れる場合は、最もユーザーに伝わりやすい主カテゴリを1つ選ぶ。
-それでも曖昧なら掲載を保留する。
+If the classification is debatable, choose the single primary category that is easiest for users to understand.
+If it is still ambiguous, hold the company rather than publishing it.
 
-## 位置情報のルール
+## Location Rules
 
-地図上の座標は、必ず公開ソースで確認できた所在地から作る。
+Coordinates on the map must always be created from a location that has been verified through a public source.
 
-やってよいこと:
+Allowed:
 
-1. 公開住所を geocoding して座標化する
-2. building address を `locationLabel` として表示する
+1. Geocode a public address into coordinates
+2. Show the building address as `locationLabel`
 
-やってはいけないこと:
+Not allowed:
 
-1. neighborhood だけを見て適当に配置する
-2. カテゴリごとにクラスタ用の仮座標を振る
-3. 会社名から雰囲気で SoMa / Mission Bay に置く
+1. Place a company loosely based only on a neighborhood
+2. Assign fake cluster coordinates by category
+3. Put a company in SoMa or Mission Bay based on vibes from the company name
 
-## 説明文のルール
+## Description Rules
 
-`shortDescription` と `whyItMatters` は、誇張しすぎない。
+`shortDescription` and `whyItMatters` should not be overly exaggerated.
 
-守ること:
+Must do:
 
-1. 公式説明と矛盾しない
-2. 過度に煽らない
-3. 断定できない評価は書かない
+1. Stay consistent with official descriptions
+2. Avoid overhyping
+3. Avoid evaluative claims that cannot be stated confidently
 
-避けること:
+Avoid:
 
-1. `Xでバズっているから重要`
-2. `たぶんSoMa`
-3. `明らかに今っぽい`
+1. `Important because it is going viral on X`
+2. `Probably in SoMa`
+3. `Obviously very current`
 
-空気感ではなく、プロダクトの位置づけが伝わる説明を優先する。
+Prefer explanations that communicate the company's role in the product landscape, not just the surrounding vibe.
 
-## データ追加の手順
+## Process for Adding Data
 
-新しい会社を追加するときは、必ず次の順番で行う。
+When adding a new company, always follow this order:
 
-1. 会社が AI-native か確認する
-2. 公式サイトを確認する
-3. SF location の公開ソースを見つける
-4. 住所を geocode して座標を取る
-5. カテゴリを決める
-6. `sourceUrl` と `sourceLabel` を付ける
-7. ブラウザで表示確認する
+1. Confirm that the company is AI-native
+2. Check the official website
+3. Find a public source for the SF location
+4. Geocode the address to get coordinates
+5. Decide the category
+6. Add `sourceUrl` and `sourceLabel`
+7. Verify the result in the browser
 
-1つでも曖昧な情報がある場合は公開しない。
+If even one piece of information is ambiguous, do not publish it.
 
-## 既存データの扱い
+## Handling Existing Data
 
-過去に追加したデータでも、以下に当てはまる場合は公開対象から外す。
+Even previously added data should be removed from the public dataset if any of the following are true:
 
-1. location source が見つからない
-2. 住所が推測だった
-3. カテゴリが推定ベースだった
-4. 会社の主事業が AI ではなかった
+1. The location source can no longer be found
+2. The address was based on inference
+3. The category was based on estimation
+4. The company's main business was not actually AI
 
-## このプロジェクトでの原則
+## Project Principle
 
-このマップは、会社数を増やすことよりも、載せる情報の確かさを優先する。
+For this map, confidence in the data matters more than increasing the company count.
 
-100社あることよりも、8社でも信頼できることの方が重要。
+Having 8 trustworthy companies is better than having 100 questionable ones.
 
-将来的に掲載数を増やす場合も、同じ原則を守る。
+Even if the number of listed companies grows in the future, the same principle should hold.
