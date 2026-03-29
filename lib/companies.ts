@@ -252,6 +252,21 @@ export const COMPANIES: Company[] = [
     sourceLabel: "CB Insights company profile",
   },
   {
+    slug: "delphi",
+    name: "Delphi",
+    website: "https://www.delphi.ai",
+    shortDescription:
+      "Builds conversational digital twins for experts and creators—on-brand, always-on stand-ins that answer fans and clients in their voice.",
+    whyItMatters:
+      "A flagship take on personal digital twins: scaling one person’s expertise without losing tone or presence.",
+    category: "Consumer AI",
+    locationLabel: "850 Montgomery St, Suite 350, San Francisco",
+    coordinates: [-122.4035081, 37.7969892],
+    founded: 2022,
+    sourceUrl: "https://www.delphi.ai/terms-of-use",
+    sourceLabel: "Delphi Terms of Use",
+  },
+  {
     slug: "cognition",
     name: "Cognition",
     website: "https://cognition.ai",
