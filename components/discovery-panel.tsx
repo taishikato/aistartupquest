@@ -1,29 +1,29 @@
-"use client";
+"use client"
 
-import { useEffect, useRef } from "react";
-import Image from "next/image";
-import { Search } from "lucide-react";
+import { useEffect, useRef } from "react"
+import Image from "next/image"
+import { Search } from "lucide-react"
 
 import {
   CATEGORY_COLORS,
   COMPANY_CATEGORIES,
   type Company,
   type CompanyCategory,
-} from "@/lib/companies";
-import { cn } from "@/lib/utils";
-import { CompanyCard } from "@/components/company-card";
+} from "@/lib/companies"
+import { cn } from "@/lib/utils"
+import { CompanyCard } from "@/components/company-card"
 
 type DiscoveryPanelProps = {
-  companies: Company[];
-  selectedCompany: Company;
-  search: string;
-  onSearchChange: (value: string) => void;
-  category: CompanyCategory | "All";
-  onCategoryChange: (value: CompanyCategory | "All") => void;
-  onSelectCompany: (slug: string) => void;
-};
+  companies: Company[]
+  selectedCompany: Company
+  search: string
+  onSearchChange: (value: string) => void
+  category: CompanyCategory | "All"
+  onCategoryChange: (value: CompanyCategory | "All") => void
+  onSelectCompany: (slug: string) => void
+}
 
-const FILTER_ALL_COLOR = "#1a1a2e";
+const FILTER_ALL_COLOR = "#1a1a2e"
 
 export function DiscoveryPanel({
   companies,
@@ -34,24 +34,24 @@ export function DiscoveryPanel({
   onCategoryChange,
   onSelectCompany,
 }: DiscoveryPanelProps) {
-  const activeItemRef = useRef<HTMLDivElement | null>(null);
+  const activeItemRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    const activeItem = activeItemRef.current;
+    const activeItem = activeItemRef.current
     const isSelectedVisible = companies.some(
       (company) => company.slug === selectedCompany.slug
-    );
+    )
 
     if (!activeItem || !isSelectedVisible) {
-      return;
+      return
     }
 
     activeItem.scrollIntoView({
       behavior: "smooth",
       block: "nearest",
       inline: "nearest",
-    });
-  }, [companies, selectedCompany.slug]);
+    })
+  }, [companies, selectedCompany.slug])
 
   return (
     <aside className="flex h-full min-h-0 flex-col gap-4 overflow-y-auto border-r-3 border-[#1a1a2e] bg-[#1a1a2e] p-5 text-[#f0f7e6]">
@@ -173,7 +173,7 @@ export function DiscoveryPanel({
         <CompanyCard company={selectedCompany} active />
       </section>
     </aside>
-  );
+  )
 }
 
 function FilterPill({
@@ -182,10 +182,10 @@ function FilterPill({
   color,
   onClick,
 }: {
-  active: boolean;
-  label: string;
-  color: string;
-  onClick: () => void;
+  active: boolean
+  label: string
+  color: string
+  onClick: () => void
 }) {
   return (
     <button
@@ -208,5 +208,5 @@ function FilterPill({
     >
       {label}
     </button>
-  );
+  )
 }

@@ -1,37 +1,36 @@
-"use client";
+"use client"
 
-import { useEffect, useRef, useState } from "react";
-import { Github, Volume2, VolumeX } from "lucide-react";
+import { useEffect, useRef, useState } from "react"
+import { Github, Volume2, VolumeX } from "lucide-react"
 import maplibregl, {
   type ExpressionSpecification,
   type Map as MapLibreMap,
   type Marker,
-} from "maplibre-gl";
+} from "maplibre-gl"
 
 import {
   CATEGORY_COLORS,
   getCompanyLogoUrl,
   getCompanyMonogram,
   type Company,
-} from "@/lib/companies";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { PixelClouds } from "@/components/pixel-clouds";
+} from "@/lib/companies"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { PixelClouds } from "@/components/pixel-clouds"
 
 type MapShellProps = {
-  companies: Company[];
-  selectedCompany: Company;
-  onSelectCompany: (slug: string) => void;
-  isAudioMuted: boolean;
-  onToggleMute: () => void;
-};
+  companies: Company[]
+  selectedCompany: Company
+  onSelectCompany: (slug: string) => void
+  isAudioMuted: boolean
+  onToggleMute: () => void
+}
 
-const SF_CENTER: [number, number] = [-122.4167, 37.7793];
-const MAP_STYLE =
-  "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
+const SF_CENTER: [number, number] = [-122.4167, 37.7793]
+const MAP_STYLE = "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
 // Oblique camera reads closer to isometric / retro city builders.
-const MAP_PITCH = 54;
-const MAP_BEARING = -24;
+const MAP_PITCH = 54
+const MAP_BEARING = -24
 
 function setPaintPropertyIfLayerExists(
   map: MapLibreMap,
@@ -40,15 +39,15 @@ function setPaintPropertyIfLayerExists(
   value: unknown
 ) {
   if (!map.getLayer(layerId)) {
-    return;
+    return
   }
 
-  map.setPaintProperty(layerId, property, value);
+  map.setPaintProperty(layerId, property, value)
 }
 
 function addVoxelCityLayers(map: MapLibreMap) {
   if (!map.getSource("carto") || map.getLayer("minecraft-buildings")) {
-    return;
+    return
   }
 
   const rawHeight: ExpressionSpecification = [
@@ -56,12 +55,12 @@ function addVoxelCityLayers(map: MapLibreMap) {
     ["to-number", ["get", "render_height"]],
     ["to-number", ["get", "height"]],
     12,
-  ];
+  ]
   const snappedHeight: ExpressionSpecification = [
     "max",
     8,
     ["min", 180, ["*", ["round", ["/", rawHeight, 8]], 8]],
-  ];
+  ]
 
   map.addLayer(
     {
@@ -91,7 +90,7 @@ function addVoxelCityLayers(map: MapLibreMap) {
       },
     },
     "boundary_country_outline"
-  );
+  )
 }
 
 // Apply a blocky voxel-like palette without changing the data layers.
@@ -101,33 +100,33 @@ function applyMinecraftStyle(map: MapLibreMap) {
     "background",
     "background-color",
     "#a5c76e"
-  );
+  )
 
-  setPaintPropertyIfLayerExists(map, "landcover", "fill-color", "#7ea64a");
-  setPaintPropertyIfLayerExists(map, "landcover", "fill-opacity", 0.96);
-  ["park_national_park", "park_nature_reserve"].forEach((id) => {
-    setPaintPropertyIfLayerExists(map, id, "fill-color", "#5f9235");
-    setPaintPropertyIfLayerExists(map, id, "fill-opacity", 0.92);
-  });
+  setPaintPropertyIfLayerExists(map, "landcover", "fill-color", "#7ea64a")
+  setPaintPropertyIfLayerExists(map, "landcover", "fill-opacity", 0.96)
+  ;["park_national_park", "park_nature_reserve"].forEach((id) => {
+    setPaintPropertyIfLayerExists(map, id, "fill-color", "#5f9235")
+    setPaintPropertyIfLayerExists(map, id, "fill-opacity", 0.92)
+  })
 
   setPaintPropertyIfLayerExists(
     map,
     "landuse_residential",
     "fill-color",
     "#ddd2ac"
-  );
-  setPaintPropertyIfLayerExists(map, "landuse", "fill-color", "#d6c99a");
-  setPaintPropertyIfLayerExists(map, "landuse", "fill-opacity", 0.88);
+  )
+  setPaintPropertyIfLayerExists(map, "landuse", "fill-color", "#d6c99a")
+  setPaintPropertyIfLayerExists(map, "landuse", "fill-opacity", 0.88)
 
-  setPaintPropertyIfLayerExists(map, "water", "fill-color", "#4b83c2");
-  setPaintPropertyIfLayerExists(map, "water_shadow", "fill-color", "#325f97");
-  setPaintPropertyIfLayerExists(map, "waterway", "line-color", "#4479b1");
-  setPaintPropertyIfLayerExists(map, "waterway", "line-width", 2.4);
+  setPaintPropertyIfLayerExists(map, "water", "fill-color", "#4b83c2")
+  setPaintPropertyIfLayerExists(map, "water_shadow", "fill-color", "#325f97")
+  setPaintPropertyIfLayerExists(map, "waterway", "line-color", "#4479b1")
+  setPaintPropertyIfLayerExists(map, "waterway", "line-width", 2.4)
 
-  setPaintPropertyIfLayerExists(map, "building", "fill-color", "#c4a87a");
-  setPaintPropertyIfLayerExists(map, "building", "fill-opacity", 0.2);
-  setPaintPropertyIfLayerExists(map, "building-top", "fill-color", "#e0cca0");
-  setPaintPropertyIfLayerExists(map, "building-top", "fill-opacity", 0);
+  setPaintPropertyIfLayerExists(map, "building", "fill-color", "#c4a87a")
+  setPaintPropertyIfLayerExists(map, "building", "fill-opacity", 0.2)
+  setPaintPropertyIfLayerExists(map, "building-top", "fill-color", "#e0cca0")
+  setPaintPropertyIfLayerExists(map, "building-top", "fill-opacity", 0)
 
   const roadCases = [
     "road_service_case",
@@ -139,10 +138,10 @@ function applyMinecraftStyle(map: MapLibreMap) {
     "road_pri_case_noramp",
     "road_trunk_case_noramp",
     "road_mot_case_noramp",
-  ];
+  ]
   roadCases.forEach((id) =>
     setPaintPropertyIfLayerExists(map, id, "line-color", "#3f3427")
-  );
+  )
 
   const roadFills = [
     "road_service_fill",
@@ -152,28 +151,28 @@ function applyMinecraftStyle(map: MapLibreMap) {
     "road_mot_fill_ramp",
     "road_sec_fill_noramp",
     "road_pri_fill_noramp",
-  ];
+  ]
   roadFills.forEach((id) =>
     setPaintPropertyIfLayerExists(map, id, "line-color", "#8f856a")
-  );
+  )
 
   setPaintPropertyIfLayerExists(
     map,
     "road_trunk_fill_noramp",
     "line-color",
     "#a79b76"
-  );
+  )
   setPaintPropertyIfLayerExists(
     map,
     "road_mot_fill_noramp",
     "line-color",
     "#8a7c5b"
-  );
+  )
 
-  setPaintPropertyIfLayerExists(map, "road_path", "line-color", "#735d3a");
+  setPaintPropertyIfLayerExists(map, "road_path", "line-color", "#735d3a")
 
-  setPaintPropertyIfLayerExists(map, "rail", "line-color", "#5a5650");
-  setPaintPropertyIfLayerExists(map, "rail_dash", "line-color", "#b1aa94");
+  setPaintPropertyIfLayerExists(map, "rail", "line-color", "#5a5650")
+  setPaintPropertyIfLayerExists(map, "rail_dash", "line-color", "#b1aa94")
 
   const tunnelCases = [
     "tunnel_service_case",
@@ -182,10 +181,10 @@ function applyMinecraftStyle(map: MapLibreMap) {
     "tunnel_pri_case",
     "tunnel_trunk_case",
     "tunnel_mot_case",
-  ];
+  ]
   tunnelCases.forEach((id) =>
     setPaintPropertyIfLayerExists(map, id, "line-color", "#645642")
-  );
+  )
 
   const tunnelFills = [
     "tunnel_service_fill",
@@ -194,10 +193,10 @@ function applyMinecraftStyle(map: MapLibreMap) {
     "tunnel_pri_fill",
     "tunnel_trunk_fill",
     "tunnel_mot_fill",
-  ];
+  ]
   tunnelFills.forEach((id) =>
     setPaintPropertyIfLayerExists(map, id, "line-color", "#887a5d")
-  );
+  )
 
   const bridgeCases = [
     "bridge_service_case",
@@ -206,10 +205,10 @@ function applyMinecraftStyle(map: MapLibreMap) {
     "bridge_pri_case",
     "bridge_trunk_case",
     "bridge_mot_case",
-  ];
+  ]
   bridgeCases.forEach((id) =>
     setPaintPropertyIfLayerExists(map, id, "line-color", "#473c2e")
-  );
+  )
 
   const bridgeFills = [
     "bridge_service_fill",
@@ -218,18 +217,13 @@ function applyMinecraftStyle(map: MapLibreMap) {
     "bridge_pri_fill",
     "bridge_trunk_fill",
     "bridge_mot_fill",
-  ];
+  ]
   bridgeFills.forEach((id) =>
     setPaintPropertyIfLayerExists(map, id, "line-color", "#978567")
-  );
+  )
 
-  setPaintPropertyIfLayerExists(
-    map,
-    "boundary_county",
-    "line-color",
-    "#8d6c49"
-  );
-  setPaintPropertyIfLayerExists(map, "boundary_state", "line-color", "#725536");
+  setPaintPropertyIfLayerExists(map, "boundary_county", "line-color", "#8d6c49")
+  setPaintPropertyIfLayerExists(map, "boundary_state", "line-color", "#725536")
 
   const placeLabels = [
     "place_hamlet",
@@ -238,12 +232,12 @@ function applyMinecraftStyle(map: MapLibreMap) {
     "place_town",
     "place_city_r6",
     "place_city_r5",
-  ];
+  ]
   placeLabels.forEach((id) => {
-    setPaintPropertyIfLayerExists(map, id, "text-color", "#3d2e1f");
-    setPaintPropertyIfLayerExists(map, id, "text-halo-color", "#d9cb97");
-    setPaintPropertyIfLayerExists(map, id, "text-halo-width", 1.5);
-  });
+    setPaintPropertyIfLayerExists(map, id, "text-color", "#3d2e1f")
+    setPaintPropertyIfLayerExists(map, id, "text-halo-color", "#d9cb97")
+    setPaintPropertyIfLayerExists(map, id, "text-halo-width", 1.5)
+  })
 
   const cityDots = [
     "place_city_dot_r7",
@@ -251,26 +245,16 @@ function applyMinecraftStyle(map: MapLibreMap) {
     "place_city_dot_r2",
     "place_city_dot_z7",
     "place_capital_dot_z7",
-  ];
+  ]
   cityDots.forEach((id) => {
-    setPaintPropertyIfLayerExists(map, id, "text-color", "#2e2418");
-    setPaintPropertyIfLayerExists(map, id, "text-halo-color", "#d9cb97");
-    setPaintPropertyIfLayerExists(map, id, "text-halo-width", 1.5);
-  });
+    setPaintPropertyIfLayerExists(map, id, "text-color", "#2e2418")
+    setPaintPropertyIfLayerExists(map, id, "text-halo-color", "#d9cb97")
+    setPaintPropertyIfLayerExists(map, id, "text-halo-width", 1.5)
+  })
 
-  setPaintPropertyIfLayerExists(map, "place_state", "text-color", "#6b5a46");
-  setPaintPropertyIfLayerExists(
-    map,
-    "place_country_1",
-    "text-color",
-    "#4f3f2d"
-  );
-  setPaintPropertyIfLayerExists(
-    map,
-    "place_country_2",
-    "text-color",
-    "#4f3f2d"
-  );
+  setPaintPropertyIfLayerExists(map, "place_state", "text-color", "#6b5a46")
+  setPaintPropertyIfLayerExists(map, "place_country_1", "text-color", "#4f3f2d")
+  setPaintPropertyIfLayerExists(map, "place_country_2", "text-color", "#4f3f2d")
 
   const waterLabels = [
     "watername_ocean",
@@ -278,46 +262,41 @@ function applyMinecraftStyle(map: MapLibreMap) {
     "watername_lake",
     "watername_lake_line",
     "waterway_label",
-  ];
+  ]
   waterLabels.forEach((id) => {
-    setPaintPropertyIfLayerExists(map, id, "text-color", "#244e82");
-    setPaintPropertyIfLayerExists(map, id, "text-halo-color", "#78a7db");
-    setPaintPropertyIfLayerExists(map, id, "text-halo-width", 1);
-  });
+    setPaintPropertyIfLayerExists(map, id, "text-color", "#244e82")
+    setPaintPropertyIfLayerExists(map, id, "text-halo-color", "#78a7db")
+    setPaintPropertyIfLayerExists(map, id, "text-halo-width", 1)
+  })
 
-  setPaintPropertyIfLayerExists(map, "poi_park", "text-color", "#346a28");
-  setPaintPropertyIfLayerExists(map, "poi_stadium", "text-color", "#5a4a3a");
+  setPaintPropertyIfLayerExists(map, "poi_park", "text-color", "#346a28")
+  setPaintPropertyIfLayerExists(map, "poi_stadium", "text-color", "#5a4a3a")
 
-  setPaintPropertyIfLayerExists(map, "aeroway-runway", "line-color", "#8b8371");
-  setPaintPropertyIfLayerExists(
-    map,
-    "aeroway-taxiway",
-    "line-color",
-    "#9d927e"
-  );
+  setPaintPropertyIfLayerExists(map, "aeroway-runway", "line-color", "#8b8371")
+  setPaintPropertyIfLayerExists(map, "aeroway-taxiway", "line-color", "#9d927e")
 }
 
 // Helper to create a styled div
 function sd(styles: Partial<CSSStyleDeclaration>) {
-  const el = document.createElement("div");
-  Object.assign(el.style, styles);
-  return el;
+  const el = document.createElement("div")
+  Object.assign(el.style, styles)
+  return el
 }
 
 function getMarkerFloatTiming(slug: string) {
-  let hash = 0;
+  let hash = 0
   for (let i = 0; i < slug.length; i += 1) {
-    hash = (hash * 31 + slug.charCodeAt(i)) % 10000;
+    hash = (hash * 31 + slug.charCodeAt(i)) % 10000
   }
 
   return {
     duration: `${3.9 + (hash % 7) * 0.16}s`,
     delay: `${((hash >> 1) % 9) * -0.35}s`,
-  };
+  }
 }
 
 function createFloatingMarkerFrame(company: Company) {
-  const { duration, delay } = getMarkerFloatTiming(company.slug);
+  const { duration, delay } = getMarkerFloatTiming(company.slug)
 
   return sd({
     display: "flex",
@@ -329,7 +308,7 @@ function createFloatingMarkerFrame(company: Company) {
     animationIterationCount: "infinite",
     animationDelay: delay,
     willChange: "transform",
-  });
+  })
 }
 
 // Logo badge: category-colored frame + light inner pad so logos stay readable.
@@ -339,12 +318,12 @@ function makeLogoBadge(
   dense: boolean,
   categoryColor: string
 ) {
-  const OL = "#342414";
-  const sz = dense ? (active ? 24 : 20) : active ? 28 : 24;
+  const OL = "#342414"
+  const sz = dense ? (active ? 24 : 20) : active ? 28 : 24
   // border-box: inner pad = sz - borders - padding
-  const innerSz = Math.max(8, sz - 8);
-  const rawLogoSz = dense ? (active ? 18 : 14) : active ? 22 : 18;
-  const logoSz = Math.min(rawLogoSz, Math.max(6, innerSz - 2));
+  const innerSz = Math.max(8, sz - 8)
+  const rawLogoSz = dense ? (active ? 18 : 14) : active ? 22 : 18
+  const logoSz = Math.min(rawLogoSz, Math.max(6, innerSz - 2))
   const badge = sd({
     width: `${sz}px`,
     height: `${sz}px`,
@@ -361,7 +340,7 @@ function makeLogoBadge(
     marginBottom: "2px",
     position: "relative",
     zIndex: "5",
-  });
+  })
   const inner = sd({
     width: `${innerSz}px`,
     height: `${innerSz}px`,
@@ -371,42 +350,42 @@ function makeLogoBadge(
     alignItems: "center",
     justifyContent: "center",
     boxSizing: "border-box",
-  });
-  const img = document.createElement("img");
-  img.src = getCompanyLogoUrl(company);
-  img.alt = company.name;
+  })
+  const img = document.createElement("img")
+  img.src = getCompanyLogoUrl(company)
+  img.alt = company.name
   Object.assign(img.style, {
     width: `${logoSz}px`,
     height: `${logoSz}px`,
     objectFit: "contain",
-  });
-  const monogram = getCompanyMonogram(company);
+  })
+  const monogram = getCompanyMonogram(company)
   img.addEventListener("error", () => {
-    img.replaceWith(createFallback(monogram, active, dense));
-  });
-  inner.appendChild(img);
-  badge.appendChild(inner);
-  return badge;
+    img.replaceWith(createFallback(monogram, active, dense))
+  })
+  inner.appendChild(img)
+  badge.appendChild(inner)
+  return badge
 }
 
 function createSpriteMarker(company: Company, active: boolean, dense: boolean) {
-  const accent = CATEGORY_COLORS[company.category];
-  const OL = "#342414";
+  const accent = CATEGORY_COLORS[company.category]
+  const OL = "#342414"
   // Robot body sizes
-  const w = dense ? (active ? 28 : 22) : active ? 34 : 28;
-  const h = dense ? (active ? 34 : 26) : active ? 42 : 34;
-  const bw = active ? 3 : 2;
-  const badgeW = dense ? (active ? 24 : 20) : active ? 28 : 24;
+  const w = dense ? (active ? 28 : 22) : active ? 34 : 28
+  const h = dense ? (active ? 34 : 26) : active ? 42 : 34
+  const bw = active ? 3 : 2
+  const badgeW = dense ? (active ? 24 : 20) : active ? 28 : 24
 
   const wrapper = sd({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-  });
-  const sprite = createFloatingMarkerFrame(company);
+  })
+  const sprite = createFloatingMarkerFrame(company)
 
   // Logo badge on top
-  sprite.appendChild(makeLogoBadge(company, active, dense, accent));
+  sprite.appendChild(makeLogoBadge(company, active, dense, accent))
 
   // High-contrast category bar (readable when markers overlap)
   sprite.appendChild(
@@ -421,11 +400,11 @@ function createSpriteMarker(company: Company, active: boolean, dense: boolean) {
       position: "relative",
       zIndex: "4",
     })
-  );
+  )
 
   // === ROBOT SPRITE (all companies) ===
   // Antenna
-  const dotSz = Math.max(6, Math.round(w * 0.18));
+  const dotSz = Math.max(6, Math.round(w * 0.18))
   const antenna = sd({
     display: "flex",
     flexDirection: "column",
@@ -433,7 +412,7 @@ function createSpriteMarker(company: Company, active: boolean, dense: boolean) {
     marginBottom: "-2px",
     position: "relative",
     zIndex: "2",
-  });
+  })
   antenna.appendChild(
     sd({
       width: `${dotSz}px`,
@@ -441,7 +420,7 @@ function createSpriteMarker(company: Company, active: boolean, dense: boolean) {
       background: accent,
       border: `2px solid ${OL}`,
     })
-  );
+  )
   antenna.appendChild(
     sd({
       width: `${Math.max(3, Math.round(w * 0.08))}px`,
@@ -450,8 +429,8 @@ function createSpriteMarker(company: Company, active: boolean, dense: boolean) {
       borderLeft: `2px solid ${OL}`,
       borderRight: `2px solid ${OL}`,
     })
-  );
-  sprite.appendChild(antenna);
+  )
+  sprite.appendChild(antenna)
 
   // Robot head — cool gray so category accent pops on land and water.
   const head = sd({
@@ -461,9 +440,9 @@ function createSpriteMarker(company: Company, active: boolean, dense: boolean) {
     border: `${bw}px solid ${OL}`,
     boxShadow: `4px 4px 0 ${OL}`,
     position: "relative",
-  });
+  })
   // Eyes (category colored)
-  const eSz = Math.max(5, Math.round(w * 0.16));
+  const eSz = Math.max(5, Math.round(w * 0.16))
   for (const side of ["left", "right"] as const) {
     head.appendChild(
       sd({
@@ -475,7 +454,7 @@ function createSpriteMarker(company: Company, active: boolean, dense: boolean) {
         background: accent,
         border: `2px solid ${OL}`,
       })
-    );
+    )
   }
   // Mouth
   head.appendChild(
@@ -488,8 +467,8 @@ function createSpriteMarker(company: Company, active: boolean, dense: boolean) {
       height: `${Math.max(3, Math.round(h * 0.05))}px`,
       background: OL,
     })
-  );
-  sprite.appendChild(head);
+  )
+  sprite.appendChild(head)
 
   // Robot body
   sprite.appendChild(
@@ -500,14 +479,14 @@ function createSpriteMarker(company: Company, active: boolean, dense: boolean) {
       border: `${bw}px solid ${OL}`,
       marginTop: "-2px",
     })
-  );
+  )
 
   // Feet
   const feet = sd({
     display: "flex",
     gap: `${Math.round(w * 0.15)}px`,
     marginTop: "-1px",
-  });
+  })
   for (let i = 0; i < 2; i++) {
     feet.appendChild(
       sd({
@@ -516,11 +495,11 @@ function createSpriteMarker(company: Company, active: boolean, dense: boolean) {
         background: "#6a6a7a",
         border: `2px solid ${OL}`,
       })
-    );
+    )
   }
-  sprite.appendChild(feet);
+  sprite.appendChild(feet)
 
-  wrapper.appendChild(sprite);
+  wrapper.appendChild(sprite)
 
   // Ground shadow (chunky pixel ellipse, no blur)
   wrapper.appendChild(
@@ -531,9 +510,9 @@ function createSpriteMarker(company: Company, active: boolean, dense: boolean) {
       marginTop: "2px",
       boxShadow: "0 0 0 1px rgba(52,36,20,0.15)",
     })
-  );
+  )
 
-  return wrapper;
+  return wrapper
 }
 
 // YC / landmark: YC brand orange + cream trim — reads as "boss" vs neutral robots.
@@ -544,11 +523,11 @@ function makeBossLogoBadge(
   brandOrange: string,
   trimCream: string
 ) {
-  const OL = "#342414";
-  const sz = dense ? (active ? 30 : 24) : active ? 36 : 30;
-  const innerSz = Math.max(10, sz - 10);
-  const rawLogoSz = dense ? (active ? 22 : 16) : active ? 26 : 20;
-  const logoSz = Math.min(rawLogoSz, Math.max(8, innerSz - 2));
+  const OL = "#342414"
+  const sz = dense ? (active ? 30 : 24) : active ? 36 : 30
+  const innerSz = Math.max(10, sz - 10)
+  const rawLogoSz = dense ? (active ? 22 : 16) : active ? 26 : 20
+  const logoSz = Math.min(rawLogoSz, Math.max(8, innerSz - 2))
   const badge = sd({
     width: `${sz}px`,
     height: `${sz}px`,
@@ -565,7 +544,7 @@ function makeBossLogoBadge(
     marginBottom: "2px",
     position: "relative",
     zIndex: "6",
-  });
+  })
   const inner = sd({
     width: `${innerSz}px`,
     height: `${innerSz}px`,
@@ -575,22 +554,22 @@ function makeBossLogoBadge(
     alignItems: "center",
     justifyContent: "center",
     boxSizing: "border-box",
-  });
-  const img = document.createElement("img");
-  img.src = getCompanyLogoUrl(company);
-  img.alt = company.name;
+  })
+  const img = document.createElement("img")
+  img.src = getCompanyLogoUrl(company)
+  img.alt = company.name
   Object.assign(img.style, {
     width: `${logoSz}px`,
     height: `${logoSz}px`,
     objectFit: "contain",
-  });
-  const monogram = getCompanyMonogram(company);
+  })
+  const monogram = getCompanyMonogram(company)
   img.addEventListener("error", () => {
-    img.replaceWith(createFallback(monogram, active, dense));
-  });
-  inner.appendChild(img);
-  badge.appendChild(inner);
-  return badge;
+    img.replaceWith(createFallback(monogram, active, dense))
+  })
+  inner.appendChild(img)
+  badge.appendChild(inner)
+  return badge
 }
 
 function createBossSpriteMarker(
@@ -599,28 +578,28 @@ function createBossSpriteMarker(
   dense: boolean
 ) {
   // Y Combinator–style orange (high saturation, readable on the map).
-  const orange = "#f26522";
-  const orangeDeep = "#d94d12";
-  const orangeMid = "#ea5a1a";
-  const orangeLight = "#ff8f4d";
-  const trimCream = "#fff8f0";
-  const OL = "#342414";
-  const eyeWhite = "#fffef8";
-  const w = dense ? (active ? 36 : 30) : active ? 44 : 36;
-  const h = dense ? (active ? 46 : 38) : active ? 54 : 44;
-  const bw = active ? 3 : 2;
+  const orange = "#f26522"
+  const orangeDeep = "#d94d12"
+  const orangeMid = "#ea5a1a"
+  const orangeLight = "#ff8f4d"
+  const trimCream = "#fff8f0"
+  const OL = "#342414"
+  const eyeWhite = "#fffef8"
+  const w = dense ? (active ? 36 : 30) : active ? 44 : 36
+  const h = dense ? (active ? 46 : 38) : active ? 54 : 44
+  const bw = active ? 3 : 2
 
   const wrapper = sd({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     filter: active ? "none" : "brightness(0.97)",
-  });
-  const sprite = createFloatingMarkerFrame(company);
+  })
+  const sprite = createFloatingMarkerFrame(company)
 
   sprite.appendChild(
     makeBossLogoBadge(company, active, dense, orange, trimCream)
-  );
+  )
 
   sprite.appendChild(
     sd({
@@ -634,7 +613,7 @@ function createBossSpriteMarker(
       position: "relative",
       zIndex: "5",
     })
-  );
+  )
 
   const horns = sd({
     display: "flex",
@@ -643,7 +622,7 @@ function createBossSpriteMarker(
     marginBottom: "-4px",
     position: "relative",
     zIndex: "3",
-  });
+  })
   for (let i = 0; i < 2; i++) {
     horns.appendChild(
       sd({
@@ -654,9 +633,9 @@ function createBossSpriteMarker(
         borderBottom: `${Math.round(h * 0.14)}px solid ${orangeLight}`,
         filter: "drop-shadow(2px 2px 0 #342414)",
       })
-    );
+    )
   }
-  sprite.appendChild(horns);
+  sprite.appendChild(horns)
 
   const head = sd({
     width: `${w}px`,
@@ -667,9 +646,9 @@ function createBossSpriteMarker(
       ? `5px 5px 0 ${OL}, 0 0 12px rgba(242,101,34,0.65)`
       : `5px 5px 0 ${OL}`,
     position: "relative",
-  });
+  })
 
-  const eSz = Math.max(6, Math.round(w * 0.2));
+  const eSz = Math.max(6, Math.round(w * 0.2))
   for (const side of ["left", "right"] as const) {
     head.appendChild(
       sd({
@@ -682,7 +661,7 @@ function createBossSpriteMarker(
         border: `2px solid ${OL}`,
         boxShadow: "inset -1px -1px 0 rgba(0,0,0,0.12)",
       })
-    );
+    )
   }
 
   head.appendChild(
@@ -696,15 +675,15 @@ function createBossSpriteMarker(
       background: OL,
       borderTop: `2px solid ${orangeDeep}`,
     })
-  );
-  sprite.appendChild(head);
+  )
+  sprite.appendChild(head)
 
   const shoulders = sd({
     display: "flex",
     flexDirection: "row",
     gap: `${Math.round(w * 0.08)}px`,
     marginTop: "-3px",
-  });
+  })
   for (let i = 0; i < 2; i++) {
     shoulders.appendChild(
       sd({
@@ -714,9 +693,9 @@ function createBossSpriteMarker(
         border: `2px solid ${OL}`,
         boxShadow: `2px 2px 0 ${OL}`,
       })
-    );
+    )
   }
-  sprite.appendChild(shoulders);
+  sprite.appendChild(shoulders)
 
   sprite.appendChild(
     sd({
@@ -727,13 +706,13 @@ function createBossSpriteMarker(
       marginTop: "-2px",
       boxShadow: `inset 0 -6px 0 rgba(180,60,10,0.35)`,
     })
-  );
+  )
 
   const feet = sd({
     display: "flex",
     gap: `${Math.round(w * 0.18)}px`,
     marginTop: "-1px",
-  });
+  })
   for (let i = 0; i < 2; i++) {
     feet.appendChild(
       sd({
@@ -742,11 +721,11 @@ function createBossSpriteMarker(
         background: orangeDeep,
         border: `2px solid ${OL}`,
       })
-    );
+    )
   }
-  sprite.appendChild(feet);
+  sprite.appendChild(feet)
 
-  wrapper.appendChild(sprite);
+  wrapper.appendChild(sprite)
 
   wrapper.appendChild(
     sd({
@@ -756,33 +735,33 @@ function createBossSpriteMarker(
       marginTop: "3px",
       boxShadow: "0 0 0 1px rgba(242,101,34,0.25)",
     })
-  );
+  )
 
-  return wrapper;
+  return wrapper
 }
 
 function createMarkerSprite(company: Company, active: boolean, dense: boolean) {
   if (company.mapSprite === "boss") {
-    return createBossSpriteMarker(company, active, dense);
+    return createBossSpriteMarker(company, active, dense)
   }
 
-  return createSpriteMarker(company, active, dense);
+  return createSpriteMarker(company, active, dense)
 }
 
 function createFallback(monogram: string, active: boolean, dense: boolean) {
-  const el = document.createElement("span");
-  el.textContent = monogram;
+  const el = document.createElement("span")
+  el.textContent = monogram
   el.style.fontSize = dense
     ? active
       ? "10px"
       : "8px"
     : active
       ? "12px"
-      : "9px";
-  el.style.fontWeight = "700";
-  el.style.lineHeight = "1";
-  el.style.color = "#342414";
-  return el;
+      : "9px"
+  el.style.fontWeight = "700"
+  el.style.lineHeight = "1"
+  el.style.color = "#342414"
+  return el
 }
 
 export function MapShell({
@@ -792,25 +771,25 @@ export function MapShell({
   isAudioMuted,
   onToggleMute,
 }: MapShellProps) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<MapLibreMap | null>(null);
-  const markersRef = useRef<Map<string, Marker>>(new Map());
-  const hasInteractedRef = useRef(false);
-  const mapMarkersSignatureRef = useRef("");
-  const selectedSlugRef = useRef(selectedCompany.slug);
-  const [mapReady, setMapReady] = useState<MapLibreMap | null>(null);
-  const dense = companies.length >= 60;
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const mapRef = useRef<MapLibreMap | null>(null)
+  const markersRef = useRef<Map<string, Marker>>(new Map())
+  const hasInteractedRef = useRef(false)
+  const mapMarkersSignatureRef = useRef("")
+  const selectedSlugRef = useRef(selectedCompany.slug)
+  const [mapReady, setMapReady] = useState<MapLibreMap | null>(null)
+  const dense = companies.length >= 60
 
   useEffect(() => {
-    selectedSlugRef.current = selectedCompany.slug;
-  }, [selectedCompany.slug]);
+    selectedSlugRef.current = selectedCompany.slug
+  }, [selectedCompany.slug])
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) {
-      return;
+      return
     }
 
-    const markers = markersRef.current;
+    const markers = markersRef.current
     const map = new maplibregl.Map({
       container: containerRef.current,
       style: MAP_STYLE,
@@ -822,78 +801,78 @@ export function MapShell({
       maxZoom: 15.8,
       attributionControl: false,
       renderWorldCopies: false,
-    });
+    })
 
-    map.dragRotate.disable();
-    map.touchZoomRotate.disableRotation();
+    map.dragRotate.disable()
+    map.touchZoomRotate.disableRotation()
     map.addControl(
       new maplibregl.NavigationControl({ showCompass: false }),
       "bottom-right"
-    );
+    )
     map.on("load", () => {
-      applyMinecraftStyle(map);
-      addVoxelCityLayers(map);
-      map.resize();
-      setMapReady(map);
-    });
-    mapRef.current = map;
+      applyMinecraftStyle(map)
+      addVoxelCityLayers(map)
+      map.resize()
+      setMapReady(map)
+    })
+    mapRef.current = map
 
     const resizeObserver = new ResizeObserver(() => {
-      map.resize();
-    });
+      map.resize()
+    })
 
-    resizeObserver.observe(containerRef.current);
+    resizeObserver.observe(containerRef.current)
 
     return () => {
-      resizeObserver.disconnect();
-      markers.forEach((marker) => marker.remove());
-      markers.clear();
-      map.remove();
-      mapRef.current = null;
-    };
-  }, []);
+      resizeObserver.disconnect()
+      markers.forEach((marker) => marker.remove())
+      markers.clear()
+      map.remove()
+      mapRef.current = null
+    }
+  }, [])
 
   useEffect(() => {
-    const map = mapRef.current;
+    const map = mapRef.current
     if (!map) {
-      return;
+      return
     }
 
-    markersRef.current.forEach((marker) => marker.remove());
-    markersRef.current.clear();
+    markersRef.current.forEach((marker) => marker.remove())
+    markersRef.current.clear()
 
     companies.forEach((company) => {
-      const active = company.slug === selectedSlugRef.current;
-      const element = document.createElement("button");
-      element.type = "button";
-      element.setAttribute("aria-label", company.name);
-      element.style.cursor = "pointer";
-      element.style.padding = "0";
-      element.style.outline = "none";
-      element.style.background = "none";
-      element.style.border = "none";
-      element.appendChild(createMarkerSprite(company, active, dense));
-      element.addEventListener("click", () => onSelectCompany(company.slug));
+      const active = company.slug === selectedSlugRef.current
+      const element = document.createElement("button")
+      element.type = "button"
+      element.setAttribute("aria-label", company.name)
+      element.style.cursor = "pointer"
+      element.style.padding = "0"
+      element.style.outline = "none"
+      element.style.background = "none"
+      element.style.border = "none"
+      element.appendChild(createMarkerSprite(company, active, dense))
+      element.addEventListener("click", () => onSelectCompany(company.slug))
 
       const marker = new maplibregl.Marker({ element, anchor: "bottom" })
         .setLngLat(company.coordinates)
-        .addTo(map);
+        .addTo(map)
 
-      markersRef.current.set(company.slug, marker);
-    });
+      markersRef.current.set(company.slug, marker)
+    })
 
     const markerSetSignature = [...companies]
       .map((c) => c.slug)
       .sort()
-      .join("|");
+      .join("|")
     const shouldRefit =
       markerSetSignature !== mapMarkersSignatureRef.current &&
-      companies.length > 0;
-    mapMarkersSignatureRef.current = markerSetSignature;
+      companies.length > 0
+    mapMarkersSignatureRef.current = markerSetSignature
 
     if (shouldRefit) {
-      const bounds = new maplibregl.LngLatBounds();
-      companies.forEach((c) => bounds.extend(c.coordinates));
+      const bounds = new maplibregl.LngLatBounds()
+      companies.forEach((c) => bounds.extend(c.coordinates))
 
       if (companies.length === 1) {
         map.jumpTo({
@@ -901,41 +880,41 @@ export function MapShell({
           zoom: 12.5,
           pitch: MAP_PITCH,
           bearing: MAP_BEARING,
-        });
+        })
       } else {
         map.fitBounds(bounds, {
           padding: 56,
           maxZoom: 12.35,
           duration: 0,
-        });
-        map.setPitch(MAP_PITCH);
-        map.setBearing(MAP_BEARING);
+        })
+        map.setPitch(MAP_PITCH)
+        map.setBearing(MAP_BEARING)
       }
     }
-  }, [companies, dense, onSelectCompany]);
+  }, [companies, dense, onSelectCompany])
 
   useEffect(() => {
     markersRef.current.forEach((marker, slug) => {
-      const button = marker.getElement() as HTMLButtonElement;
-      const active = slug === selectedCompany.slug;
-      const company = companies.find((item) => item.slug === slug);
+      const button = marker.getElement() as HTMLButtonElement
+      const active = slug === selectedCompany.slug
+      const company = companies.find((item) => item.slug === slug)
 
-      button.style.zIndex = active ? "10" : "1";
+      button.style.zIndex = active ? "10" : "1"
       if (company) {
-        button.replaceChildren(createMarkerSprite(company, active, dense));
+        button.replaceChildren(createMarkerSprite(company, active, dense))
       }
-    });
-  }, [companies, dense, selectedCompany]);
+    })
+  }, [companies, dense, selectedCompany])
 
   useEffect(() => {
-    const map = mapRef.current;
+    const map = mapRef.current
     if (!map) {
-      return;
+      return
     }
 
     if (!hasInteractedRef.current) {
-      hasInteractedRef.current = true;
-      return;
+      hasInteractedRef.current = true
+      return
     }
 
     map.flyTo({
@@ -946,8 +925,8 @@ export function MapShell({
       speed: 0.65,
       curve: 1.2,
       essential: true,
-    });
-  }, [selectedCompany]);
+    })
+  }, [selectedCompany])
 
   return (
     <div className="relative h-full min-h-0 overflow-hidden bg-[#cdb98b] lg:min-h-160">
@@ -1087,5 +1066,5 @@ export function MapShell({
         }
       `}</style>
     </div>
-  );
+  )
 }

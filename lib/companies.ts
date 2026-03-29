@@ -5,9 +5,9 @@ export const COMPANY_CATEGORIES = [
   "Infra",
   "Agents",
   "Vertical AI",
-] as const;
+] as const
 
-export type CompanyCategory = (typeof COMPANY_CATEGORIES)[number];
+export type CompanyCategory = (typeof COMPANY_CATEGORIES)[number]
 
 /**
  * Distinct, saturated hues for map + UI so categories read clearly against
@@ -20,66 +20,66 @@ export const CATEGORY_COLORS: Record<CompanyCategory, string> = {
   Infra: "#7b1fa2",
   Agents: "#1565c0",
   "Vertical AI": "#e65100",
-};
+}
 
 /** Text on filled category pills in the dark sidebar (high contrast). */
 export function categoryPillForeground(
   category: CompanyCategory
 ): "#ffffff" | "#1a1a2e" {
-  return category === "Devtools" ? "#1a1a2e" : "#ffffff";
+  return category === "Devtools" ? "#1a1a2e" : "#ffffff"
 }
 
 export type Company = {
-  slug: string;
-  name: string;
-  website: string;
-  shortDescription: string;
-  whyItMatters: string;
-  category: CompanyCategory;
-  locationLabel: string;
-  coordinates: [number, number];
-  founded: number;
-  logoUrl?: string;
+  slug: string
+  name: string
+  website: string
+  shortDescription: string
+  whyItMatters: string
+  category: CompanyCategory
+  locationLabel: string
+  coordinates: [number, number]
+  founded: number
+  logoUrl?: string
   /** When true, the card is omitted from the sidebar until the user searches. */
-  hideFromSidebar?: boolean;
+  hideFromSidebar?: boolean
   /** Map marker style — "boss" uses a larger, high-threat sprite. */
-  mapSprite?: "default" | "boss";
-  sourceUrl: string;
-  sourceLabel: string;
-};
+  mapSprite?: "default" | "boss"
+  sourceUrl: string
+  sourceLabel: string
+}
 
 /** Slug for the YC HQ landmark (not an SF startup; shown as a map boss). */
-export const YC_BOSS_SLUG = "y-combinator" as const;
+export const YC_BOSS_SLUG = "y-combinator" as const
 
 export function getCompanyMonogram(company: Company) {
   if (company.name === "11x") {
-    return "11";
+    return "11"
   }
 
   const parts = company.name
     .replace(/[^a-zA-Z0-9 ]/g, " ")
     .split(" ")
-    .filter(Boolean);
+    .filter(Boolean)
 
   if (parts.length >= 2) {
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
   }
 
-  return company.name.slice(0, 2).toUpperCase();
+  return company.name.slice(0, 2).toUpperCase()
 }
 
 export function getCompanyDomain(company: Company) {
-  return new URL(company.website).hostname;
+  return new URL(company.website).hostname
 }
 
 export function getCompanyLogoUrl(company: Company) {
   if (company.logoUrl) {
-    return company.logoUrl;
+    return company.logoUrl
   }
 
-  const domain = getCompanyDomain(company);
+  const domain = getCompanyDomain(company)
 
-  return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`
 }
 
 // Only companies with a public, source-backed SF office location are included below.
@@ -861,4 +861,4 @@ export const COMPANIES: Company[] = [
       "https://www.openstreetmap.org/search?query=335%20Pioneer%20Way%20Mountain%20View%20CA",
     sourceLabel: "OpenStreetMap / Nominatim geocode",
   },
-];
+]

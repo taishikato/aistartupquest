@@ -1,17 +1,17 @@
-"use client";
+"use client"
 
-import { useEffect, useRef } from "react";
-import maplibregl, { type Map as MapLibreMap } from "maplibre-gl";
+import { useEffect, useRef } from "react"
+import maplibregl, { type Map as MapLibreMap } from "maplibre-gl"
 
 // Parse ASCII art into [col, row] pixel coordinate arrays
 function parseShape(art: string[]): [number, number][] {
-  const pixels: [number, number][] = [];
+  const pixels: [number, number][] = []
   for (let y = 0; y < art.length; y++) {
     for (let x = 0; x < art[y].length; x++) {
-      if (art[y][x] === "#") pixels.push([x, y]);
+      if (art[y][x] === "#") pixels.push([x, y])
     }
   }
-  return pixels;
+  return pixels
 }
 
 const SHAPES = [
@@ -73,7 +73,7 @@ const SHAPES = [
     "       ####################################  ",
     "          ##############################     ",
   ]),
-];
+]
 
 function buildBoxShadow(
   pixels: [number, number][],
@@ -82,27 +82,27 @@ function buildBoxShadow(
 ) {
   return pixels
     .map(([x, y]) => `${x * size}px ${y * size}px 0 0 ${color}`)
-    .join(",");
+    .join(",")
 }
 
 function createCloudElement(shapeIndex: number, size: number, opacity: number) {
-  const el = document.createElement("div");
-  el.style.pointerEvents = "none";
-  el.style.width = `${size}px`;
-  el.style.height = `${size}px`;
-  el.style.boxShadow = buildBoxShadow(SHAPES[shapeIndex], size, "#fff");
-  el.style.opacity = String(opacity);
-  return el;
+  const el = document.createElement("div")
+  el.style.pointerEvents = "none"
+  el.style.width = `${size}px`
+  el.style.height = `${size}px`
+  el.style.boxShadow = buildBoxShadow(SHAPES[shapeIndex], size, "#fff")
+  el.style.opacity = String(opacity)
+  return el
 }
 
 type CloudConfig = {
-  shape: number;
-  size: number;
-  lat: number;
-  lng: number;
-  speed: number; // lng degrees per second (westward drift)
-  opacity: number;
-};
+  shape: number
+  size: number
+  lat: number
+  lng: number
+  speed: number // lng degrees per second (westward drift)
+  opacity: number
+}
 
 const CLOUD_CONFIGS: CloudConfig[] = [
   {
@@ -169,14 +169,14 @@ const CLOUD_CONFIGS: CloudConfig[] = [
     speed: 0.0004,
     opacity: 0.25,
   },
-];
+]
 
 type PixelCloudsProps = {
-  map: MapLibreMap;
-};
+  map: MapLibreMap
+}
 
 export function PixelClouds({ map }: PixelCloudsProps) {
-  const frameRef = useRef<number>(0);
+  const frameRef = useRef<number>(0)
 
   useEffect(() => {
     const states = CLOUD_CONFIGS.map((config) => {
@@ -184,49 +184,49 @@ export function PixelClouds({ map }: PixelCloudsProps) {
         config.shape,
         config.size,
         config.opacity
-      );
+      )
       const marker = new maplibregl.Marker({ element, anchor: "center" })
         .setLngLat([config.lng, config.lat])
-        .addTo(map);
+        .addTo(map)
 
-      marker.getElement().style.zIndex = "30";
-      marker.getElement().style.pointerEvents = "none";
+      marker.getElement().style.zIndex = "30"
+      marker.getElement().style.pointerEvents = "none"
 
-      return { ...config, currentLng: config.lng, marker };
-    });
+      return { ...config, currentLng: config.lng, marker }
+    })
 
-    let lastTime = performance.now();
+    let lastTime = performance.now()
 
     function animate(time: number) {
-      const dt = (time - lastTime) / 1000;
-      lastTime = time;
+      const dt = (time - lastTime) / 1000
+      lastTime = time
 
-      const bounds = map.getBounds();
-      const lngSpan = bounds.getEast() - bounds.getWest();
-      const rightLng = bounds.getEast() + lngSpan * 0.3;
-      const leftLng = bounds.getWest() - lngSpan * 0.3;
+      const bounds = map.getBounds()
+      const lngSpan = bounds.getEast() - bounds.getWest()
+      const rightLng = bounds.getEast() + lngSpan * 0.3
+      const leftLng = bounds.getWest() - lngSpan * 0.3
 
       for (const state of states) {
-        state.currentLng -= state.speed * dt;
+        state.currentLng -= state.speed * dt
 
         // Wrap around when cloud exits left side
         if (state.currentLng < leftLng) {
-          state.currentLng = rightLng;
+          state.currentLng = rightLng
         }
 
-        state.marker.setLngLat([state.currentLng, state.lat]);
+        state.marker.setLngLat([state.currentLng, state.lat])
       }
 
-      frameRef.current = requestAnimationFrame(animate);
+      frameRef.current = requestAnimationFrame(animate)
     }
 
-    frameRef.current = requestAnimationFrame(animate);
+    frameRef.current = requestAnimationFrame(animate)
 
     return () => {
-      cancelAnimationFrame(frameRef.current);
-      states.forEach((s) => s.marker.remove());
-    };
-  }, [map]);
+      cancelAnimationFrame(frameRef.current)
+      states.forEach((s) => s.marker.remove())
+    }
+  }, [map])
 
-  return null;
+  return null
 }

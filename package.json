@@ -43,10 +43,16 @@
   },
   "prettier": {
     "endOfLine": "lf",
-    "semi": true,
+    "semi": false,
     "singleQuote": false,
     "tabWidth": 2,
     "trailingComma": "es5",
+    "printWidth": 80,
+    "tailwindStylesheet": "app/globals.css",
+    "tailwindFunctions": [
+      "cn",
+      "cva"
+    ],
     "importOrder": [
       "^(react/(.*)$)|^(react$)",
       "^(next/(.*)$)|^(next$)",

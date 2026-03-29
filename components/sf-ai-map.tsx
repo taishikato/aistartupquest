@@ -1,77 +1,77 @@
-"use client";
+"use client"
 
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react"
 
 import {
   COMPANIES,
   YC_BOSS_SLUG,
   type Company,
   type CompanyCategory,
-} from "@/lib/companies";
-import { cn } from "@/lib/utils";
-import { DiscoveryPanel } from "@/components/discovery-panel";
-import { MapShell } from "@/components/map-shell";
+} from "@/lib/companies"
+import { cn } from "@/lib/utils"
+import { DiscoveryPanel } from "@/components/discovery-panel"
+import { MapShell } from "@/components/map-shell"
 
 export function SfAiMap() {
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState<CompanyCategory | "All">("All");
-  const [selectedSlug, setSelectedSlug] = useState("openai");
-  const [isAudioMuted, setIsAudioMuted] = useState(true);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [search, setSearch] = useState("")
+  const [category, setCategory] = useState<CompanyCategory | "All">("All")
+  const [selectedSlug, setSelectedSlug] = useState("openai")
+  const [isAudioMuted, setIsAudioMuted] = useState(true)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  const deferredSearch = useDeferredValue(search);
+  const deferredSearch = useDeferredValue(search)
 
   useEffect(() => {
-    const audio = new Audio("/audio/sf-ai-startup-map-theme.mp3");
-    audio.loop = true;
-    audio.preload = "auto";
-    audio.volume = 0.42;
-    audio.muted = true;
-    audioRef.current = audio;
+    const audio = new Audio("/audio/sf-ai-startup-map-theme.mp3")
+    audio.loop = true
+    audio.preload = "auto"
+    audio.volume = 0.42
+    audio.muted = true
+    audioRef.current = audio
 
     audio.play().catch(() => {
       // Browsers usually allow muted autoplay, but failing closed is fine here.
-    });
+    })
 
     return () => {
-      audio.pause();
-      audioRef.current = null;
-    };
-  }, []);
+      audio.pause()
+      audioRef.current = null
+    }
+  }, [])
 
   useEffect(() => {
-    const audio = audioRef.current;
+    const audio = audioRef.current
 
     if (!audio) {
-      return;
+      return
     }
 
-    audio.muted = isAudioMuted;
-  }, [isAudioMuted]);
+    audio.muted = isAudioMuted
+  }, [isAudioMuted])
 
   const handleToggleMute = async () => {
-    const audio = audioRef.current;
+    const audio = audioRef.current
 
     if (!audio) {
-      return;
+      return
     }
 
-    const nextMuted = !isAudioMuted;
-    audio.muted = nextMuted;
-    setIsAudioMuted(nextMuted);
+    const nextMuted = !isAudioMuted
+    audio.muted = nextMuted
+    setIsAudioMuted(nextMuted)
 
     if (!nextMuted) {
       try {
-        await audio.play();
+        await audio.play()
       } catch {
-        setIsAudioMuted(true);
-        audio.muted = true;
+        setIsAudioMuted(true)
+        audio.muted = true
       }
     }
-  };
+  }
 
   const filteredCompanies = useMemo(() => {
-    const query = deferredSearch.trim().toLowerCase();
+    const query = deferredSearch.trim().toLowerCase()
 
     return [...COMPANIES]
       .filter((company) =>
@@ -80,10 +80,10 @@ export function SfAiMap() {
       .filter((company) => {
         if (!query) {
           if (company.hideFromSidebar) {
-            return false;
+            return false
           }
 
-          return true;
+          return true
         }
 
         return [
@@ -96,28 +96,28 @@ export function SfAiMap() {
         ]
           .join(" ")
           .toLowerCase()
-          .includes(query);
+          .includes(query)
       })
-      .sort((left, right) => left.name.localeCompare(right.name));
-  }, [category, deferredSearch]);
+      .sort((left, right) => left.name.localeCompare(right.name))
+  }, [category, deferredSearch])
 
   const selectedCompany =
     filteredCompanies.find((company) => company.slug === selectedSlug) ??
     COMPANIES.find((company) => company.slug === selectedSlug) ??
     filteredCompanies[0] ??
-    COMPANIES[0];
+    COMPANIES[0]
 
   const mapCompanies = useMemo((): Company[] => {
     const base =
-      filteredCompanies.length > 0 ? filteredCompanies : [selectedCompany];
-    const boss = COMPANIES.find((c) => c.slug === YC_BOSS_SLUG);
+      filteredCompanies.length > 0 ? filteredCompanies : [selectedCompany]
+    const boss = COMPANIES.find((c) => c.slug === YC_BOSS_SLUG)
 
     if (!boss || base.some((c) => c.slug === YC_BOSS_SLUG)) {
-      return base;
+      return base
     }
 
-    return [...base, boss];
-  }, [filteredCompanies, selectedCompany]);
+    return [...base, boss]
+  }, [filteredCompanies, selectedCompany])
 
   return (
     <main className="h-dvh overflow-hidden bg-[#1a1a2e]">
@@ -153,5 +153,5 @@ export function SfAiMap() {
         </div>
       </section>
     </main>
-  );
+  )
 }

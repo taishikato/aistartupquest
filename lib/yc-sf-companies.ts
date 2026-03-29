@@ -1,12 +1,12 @@
 export type DiscoveredCompany = {
-  slug: string;
-  name: string;
-  website: string;
-  shortDescription: string;
-  founded: number;
-  logoUrl: string;
-  tags: string[];
-};
+  slug: string
+  name: string
+  website: string
+  shortDescription: string
+  founded: number
+  logoUrl: string
+  tags: string[]
+}
 
 // Sourced from Y Combinator's AI / San Francisco directory pages on 2026-03-22.
 export const YC_SF_SEARCH_COMPANIES: DiscoveredCompany[] = [
@@ -941,4 +941,4 @@ export const YC_SF_SEARCH_COMPANIES: DiscoveredCompany[] = [
       "https://bookface-images.s3.amazonaws.com/small_logos/13449379aadac83de276a47cb8ee88b50b55c4f8.png",
     tags: ["b2b", "lending", "artificial-intelligence"],
   },
-];
+]
