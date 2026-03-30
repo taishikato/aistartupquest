@@ -10,6 +10,9 @@
     "lint": "eslint",
     "format:write": "prettier --write \"**/*.{ts,tsx}\" --cache",
     "format:check": "prettier --check \"**/*.{ts,tsx}\" --cache",
+    "_with-env": "dotenv -e .env -c -- ",
+    "_genType": "supabase gen types typescript --project-id $NEXT_PUBLIC_SUPABASE_PROJECT_ID --schema public > types/supabase.ts",
+    "genType": "pnpm run _with-env pnpm run _genType",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -36,6 +39,7 @@
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9.39.4",
     "eslint-config-next": "16.1.7",
     "postcss": "^8",
