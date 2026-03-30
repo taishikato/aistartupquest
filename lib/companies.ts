@@ -938,4 +938,21 @@ export const COMPANIES: Company[] = [
     sourceUrl: "https://circleback.ai",
     sourceLabel: "Circleback website",
   },
+  {
+    slug: "reevo",
+    name: "Reevo",
+    website: "https://reevo.ai",
+    shortDescription:
+      "AI revenue operating system that unifies lead gen, outreach, call intelligence, and CRM in one GTM platform.",
+    whyItMatters:
+      "Backed by Khosla Ventures and Kleiner Perkins, Reevo is collapsing the fragmented sales stack into one AI-native platform built for the modern revenue team.",
+    category: "Vertical AI",
+    locationLabel: "2 Embarcadero Center, San Francisco",
+    coordinates: [-122.3984101, 37.7947881],
+    founded: 2024,
+    logoUrl: "https://reevo.ai/assets/images/favicon-light.png",
+    sourceUrl:
+      "https://www.wework.com/buildings/2-embarcadero-center--san-francisco--CA",
+    sourceLabel: "WeWork 2 Embarcadero Center SF",
+  },
 ]
