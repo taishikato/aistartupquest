@@ -1024,7 +1024,7 @@ export const COMPANIES: Company[] = [
     shortDescription:
       "Enterprise-grade AI text-to-speech API with linguistically-designed voices for real-time conversational AI.",
     whyItMatters:
-      "Built by a Stanford NLP PhD and an Amazon Alexa linguist, Rime delivers low-latency, production-grade voice infrastructure for the next generation of AI-powered contact centers and voice agents.",
+      "Built by a Stanford NLP PhD, an Amazon Alexa linguist, and a Stanford product engineer, Rime delivers low-latency, production-grade voice infrastructure for the next generation of AI-powered contact centers and voice agents.",
     category: "Infra",
     locationLabel: "911 Minna St, San Francisco",
     coordinates: [-122.4156742, 37.7744104],
