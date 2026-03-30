@@ -934,6 +934,24 @@ export const COMPANIES: Company[] = [
     sourceLabel: "Composite official website",
   },
   {
+    slug: "arcade",
+    name: "Arcade",
+    website: "https://www.arcade.dev",
+    shortDescription:
+      "The MCP runtime delivering secure agent authorization, reliable tools, and agent lifecycle governance for multi-user AI agents at scale.",
+    whyItMatters:
+      "The infrastructure layer solving authorization, reliability, and governance so enterprise AI agents can actually take actions.",
+    category: "Infra",
+    locationLabel: "42 Decatur St, San Francisco",
+    coordinates: [-122.4063, 37.7726],
+    founded: 2024,
+    logoUrl:
+      "https://arcade-public.s3.us-east-1.amazonaws.com/toolbench/arcade.png",
+    sourceUrl:
+      "https://www.linkedin.com/company/arcade-ai/about/",
+    sourceLabel: "LinkedIn company page",
+  },
+  {
     slug: YC_BOSS_SLUG,
     name: "Y Combinator",
     website: "https://www.ycombinator.com",
