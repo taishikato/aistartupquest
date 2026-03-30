@@ -41,3 +41,6 @@ supabase/.temp/
 
 # codex
 .codex/
+
+# other
+context/
