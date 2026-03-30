@@ -17,6 +17,7 @@ export default async function Page() {
 
   return (
     <CityMap
+      key="sf"
       companies={(data ?? []).map(companyFromRow)}
       config={sfMapConfig}
     />

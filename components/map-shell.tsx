@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import Link from "next/link"
 import { Github, Volume2, VolumeX } from "lucide-react"
 import maplibregl, {
   type ExpressionSpecification,
@@ -780,6 +779,7 @@ export function MapShell({
   const hasInteractedRef = useRef(false)
   const mapMarkersSignatureRef = useRef("")
   const selectedSlugRef = useRef(selectedCompany.slug)
+  const initialCenterRef = useRef(config.mapCenter)
   const [mapReady, setMapReady] = useState<MapLibreMap | null>(null)
   const dense = companies.length >= 60
 
@@ -796,7 +796,7 @@ export function MapShell({
     const map = new maplibregl.Map({
       container: containerRef.current,
       style: MAP_STYLE,
-      center: config.mapCenter,
+      center: initialCenterRef.current,
       zoom: 11.95,
       pitch: MAP_PITCH,
       bearing: MAP_BEARING,
@@ -833,7 +833,7 @@ export function MapShell({
       map.remove()
       mapRef.current = null
     }
-  }, [config.mapCenter])
+  }, [])
 
   useEffect(() => {
     const map = mapRef.current
@@ -975,7 +975,7 @@ export function MapShell({
         >
           <Github className="size-3.5" strokeWidth={2} aria-hidden />
         </a>
-        <Link
+        <a
           href={config.switchHref}
           className="flex size-10 items-center justify-center border-[3px] border-[#342414] bg-[#f4ecd2] text-[#4c3926] shadow-[4px_4px_0px_#342414] transition-colors hover:bg-[#e7d8ae]"
           aria-label={config.switchAriaLabel}
@@ -986,7 +986,7 @@ export function MapShell({
           >
             {config.switchLabel}
           </span>
-        </Link>
+        </a>
       </div>
       <style jsx global>{`
         .maplibregl-canvas {

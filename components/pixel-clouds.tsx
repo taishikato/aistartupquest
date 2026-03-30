@@ -179,6 +179,7 @@ export function PixelClouds({ map }: PixelCloudsProps) {
   const frameRef = useRef<number>(0)
 
   useEffect(() => {
+    let disposed = false
     const states = CLOUD_CONFIGS.map((config) => {
       const element = createCloudElement(
         config.shape,
@@ -198,10 +199,21 @@ export function PixelClouds({ map }: PixelCloudsProps) {
     let lastTime = performance.now()
 
     function animate(time: number) {
+      if (disposed) {
+        return
+      }
+
       const dt = (time - lastTime) / 1000
       lastTime = time
 
-      const bounds = map.getBounds()
+      let bounds: ReturnType<MapLibreMap["getBounds"]>
+
+      try {
+        bounds = map.getBounds()
+      } catch {
+        return
+      }
+
       const lngSpan = bounds.getEast() - bounds.getWest()
       const rightLng = bounds.getEast() + lngSpan * 0.3
       const leftLng = bounds.getWest() - lngSpan * 0.3
@@ -223,6 +235,7 @@ export function PixelClouds({ map }: PixelCloudsProps) {
     frameRef.current = requestAnimationFrame(animate)
 
     return () => {
+      disposed = true
       cancelAnimationFrame(frameRef.current)
       states.forEach((s) => s.marker.remove())
     }

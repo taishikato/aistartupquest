@@ -156,6 +156,7 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
           </div>
           <div className="relative h-full min-h-0 overflow-hidden">
             <MapShell
+              key={config.initialSelectedSlug}
               companies={mapCompanies}
               selectedCompany={selectedCompany}
               config={config}

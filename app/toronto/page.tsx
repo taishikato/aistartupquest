@@ -25,6 +25,7 @@ export default async function Page() {
 
   return (
     <CityMap
+      key="toronto"
       companies={(data ?? []).map(companyFromRow)}
       config={torontoMapConfig}
     />
