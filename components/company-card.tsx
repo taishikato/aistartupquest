@@ -9,7 +9,7 @@ import {
   getCompanyLogoUrl,
   getCompanyMonogram,
   type Company,
-} from "@/lib/companies"
+} from "@/lib/company"
 import { cn } from "@/lib/utils"
 
 type CompanyCardProps = {
@@ -137,15 +137,6 @@ export function CompanyCard({
         {company.shortDescription}
       </p>
 
-      <div className="mt-4 border-2 border-[#3a3a5e] bg-[#2a2a4e] px-4 py-3">
-        <div className="font-[family-name:var(--font-pixel)] text-[7px] tracking-wider text-[#ffe66d] uppercase">
-          Why it matters
-        </div>
-        <p className="mt-2 text-sm leading-6 text-[#f0f7e6]">
-          {company.whyItMatters}
-        </p>
-      </div>
-
       <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-[#f0f7e6]/50">
         <span className="inline-flex items-center gap-1.5">
           <MapPin className="size-3.5" />
@@ -158,7 +149,7 @@ export function CompanyCard({
           rel="noreferrer"
           className="text-[#4ecdc4] underline-offset-2 hover:underline"
         >
-          {company.sourceLabel}
+          Source
         </a>
       </div>
     </article>

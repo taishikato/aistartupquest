@@ -2,17 +2,16 @@
 
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react"
 
-import {
-  COMPANIES,
-  YC_BOSS_SLUG,
-  type Company,
-  type CompanyCategory,
-} from "@/lib/companies"
+import { YC_BOSS_SLUG, type Company, type CompanyCategory } from "@/lib/company"
 import { cn } from "@/lib/utils"
 import { DiscoveryPanel } from "@/components/discovery-panel"
 import { MapShell } from "@/components/map-shell"
 
-export function SfAiMap() {
+type SfAiMapProps = {
+  companies: Company[]
+}
+
+export function SfAiMap({ companies: allCompanies }: SfAiMapProps) {
   const [search, setSearch] = useState("")
   const [category, setCategory] = useState<CompanyCategory | "All">("All")
   const [selectedSlug, setSelectedSlug] = useState("openai")
@@ -73,16 +72,13 @@ export function SfAiMap() {
   const filteredCompanies = useMemo(() => {
     const query = deferredSearch.trim().toLowerCase()
 
-    return [...COMPANIES]
+    return [...allCompanies]
       .filter((company) =>
         category === "All" ? true : company.category === category
       )
+      .filter((company) => (query ? true : company.slug !== YC_BOSS_SLUG))
       .filter((company) => {
         if (!query) {
-          if (company.hideFromSidebar) {
-            return false
-          }
-
           return true
         }
 
@@ -91,33 +87,46 @@ export function SfAiMap() {
           company.shortDescription,
           company.category,
           company.locationLabel,
-          company.whyItMatters,
-          company.sourceLabel,
         ]
           .join(" ")
           .toLowerCase()
           .includes(query)
       })
       .sort((left, right) => left.name.localeCompare(right.name))
-  }, [category, deferredSearch])
+  }, [allCompanies, category, deferredSearch])
 
   const selectedCompany =
     filteredCompanies.find((company) => company.slug === selectedSlug) ??
-    COMPANIES.find((company) => company.slug === selectedSlug) ??
+    allCompanies.find((company) => company.slug === selectedSlug) ??
     filteredCompanies[0] ??
-    COMPANIES[0]
+    allCompanies[0]
 
   const mapCompanies = useMemo((): Company[] => {
     const base =
       filteredCompanies.length > 0 ? filteredCompanies : [selectedCompany]
-    const boss = COMPANIES.find((c) => c.slug === YC_BOSS_SLUG)
+    const boss = allCompanies.find((company) => company.slug === YC_BOSS_SLUG)
 
     if (!boss || base.some((c) => c.slug === YC_BOSS_SLUG)) {
       return base
     }
 
     return [...base, boss]
-  }, [filteredCompanies, selectedCompany])
+  }, [allCompanies, filteredCompanies, selectedCompany])
+
+  if (!selectedCompany) {
+    return (
+      <main className="flex h-dvh items-center justify-center bg-[#1a1a2e] px-6 text-center text-[#f0f7e6]">
+        <div>
+          <h1 className="font-(family-name:--font-pixel) text-lg text-[#ffe66d]">
+            SF AI Startup Map
+          </h1>
+          <p className="mt-3 text-sm text-[#f0f7e6]/70">
+            No companies are available yet.
+          </p>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main className="h-dvh overflow-hidden bg-[#1a1a2e]">

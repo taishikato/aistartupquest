@@ -13,7 +13,7 @@ import {
   getCompanyLogoUrl,
   getCompanyMonogram,
   type Company,
-} from "@/lib/companies"
+} from "@/lib/company"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { PixelClouds } from "@/components/pixel-clouds"
@@ -104,10 +104,10 @@ function applyMinecraftStyle(map: MapLibreMap) {
 
   setPaintPropertyIfLayerExists(map, "landcover", "fill-color", "#7ea64a")
   setPaintPropertyIfLayerExists(map, "landcover", "fill-opacity", 0.96)
-    ;["park_national_park", "park_nature_reserve"].forEach((id) => {
-      setPaintPropertyIfLayerExists(map, id, "fill-color", "#5f9235")
-      setPaintPropertyIfLayerExists(map, id, "fill-opacity", 0.92)
-    })
+  ;["park_national_park", "park_nature_reserve"].forEach((id) => {
+    setPaintPropertyIfLayerExists(map, id, "fill-color", "#5f9235")
+    setPaintPropertyIfLayerExists(map, id, "fill-opacity", 0.92)
+  })
 
   setPaintPropertyIfLayerExists(
     map,

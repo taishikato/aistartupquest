@@ -36,11 +36,13 @@
 
 ## Implementation Notes
 
-- Startup data lives in `lib/companies.ts`.
+- Startup data is loaded from the Supabase `companies` table in `app/page.tsx`.
+- Shared company types and helpers live in `lib/company.ts`.
 - Sidebar UI lives in `components/discovery-panel.tsx`.
 - Company cards live in `components/company-card.tsx`.
 - Map rendering lives in `components/map-shell.tsx`.
 - Company logos are shown in both cards and map markers. Keep those in sync.
+- In Supabase client queries, prefer `.match()` over `.eq()`.
 
 ## Change Discipline
 

@@ -9,7 +9,7 @@ import {
   COMPANY_CATEGORIES,
   type Company,
   type CompanyCategory,
-} from "@/lib/companies"
+} from "@/lib/company"
 import { cn } from "@/lib/utils"
 import { CompanyCard } from "@/components/company-card"
 
