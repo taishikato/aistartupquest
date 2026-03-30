@@ -17,6 +17,7 @@ import {
 } from "@/lib/company"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { CompanyRequestPanel } from "@/components/company-request-panel"
 import { PixelClouds } from "@/components/pixel-clouds"
 
 type MapShellProps = {
@@ -105,10 +106,10 @@ function applyMinecraftStyle(map: MapLibreMap) {
 
   setPaintPropertyIfLayerExists(map, "landcover", "fill-color", "#7ea64a")
   setPaintPropertyIfLayerExists(map, "landcover", "fill-opacity", 0.96)
-    ;["park_national_park", "park_nature_reserve"].forEach((id) => {
-      setPaintPropertyIfLayerExists(map, id, "fill-color", "#5f9235")
-      setPaintPropertyIfLayerExists(map, id, "fill-opacity", 0.92)
-    })
+  ;["park_national_park", "park_nature_reserve"].forEach((id) => {
+    setPaintPropertyIfLayerExists(map, id, "fill-color", "#5f9235")
+    setPaintPropertyIfLayerExists(map, id, "fill-opacity", 0.92)
+  })
 
   setPaintPropertyIfLayerExists(
     map,
@@ -949,6 +950,7 @@ export function MapShell({
         />
       </div>
       {mapReady && <PixelClouds map={mapReady} />}
+      <CompanyRequestPanel initialCity={config.city} />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#fff3cf]/35 to-transparent" />
       <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
         <Button

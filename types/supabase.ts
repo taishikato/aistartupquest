@@ -71,6 +71,54 @@ export type Database = {
         }
         Relationships: []
       }
+      company_submission_requests: {
+        Row: {
+          category: string
+          city: string
+          company_name: string
+          contact_email: string | null
+          created_at: string
+          founded: number
+          id: number
+          location_label: string
+          notes: string | null
+          short_description: string
+          status: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          category: string
+          city: string
+          company_name: string
+          contact_email?: string | null
+          created_at?: string
+          founded: number
+          id?: never
+          location_label: string
+          notes?: string | null
+          short_description: string
+          status?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          category?: string
+          city?: string
+          company_name?: string
+          contact_email?: string | null
+          created_at?: string
+          founded?: number
+          id?: never
+          location_label?: string
+          notes?: string | null
+          short_description?: string
+          status?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -2,8 +2,8 @@
 
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react"
 
-import { YC_BOSS_SLUG, type Company, type CompanyCategory } from "@/lib/company"
 import type { CityMapConfig } from "@/lib/city-config"
+import { YC_BOSS_SLUG, type Company, type CompanyCategory } from "@/lib/company"
 import { cn } from "@/lib/utils"
 import { DiscoveryPanel } from "@/components/discovery-panel"
 import { MapShell } from "@/components/map-shell"
