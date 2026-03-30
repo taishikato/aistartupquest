@@ -938,4 +938,20 @@ export const COMPANIES: Company[] = [
     sourceUrl: "https://circleback.ai",
     sourceLabel: "Circleback website",
   },
+
+  {
+    slug: "okx",
+    name: "OKX",
+    website: "https://www.okx.com",
+    shortDescription:
+      "Global crypto exchange and Web3 platform, building AI-powered trading and DeFi tools.",
+    whyItMatters:
+      "One of the world's largest crypto platforms, bringing Web3 and AI-native finance to SF's Financial District.",
+    category: "Vertical AI",
+    locationLabel: "1 Sansome St, San Francisco",
+    coordinates: [-122.40074, 37.79141],
+    founded: 2017,
+    sourceUrl: "https://www.okx.com/en-us/help/privacy-notice-us",
+    sourceLabel: "OKX US Privacy Notice – SF office address",
+  },
 ]
