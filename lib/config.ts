@@ -7,7 +7,7 @@ export const pageDescription =
   "Browse AI-native startups across San Francisco on an interactive retro quest map, with pixel-art visuals, category filters, and direct company links."
 
 export const ogImage = {
-  url: "/ogp-sf-ai-startup-map.png",
+  url: "/ogp-ai-startup-map.png",
   width: 1367,
   height: 768,
   alt: "SF Startup Quest pixel-art key visual",
