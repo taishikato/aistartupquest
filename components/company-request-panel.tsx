@@ -3,8 +3,8 @@
 import { useState, useTransition, type FormEvent } from "react"
 import { LoaderCircle, Plus, X } from "lucide-react"
 
-import { COMPANY_CATEGORIES, type CompanyCategory } from "@/lib/company"
 import type { CityId } from "@/lib/city-config"
+import { COMPANY_CATEGORIES, type CompanyCategory } from "@/lib/company"
 import { Button } from "@/components/ui/button"
 import { submitCompanyRequest } from "@/app/actions/company-request"
 
@@ -18,6 +18,7 @@ const CITY_OPTIONS = [
   { value: "toronto", label: "Toronto" },
   { value: "ny", label: "New York" },
   { value: "london", label: "London" },
+  { value: "vancouver", label: "Vancouver" },
 ] as const
 
 export function CompanyRequestPanel({ initialCity }: CompanyRequestPanelProps) {
@@ -200,7 +201,9 @@ export function CompanyRequestPanel({ initialCity }: CompanyRequestPanelProps) {
                     </span>
                     <select
                       value={city}
-                      onChange={(event) => setCity(event.target.value as CityId)}
+                      onChange={(event) =>
+                        setCity(event.target.value as CityId)
+                      }
                       className="h-11 w-full border border-[#d5d9df] bg-white px-3 text-sm text-[#111827] transition-colors outline-none focus:border-[#111827]"
                     >
                       {CITY_OPTIONS.map((option) => (

@@ -2,8 +2,8 @@ import "maplibre-gl/dist/maplibre-gl.css"
 
 import type { Metadata } from "next"
 import { Geist_Mono, Inter, Press_Start_2P } from "next/font/google"
+import { GoogleAnalytics } from "@next/third-parties/google"
 import { Analytics } from "@vercel/analytics/next"
-import { GoogleAnalytics } from '@next/third-parties/google'
 
 import "./globals.css"
 

@@ -102,8 +102,7 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
         return
       }
 
-      const hash =
-        typeof window === "undefined" ? "" : window.location.hash
+      const hash = typeof window === "undefined" ? "" : window.location.hash
       const nextUrl = nextQuery ? `${pathname}?${nextQuery}${hash}` : pathname
 
       window.history.replaceState(null, "", nextUrl)
@@ -220,7 +219,10 @@ function resolveSelectedSlug(
   slugFromQuery: string | null,
   fallbackSlug: string
 ) {
-  if (slugFromQuery && companies.some((company) => company.slug === slugFromQuery)) {
+  if (
+    slugFromQuery &&
+    companies.some((company) => company.slug === slugFromQuery)
+  ) {
     return slugFromQuery
   }
 

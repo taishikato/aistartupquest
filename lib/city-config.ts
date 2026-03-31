@@ -1,4 +1,4 @@
-export type CityId = "sf" | "toronto" | "ny" | "london"
+export type CityId = "sf" | "toronto" | "ny" | "london" | "vancouver"
 
 export type CitySwitchOption = {
   city: CityId
@@ -45,6 +45,12 @@ export const sfMapConfig: CityMapConfig = {
       label: "LDN",
       ariaLabel: "Open London AI Startup Map",
     },
+    {
+      city: "vancouver",
+      href: "/vancouver",
+      label: "VAN",
+      ariaLabel: "Open Vancouver AI Startup Map",
+    },
   ],
 }
 
@@ -74,6 +80,12 @@ export const torontoMapConfig: CityMapConfig = {
       href: "/london",
       label: "LDN",
       ariaLabel: "Open London AI Startup Map",
+    },
+    {
+      city: "vancouver",
+      href: "/vancouver",
+      label: "VAN",
+      ariaLabel: "Open Vancouver AI Startup Map",
     },
   ],
 }
@@ -105,6 +117,12 @@ export const nyMapConfig: CityMapConfig = {
       label: "LDN",
       ariaLabel: "Open London AI Startup Map",
     },
+    {
+      city: "vancouver",
+      href: "/vancouver",
+      label: "VAN",
+      ariaLabel: "Open Vancouver AI Startup Map",
+    },
   ],
 }
 
@@ -134,6 +152,48 @@ export const londonMapConfig: CityMapConfig = {
       href: "/ny",
       label: "NY",
       ariaLabel: "Open New York AI Startup Map",
+    },
+    {
+      city: "vancouver",
+      href: "/vancouver",
+      label: "VAN",
+      ariaLabel: "Open Vancouver AI Startup Map",
+    },
+  ],
+}
+
+export const vancouverMapConfig: CityMapConfig = {
+  city: "vancouver",
+  titleLines: ["Vancouver AI", "Startup Map"],
+  emptyStateTitle: "Vancouver AI Startup Map",
+  searchPlaceholder: "robotics, mining, waste...",
+  initialSelectedSlug: "sanctuary-ai",
+  mapCenter: [-123.1207, 49.2827],
+  sourceHref: "https://github.com/taishikato/sf-ai-startup-quest",
+  switchOptions: [
+    {
+      city: "sf",
+      href: "/",
+      label: "SF",
+      ariaLabel: "Open SF AI Startup Map",
+    },
+    {
+      city: "toronto",
+      href: "/toronto",
+      label: "TO",
+      ariaLabel: "Open Toronto AI Startup Map",
+    },
+    {
+      city: "ny",
+      href: "/ny",
+      label: "NY",
+      ariaLabel: "Open New York AI Startup Map",
+    },
+    {
+      city: "london",
+      href: "/london",
+      label: "LDN",
+      ariaLabel: "Open London AI Startup Map",
     },
   ],
 }

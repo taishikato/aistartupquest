@@ -1,7 +1,7 @@
 "use server"
 
-import { COMPANY_CATEGORIES, type CompanyCategory } from "@/lib/company"
 import type { CityId } from "@/lib/city-config"
+import { COMPANY_CATEGORIES, type CompanyCategory } from "@/lib/company"
 import { createAdminClient } from "@/lib/supabase/admin"
 
 type City = CityId
@@ -22,7 +22,13 @@ export type CompanyRequestResult =
   | { status: "success" }
   | { status: "error"; message: string }
 
-const VALID_CITIES = new Set<City>(["sf", "toronto", "ny", "london"])
+const VALID_CITIES = new Set<City>([
+  "sf",
+  "toronto",
+  "ny",
+  "london",
+  "vancouver",
+])
 const VALID_CATEGORIES = new Set<string>(COMPANY_CATEGORIES)
 
 export async function submitCompanyRequest(

@@ -1,14 +1,14 @@
 import type { Metadata } from "next"
 
-import { londonMapConfig } from "@/lib/city-config"
+import { vancouverMapConfig } from "@/lib/city-config"
 import { companyFromRow } from "@/lib/company"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { CityMap } from "@/components/city-map"
 
 export const metadata: Metadata = {
-  title: "London AI Startup Map: Explore AI Native Startups in London",
+  title: "Vancouver AI Startup Map: Explore AI Native Startups in Vancouver",
   description:
-    "Browse AI-native startups across London on an interactive map, with category filters, source-backed locations, and direct company links.",
+    "Browse AI-native startups across Vancouver on an interactive map, with category filters, source-backed locations, and direct company links.",
 }
 
 export default async function Page() {
@@ -18,16 +18,16 @@ export default async function Page() {
     .select(
       "slug, name, website, short_description, category, location_label, city, latitude, longitude, founded, logo_url, map_sprite, source_url"
     )
-    .match({ city: "london" })
+    .match({ city: "vancouver" })
     .order("name")
 
   if (error) throw new Error(`Failed to load companies: ${error.message}`)
 
   return (
     <CityMap
-      key="london"
+      key="vancouver"
       companies={(data ?? []).map(companyFromRow)}
-      config={londonMapConfig}
+      config={vancouverMapConfig}
     />
   )
 }
