@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import type { Metadata } from "next"
 
 import { londonMapConfig } from "@/lib/city-config"
@@ -24,10 +25,12 @@ export default async function Page() {
   if (error) throw new Error(`Failed to load companies: ${error.message}`)
 
   return (
-    <CityMap
-      key="london"
-      companies={(data ?? []).map(companyFromRow)}
-      config={londonMapConfig}
-    />
+    <Suspense fallback={null}>
+      <CityMap
+        key="london"
+        companies={(data ?? []).map(companyFromRow)}
+        config={londonMapConfig}
+      />
+    </Suspense>
   )
 }

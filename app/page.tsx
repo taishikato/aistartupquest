@@ -1,3 +1,5 @@
+import { Suspense } from "react"
+
 import { sfMapConfig } from "@/lib/city-config"
 import { companyFromRow } from "@/lib/company"
 import { createAdminClient } from "@/lib/supabase/admin"
@@ -16,10 +18,12 @@ export default async function Page() {
   if (error) throw new Error(`Failed to load companies: ${error.message}`)
 
   return (
-    <CityMap
-      key="sf"
-      companies={(data ?? []).map(companyFromRow)}
-      config={sfMapConfig}
-    />
+    <Suspense fallback={null}>
+      <CityMap
+        key="sf"
+        companies={(data ?? []).map(companyFromRow)}
+        config={sfMapConfig}
+      />
+    </Suspense>
   )
 }
