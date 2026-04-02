@@ -7,6 +7,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
 } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
 
@@ -22,6 +23,8 @@ type CityMapProps = {
   config: CityMapConfig
 }
 
+const SELECTED_PANEL_STORAGE_EVENT = "selected-company-panel-storage"
+
 export function CityMap({ companies: allCompanies, config }: CityMapProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -29,16 +32,14 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
   const [category, setCategory] = useState<CompanyCategory | "All">("All")
   const [isAudioMuted, setIsAudioMuted] = useState(true)
   const selectedPanelStorageKey = `selected-company-panel:${config.city}`
-  const [isSelectedPanelCollapsed, setIsSelectedPanelCollapsed] = useState(
-    () => {
-      if (typeof window === "undefined") {
-        return false
-      }
-
-      return (
-        window.localStorage.getItem(selectedPanelStorageKey) === "collapsed"
-      )
-    }
+  const isSelectedPanelCollapsed = useSyncExternalStore(
+    (onStoreChange) =>
+      subscribeToSelectedPanelPreference(
+        selectedPanelStorageKey,
+        onStoreChange
+      ),
+    () => readSelectedPanelPreference(selectedPanelStorageKey),
+    () => false
   )
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
@@ -81,14 +82,17 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
     audio.muted = isAudioMuted
   }, [isAudioMuted])
 
-  useEffect(() => {
+  const handleToggleSelectedPanel = useCallback(() => {
     if (typeof window === "undefined") {
       return
     }
 
-    window.localStorage.setItem(
-      selectedPanelStorageKey,
-      isSelectedPanelCollapsed ? "collapsed" : "expanded"
+    const nextValue = isSelectedPanelCollapsed ? "expanded" : "collapsed"
+    window.localStorage.setItem(selectedPanelStorageKey, nextValue)
+    window.dispatchEvent(
+      new CustomEvent(SELECTED_PANEL_STORAGE_EVENT, {
+        detail: { key: selectedPanelStorageKey },
+      })
     )
   }, [isSelectedPanelCollapsed, selectedPanelStorageKey])
 
@@ -226,9 +230,7 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
           <SelectedCompanyPanel
             company={selectedCompany}
             collapsed={isSelectedPanelCollapsed}
-            onToggleCollapsed={() =>
-              setIsSelectedPanelCollapsed((current) => !current)
-            }
+            onToggleCollapsed={handleToggleSelectedPanel}
           />
           <div className="relative h-full min-h-0 overflow-hidden">
             <MapShell
@@ -260,4 +262,49 @@ function resolveSelectedSlug(
   }
 
   return fallbackSlug
+}
+
+function readSelectedPanelPreference(key: string) {
+  if (typeof window === "undefined") {
+    return false
+  }
+
+  return window.localStorage.getItem(key) === "collapsed"
+}
+
+function subscribeToSelectedPanelPreference(
+  key: string,
+  onStoreChange: () => void
+) {
+  if (typeof window === "undefined") {
+    return () => {}
+  }
+
+  const handleStorage = (event: StorageEvent) => {
+    if (event.key === key) {
+      onStoreChange()
+    }
+  }
+
+  const handleCustomEvent = (event: Event) => {
+    const customEvent = event as CustomEvent<{ key?: string }>
+
+    if (customEvent.detail?.key === key) {
+      onStoreChange()
+    }
+  }
+
+  window.addEventListener("storage", handleStorage)
+  window.addEventListener(
+    SELECTED_PANEL_STORAGE_EVENT,
+    handleCustomEvent as EventListener
+  )
+
+  return () => {
+    window.removeEventListener("storage", handleStorage)
+    window.removeEventListener(
+      SELECTED_PANEL_STORAGE_EVENT,
+      handleCustomEvent as EventListener
+    )
+  }
 }
