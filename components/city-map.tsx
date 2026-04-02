@@ -28,6 +28,18 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
   const [search, setSearch] = useState("")
   const [category, setCategory] = useState<CompanyCategory | "All">("All")
   const [isAudioMuted, setIsAudioMuted] = useState(true)
+  const selectedPanelStorageKey = `selected-company-panel:${config.city}`
+  const [isSelectedPanelCollapsed, setIsSelectedPanelCollapsed] = useState(
+    () => {
+      if (typeof window === "undefined") {
+        return false
+      }
+
+      return (
+        window.localStorage.getItem(selectedPanelStorageKey) === "collapsed"
+      )
+    }
+  )
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const deferredSearch = useDeferredValue(search)
@@ -68,6 +80,17 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
 
     audio.muted = isAudioMuted
   }, [isAudioMuted])
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return
+    }
+
+    window.localStorage.setItem(
+      selectedPanelStorageKey,
+      isSelectedPanelCollapsed ? "collapsed" : "expanded"
+    )
+  }, [isSelectedPanelCollapsed, selectedPanelStorageKey])
 
   const handleToggleMute = async () => {
     const audio = audioRef.current
@@ -181,7 +204,9 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
           className={cn(
             "grid h-full min-h-0",
             "max-lg:grid-rows-[minmax(0,1fr)_minmax(260px,min(52vh,50dvh))]",
-            "lg:grid-cols-[380px_360px_minmax(0,1fr)]",
+            isSelectedPanelCollapsed
+              ? "lg:grid-cols-[380px_56px_minmax(0,1fr)]"
+              : "lg:grid-cols-[380px_360px_minmax(0,1fr)]",
             "lg:grid-rows-1"
           )}
         >
@@ -198,7 +223,13 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
               onSelectCompany={updateSelectedSlugInUrl}
             />
           </div>
-          <SelectedCompanyPanel company={selectedCompany} />
+          <SelectedCompanyPanel
+            company={selectedCompany}
+            collapsed={isSelectedPanelCollapsed}
+            onToggleCollapsed={() =>
+              setIsSelectedPanelCollapsed((current) => !current)
+            }
+          />
           <div className="relative h-full min-h-0 overflow-hidden">
             <MapShell
               key={config.initialSelectedSlug}
