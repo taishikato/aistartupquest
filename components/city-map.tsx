@@ -395,7 +395,6 @@ export function CityMap({
           )}
           <div className="relative h-full min-h-0 overflow-hidden">
             <MapShell
-              key={`${config.city}-${mode}`}
               mode={mode}
               companies={mapCompanies}
               meetups={mapMeetups}
