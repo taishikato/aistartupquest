@@ -59,7 +59,7 @@ export function DiscoveryPanel({
   useEffect(() => {
     const activeItem = activeItemRef.current
     const slug =
-      mode === "startups" ? selectedCompany.slug : selectedMeetup?.slug ?? ""
+      mode === "startups" ? selectedCompany.slug : (selectedMeetup?.slug ?? "")
     const isSelectedVisible =
       mode === "startups"
         ? companies.some((company) => company.slug === slug)
@@ -76,14 +76,13 @@ export function DiscoveryPanel({
     })
   }, [companies, meetups, mode, selectedCompany.slug, selectedMeetup?.slug])
 
-  const boardCount =
-    mode === "startups" ? companies.length : meetups.length
+  const boardCount = mode === "startups" ? companies.length : meetups.length
   const boardLabel =
     mode === "startups" ? "players on the board" : "upcoming meetups"
 
   return (
-    <aside className="flex h-full min-h-0 flex-col gap-4 overflow-y-auto border-r-3 border-[#1a1a2e] bg-[#1a1a2e] p-5 text-[#f0f7e6]">
-      <div className="space-y-4">
+    <aside className="flex h-full min-h-0 flex-col overflow-hidden border-r-3 border-[#1a1a2e] bg-[#1a1a2e] text-[#f0f7e6]">
+      <div className="shrink-0 border-b-2 border-[#3a3a5e] bg-[#1a1a2e] px-5 pt-5 pb-4 shadow-[0_6px_14px_rgba(26,26,46,0.5)]">
         <div className="space-y-3">
           <div className="flex items-start gap-3">
             <Image
@@ -105,7 +104,7 @@ export function DiscoveryPanel({
           </div>
         </div>
 
-        <div className="flex gap-2 border-2 border-[#3a3a5e] bg-[#2a2a4e] p-2">
+        <div className="mt-4 flex gap-2 border-2 border-[#3a3a5e] bg-[#2a2a4e] p-2">
           <button
             type="button"
             onClick={() => onModeChange("startups")}
@@ -133,141 +132,151 @@ export function DiscoveryPanel({
         </div>
       </div>
 
-      <div className="space-y-4 border-2 border-[#3a3a5e] bg-[#2a2a4e] p-4">
-        <label className="block">
-          <span className="font-(family-name:--font-pixel) text-[8px] text-[#ffe66d]">
-            Search
-          </span>
-          <span className="relative mt-2 block">
-            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#f0f7e6]/50" />
-            <input
-              value={search}
-              onChange={(event) => onSearchChange(event.target.value)}
-              placeholder={
-                mode === "startups" ? searchPlaceholder : meetupSearchPlaceholder
-              }
-              className="h-11 w-full border-2 border-[#3a3a5e] bg-[#1a1a2e] pr-4 pl-10 text-sm text-[#f0f7e6] transition-colors outline-none placeholder:text-[#f0f7e6]/30 focus:border-[#4ecdc4]"
-            />
-          </span>
-        </label>
-
-        {mode === "startups" ? (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
+      <div className="min-h-0 flex-1 overflow-y-auto px-5 pt-4 pb-5">
+        <div className="flex flex-col gap-4">
+          <div className="space-y-4 border-2 border-[#3a3a5e] bg-[#2a2a4e] p-4">
+            <label className="block">
               <span className="font-(family-name:--font-pixel) text-[8px] text-[#ffe66d]">
-                Category
+                Search
               </span>
-              <button
-                type="button"
-                onClick={() => onCategoryChange("All")}
-                className="font-(family-name:--font-pixel) text-[7px] text-[#ff6b6b] hover:text-[#ff6b6b]/80"
-              >
-                Reset
-              </button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <FilterPill
-                active={category === "All"}
-                label="All"
-                color={FILTER_ALL_COLOR}
-                onClick={() => onCategoryChange("All")}
-              />
-              {COMPANY_CATEGORIES.map((item) => (
-                <FilterPill
-                  key={item}
-                  active={category === item}
-                  label={item}
-                  color={CATEGORY_COLORS[item]}
-                  onClick={() => onCategoryChange(item)}
-                />
-              ))}
-            </div>
-          </div>
-        ) : null}
-      </div>
-
-      <section className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="font-[family-name:var(--font-pixel)] text-[8px] text-[#4ecdc4]">
-            On the map
-          </h2>
-          <span className="font-[family-name:var(--font-pixel)] text-[6px] text-[#f0f7e6]/50">
-            Tap to select
-          </span>
-        </div>
-        {mode === "startups" ? (
-          companies.length > 0 ? (
-            <div className="grid gap-3 pr-1">
-              {companies.map((company) => (
-                <div
-                  key={company.slug}
-                  ref={
-                    company.slug === selectedCompany.slug ? activeItemRef : null
+              <span className="relative mt-2 block">
+                <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#f0f7e6]/50" />
+                <input
+                  value={search}
+                  onChange={(event) => onSearchChange(event.target.value)}
+                  placeholder={
+                    mode === "startups"
+                      ? searchPlaceholder
+                      : meetupSearchPlaceholder
                   }
-                >
-                  <CompanyCard
-                    company={company}
-                    compact
-                    active={company.slug === selectedCompany.slug}
-                    onSelect={onSelectCompany}
-                  />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="border-2 border-dashed border-[#3a3a5e] bg-[#2a2a4e] p-6">
-              <h3 className="font-(family-name:--font-pixel) text-[9px] text-[#ff6b6b]">
-                No match found!
-              </h3>
-              <p className="mt-2 text-xs leading-5 text-[#f0f7e6]/70">
-                Clear the search or switch to All to broaden the view.
-              </p>
-            </div>
-          )
-        ) : meetups.length > 0 ? (
-          <div className="grid gap-3 pr-1">
-            {meetups.map((meetup) => (
-              <div
-                key={meetup.slug}
-                ref={
-                  meetup.slug === selectedMeetup?.slug ? activeItemRef : null
-                }
-              >
-                <MeetupCard
-                  meetup={meetup}
-                  timeZone={timeZone}
-                  compact
-                  active={meetup.slug === selectedMeetup?.slug}
-                  onSelect={onSelectMeetup}
+                  className="h-11 w-full border-2 border-[#3a3a5e] bg-[#1a1a2e] pr-4 pl-10 text-sm text-[#f0f7e6] transition-colors outline-none placeholder:text-[#f0f7e6]/30 focus:border-[#4ecdc4]"
                 />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="border-2 border-dashed border-[#3a3a5e] bg-[#2a2a4e] p-6">
-            <h3 className="font-(family-name:--font-pixel) text-[9px] text-[#ff6b6b]">
-              No upcoming meetups
-            </h3>
-            <p className="mt-2 text-xs leading-5 text-[#f0f7e6]/70">
-              Be the first to post a meetup for this city. Use Add meetup on
-              the map.
-            </p>
-          </div>
-        )}
-      </section>
+              </span>
+            </label>
 
-      <section className="space-y-3 lg:hidden">
-        <h2 className="font-(family-name:--font-pixel) text-[8px] text-[#4ecdc4]">
-          Selected
-        </h2>
-        {mode === "startups" ? (
-          <CompanyCard company={selectedCompany} active />
-        ) : selectedMeetup ? (
-          <MeetupCard meetup={selectedMeetup} timeZone={timeZone} active />
-        ) : (
-          <p className="text-xs text-[#f0f7e6]/60">Nothing selected</p>
-        )}
-      </section>
+            {mode === "startups" ? (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-(family-name:--font-pixel) text-[8px] text-[#ffe66d]">
+                    Category
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => onCategoryChange("All")}
+                    className="font-(family-name:--font-pixel) text-[7px] text-[#ff6b6b] hover:text-[#ff6b6b]/80"
+                  >
+                    Reset
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <FilterPill
+                    active={category === "All"}
+                    label="All"
+                    color={FILTER_ALL_COLOR}
+                    onClick={() => onCategoryChange("All")}
+                  />
+                  {COMPANY_CATEGORIES.map((item) => (
+                    <FilterPill
+                      key={item}
+                      active={category === item}
+                      label={item}
+                      color={CATEGORY_COLORS[item]}
+                      onClick={() => onCategoryChange(item)}
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </div>
+
+          <section className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="font-[family-name:var(--font-pixel)] text-[8px] text-[#4ecdc4]">
+                On the map
+              </h2>
+              <span className="font-[family-name:var(--font-pixel)] text-[6px] text-[#f0f7e6]/50">
+                Tap to select
+              </span>
+            </div>
+            {mode === "startups" ? (
+              companies.length > 0 ? (
+                <div className="grid gap-3 pr-1">
+                  {companies.map((company) => (
+                    <div
+                      key={company.slug}
+                      ref={
+                        company.slug === selectedCompany.slug
+                          ? activeItemRef
+                          : null
+                      }
+                    >
+                      <CompanyCard
+                        company={company}
+                        compact
+                        active={company.slug === selectedCompany.slug}
+                        onSelect={onSelectCompany}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-[#3a3a5e] bg-[#2a2a4e] p-6">
+                  <h3 className="font-(family-name:--font-pixel) text-[9px] text-[#ff6b6b]">
+                    No match found!
+                  </h3>
+                  <p className="mt-2 text-xs leading-5 text-[#f0f7e6]/70">
+                    Clear the search or switch to All to broaden the view.
+                  </p>
+                </div>
+              )
+            ) : meetups.length > 0 ? (
+              <div className="grid gap-3 pr-1">
+                {meetups.map((meetup) => (
+                  <div
+                    key={meetup.slug}
+                    ref={
+                      meetup.slug === selectedMeetup?.slug
+                        ? activeItemRef
+                        : null
+                    }
+                  >
+                    <MeetupCard
+                      meetup={meetup}
+                      timeZone={timeZone}
+                      compact
+                      active={meetup.slug === selectedMeetup?.slug}
+                      onSelect={onSelectMeetup}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="border-2 border-dashed border-[#3a3a5e] bg-[#2a2a4e] p-6">
+                <h3 className="font-(family-name:--font-pixel) text-[9px] text-[#ff6b6b]">
+                  No upcoming meetups
+                </h3>
+                <p className="mt-2 text-xs leading-5 text-[#f0f7e6]/70">
+                  Be the first to post a meetup for this city. Use Add meetup on
+                  the map.
+                </p>
+              </div>
+            )}
+          </section>
+
+          <section className="space-y-3 lg:hidden">
+            <h2 className="font-(family-name:--font-pixel) text-[8px] text-[#4ecdc4]">
+              Selected
+            </h2>
+            {mode === "startups" ? (
+              <CompanyCard company={selectedCompany} active />
+            ) : selectedMeetup ? (
+              <MeetupCard meetup={selectedMeetup} timeZone={timeZone} active />
+            ) : (
+              <p className="text-xs text-[#f0f7e6]/60">Nothing selected</p>
+            )}
+          </section>
+        </div>
+      </div>
     </aside>
   )
 }
