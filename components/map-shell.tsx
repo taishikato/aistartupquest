@@ -774,10 +774,12 @@ function createMeetupSignboardMarker(
   dense: boolean
 ) {
   const OL = "#342414"
-  const wood = active ? "#c17a3a" : "#9d6230"
+  const wood = active ? "#b77438" : "#95602f"
   const woodDark = "#5c3a1e"
-  const plank = dense ? (active ? 32 : 28) : active ? 38 : 32
-  const h = dense ? (active ? 40 : 34) : active ? 48 : 40
+  const paper = active ? "#f5e7bf" : "#ead9ab"
+  const paperLine = "#8c6b3d"
+  const plank = dense ? (active ? 24 : 22) : active ? 28 : 24
+  const h = dense ? (active ? 30 : 28) : active ? 36 : 32
 
   const wrapper = sd({
     display: "flex",
@@ -790,14 +792,14 @@ function createMeetupSignboardMarker(
   const posts = sd({
     display: "flex",
     flexDirection: "row",
-    gap: `${Math.round(plank * 0.4)}px`,
-    marginBottom: "-4px",
+    gap: `${Math.round(plank * 0.34)}px`,
+    marginBottom: "-3px",
   })
   for (let i = 0; i < 2; i++) {
     posts.appendChild(
       sd({
-        width: `${Math.round(plank * 0.14)}px`,
-        height: `${Math.round(h * 0.35)}px`,
+        width: `${Math.max(3, Math.round(plank * 0.12))}px`,
+        height: `${Math.round(h * 0.3)}px`,
         background: woodDark,
         border: `2px solid ${OL}`,
       })
@@ -811,38 +813,65 @@ function createMeetupSignboardMarker(
     background: wood,
     border: `${active ? 3 : 2}px solid ${OL}`,
     boxShadow: active
-      ? `0 0 0 2px rgba(255,230,109,0.45), 4px 4px 0 ${OL}`
-      : `4px 4px 0 ${OL}`,
+      ? `0 0 0 2px rgba(255,230,109,0.32), 3px 3px 0 ${OL}`
+      : `3px 3px 0 ${OL}`,
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    padding: "6px 4px",
+    padding: "4px 3px",
     position: "relative",
   })
 
   board.appendChild(
     sd({
       position: "absolute",
-      top: "4px",
-      width: "6px",
-      height: "6px",
+      top: "3px",
+      width: "5px",
+      height: "5px",
       background: "#5a5a5a",
       border: `1px solid ${OL}`,
     })
   )
 
-  const bang = document.createElement("span")
-  bang.textContent = "!"
-  Object.assign(bang.style, {
-    fontSize: dense ? "15px" : "17px",
-    fontWeight: "900",
-    color: OL,
-    lineHeight: "1",
-    marginTop: "6px",
-    fontFamily: "ui-sans-serif, system-ui, sans-serif",
+  const flyer = sd({
+    width: `${Math.round(plank * 0.54)}px`,
+    height: `${Math.round(h * 0.48)}px`,
+    background: paper,
+    border: `1px solid ${OL}`,
+    boxSizing: "border-box",
+    marginTop: "4px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "2px",
   })
-  board.appendChild(bang)
+
+  flyer.appendChild(
+    sd({
+      width: `${Math.round(plank * 0.24)}px`,
+      height: `${Math.max(2, Math.round(h * 0.06))}px`,
+      background: paperLine,
+    })
+  )
+  flyer.appendChild(
+    sd({
+      width: `${Math.round(plank * 0.24)}px`,
+      height: `${Math.round(plank * 0.24)}px`,
+      border: `1px solid ${paperLine}`,
+      boxSizing: "border-box",
+      background: "rgba(255,255,255,0.16)",
+    })
+  )
+  flyer.appendChild(
+    sd({
+      width: `${Math.round(plank * 0.2)}px`,
+      height: `${Math.max(2, Math.round(h * 0.05))}px`,
+      background: paperLine,
+    })
+  )
+  board.appendChild(flyer)
 
   float.appendChild(board)
   wrapper.appendChild(float)
@@ -850,7 +879,7 @@ function createMeetupSignboardMarker(
   wrapper.appendChild(
     sd({
       width: `${Math.round(plank * 0.9)}px`,
-      height: "6px",
+      height: "5px",
       background: "rgba(52,36,20,0.35)",
       marginTop: "2px",
     })
