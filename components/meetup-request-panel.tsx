@@ -1,6 +1,7 @@
 "use client"
 
 import { useRef, useState, useTransition, type FormEvent } from "react"
+import { useQueryClient } from "@tanstack/react-query"
 import { LoaderCircle, Plus, X } from "lucide-react"
 
 import { CITY_TIMEZONES, type CityId } from "@/lib/city-config"
@@ -28,6 +29,7 @@ const CITY_OPTIONS = [
 const WEBSITE_PATTERN = "https?://.+"
 
 export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
+  const queryClient = useQueryClient()
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ""
   const [isOpen, setIsOpen] = useState(false)
   const [city, setCity] = useState<CityId>(initialCity)
@@ -125,6 +127,7 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
 
     let startsAtUtc: string
     let endsAtUtc: string | null = null
+    const submittedCity = city
     const tz = CITY_TIMEZONES[city]
     try {
       startsAtUtc = meetupLocalInputToUtcIso(startsAtLocal, tz)
@@ -162,6 +165,9 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
       }
 
       resetForm()
+      void queryClient.invalidateQueries({
+        queryKey: ["meetups", submittedCity],
+      })
       setStatus("success")
     })
   }
@@ -292,9 +298,7 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
                     <input
                       type="datetime-local"
                       value={startsAtLocal}
-                      onChange={(event) =>
-                        setStartsAtLocal(event.target.value)
-                      }
+                      onChange={(event) => setStartsAtLocal(event.target.value)}
                       required
                       className="h-11 w-full border border-[#d5d9df] bg-white px-3 text-sm text-[#111827] transition-colors outline-none focus:border-[#111827]"
                     />

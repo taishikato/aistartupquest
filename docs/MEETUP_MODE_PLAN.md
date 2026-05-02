@@ -335,9 +335,13 @@ There are currently multiple city `page.tsx` files with repeated query structure
 Implementation direction:
 
 1. Create a shared city page data loader in `lib` or `app` server utilities
-2. Fetch `companies` and `meetups` together for the requested city
-3. Keep using the admin client on the server for page data loading, matching the current pattern
+2. Keep `companies` in server page data loading with the admin client
+3. Fetch `meetups` client-side through the public
+   `published_upcoming_meetups` view with TanStack Query
 4. Continue using `.match({ city: ... })` for Supabase filters
+
+See `docs/MEETUP_CLIENT_FETCH_PLAN.md` for the current meetup client-fetch
+implementation plan and security boundary.
 
 ## Types And Helpers
 

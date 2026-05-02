@@ -9,6 +9,7 @@ import "./globals.css"
 
 import { ogImage, pageDescription, pageTitle, siteUrl } from "@/lib/config"
 import { cn } from "@/lib/utils"
+import { QueryProvider } from "@/components/query-provider"
 import { ThemeProvider } from "@/components/theme-provider"
 
 export const metadata: Metadata = {
@@ -75,7 +76,7 @@ export default function RootLayout({
           forcedTheme="light"
           disableTransitionOnChange
         >
-          {children}
+          <QueryProvider>{children}</QueryProvider>
         </ThemeProvider>
         <Analytics />
       </body>

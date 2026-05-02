@@ -20,6 +20,8 @@ type DiscoveryPanelProps = {
   onModeChange: (mode: DiscoveryMode) => void
   companies: Company[]
   meetups: Meetup[]
+  meetupsLoading: boolean
+  meetupsError: boolean
   selectedCompany: Company
   selectedMeetup: Meetup | null
   titleLines: [string, string]
@@ -41,6 +43,8 @@ export function DiscoveryPanel({
   onModeChange,
   companies,
   meetups,
+  meetupsLoading,
+  meetupsError,
   selectedCompany,
   selectedMeetup,
   titleLines,
@@ -76,9 +80,18 @@ export function DiscoveryPanel({
     })
   }, [companies, meetups, mode, selectedCompany.slug, selectedMeetup?.slug])
 
-  const boardCount = mode === "startups" ? companies.length : meetups.length
+  const boardCount =
+    mode === "meetups" && meetupsLoading
+      ? "Loading"
+      : mode === "startups"
+        ? companies.length
+        : meetups.length
   const boardLabel =
-    mode === "startups" ? "players on the board" : "upcoming meetups"
+    mode === "startups"
+      ? "players on the board"
+      : meetupsError
+        ? "meetups unavailable"
+        : "upcoming meetups"
 
   return (
     <aside className="flex h-full min-h-0 flex-col overflow-hidden border-r-3 border-[#1a1a2e] bg-[#1a1a2e] text-[#f0f7e6]">
@@ -229,6 +242,24 @@ export function DiscoveryPanel({
                   </p>
                 </div>
               )
+            ) : meetupsLoading ? (
+              <div className="border-2 border-dashed border-[#3a3a5e] bg-[#2a2a4e] p-6">
+                <h3 className="font-(family-name:--font-pixel) text-[9px] text-[#ffe66d]">
+                  Loading meetups
+                </h3>
+                <p className="mt-2 text-xs leading-5 text-[#f0f7e6]/70">
+                  Finding upcoming meetups for this city.
+                </p>
+              </div>
+            ) : meetupsError ? (
+              <div className="border-2 border-dashed border-[#3a3a5e] bg-[#2a2a4e] p-6">
+                <h3 className="font-(family-name:--font-pixel) text-[9px] text-[#ff6b6b]">
+                  Could not load meetups
+                </h3>
+                <p className="mt-2 text-xs leading-5 text-[#f0f7e6]/70">
+                  Please try again in a moment.
+                </p>
+              </div>
             ) : meetups.length > 0 ? (
               <div className="grid gap-3 pr-1">
                 {meetups.map((meetup) => (
@@ -269,6 +300,12 @@ export function DiscoveryPanel({
             </h2>
             {mode === "startups" ? (
               <CompanyCard company={selectedCompany} active />
+            ) : meetupsLoading ? (
+              <p className="text-xs text-[#f0f7e6]/60">Loading meetups...</p>
+            ) : meetupsError ? (
+              <p className="text-xs text-[#f0f7e6]/60">
+                Could not load meetups.
+              </p>
             ) : selectedMeetup ? (
               <MeetupCard meetup={selectedMeetup} timeZone={timeZone} active />
             ) : (

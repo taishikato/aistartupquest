@@ -205,7 +205,24 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      published_upcoming_meetups: {
+        Row: {
+          city: string | null
+          description: string | null
+          ends_at: string | null
+          event_url: string | null
+          latitude: number | null
+          location_label: string | null
+          longitude: number | null
+          organizer_name: string | null
+          slug: string | null
+          starts_at: string | null
+          status: string | null
+          title: string | null
+          venue_name: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never

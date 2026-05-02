@@ -12,16 +12,11 @@ export const metadata: Metadata = {
 }
 
 export default async function Page() {
-  const { companies, meetups } = await loadCityMapPageData("ny")
+  const { companies } = await loadCityMapPageData("ny")
 
   return (
     <Suspense fallback={null}>
-      <CityMap
-        key="ny"
-        companies={companies}
-        meetups={meetups}
-        config={nyMapConfig}
-      />
+      <CityMap key="ny" companies={companies} config={nyMapConfig} />
     </Suspense>
   )
 }

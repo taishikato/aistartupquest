@@ -39,6 +39,9 @@ type MeetupRow = Pick<
   | "status"
 >
 
+type PublicMeetupRow =
+  Database["public"]["Views"]["published_upcoming_meetups"]["Row"]
+
 export function meetupFromRow(row: MeetupRow): Meetup {
   return {
     slug: row.slug,
@@ -57,8 +60,29 @@ export function meetupFromRow(row: MeetupRow): Meetup {
   }
 }
 
+export function meetupFromPublicRow(row: PublicMeetupRow): Meetup {
+  return {
+    slug: row.slug as string,
+    city: row.city as CityId,
+    title: row.title as string,
+    description: row.description as string,
+    venueName: row.venue_name as string,
+    locationLabel: row.location_label as string,
+    coordinates: [row.longitude as number, row.latitude as number],
+    startsAt: row.starts_at as string,
+    endsAt: row.ends_at,
+    organizerName: row.organizer_name as string,
+    eventUrl: row.event_url as string,
+    contactEmail: null,
+    status: row.status as MeetupStatus,
+  }
+}
+
 /** Matches the "upcoming" rule from MEETUP_MODE_PLAN (client-side filter on fetched rows). */
-export function isMeetupUpcoming(meetup: Meetup, nowMs: number = Date.now()): boolean {
+export function isMeetupUpcoming(
+  meetup: Meetup,
+  nowMs: number = Date.now()
+): boolean {
   if (meetup.status !== "published") {
     return false
   }
