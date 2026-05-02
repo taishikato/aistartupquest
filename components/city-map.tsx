@@ -58,7 +58,14 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
   const allMeetups = meetupsError
     ? EMPTY_MEETUPS
     : (meetupsQuery.data ?? EMPTY_MEETUPS)
-  const meetupsSelectionUnavailable = meetupsLoading || meetupsError
+  const meetupSlugFromQuery = searchParams.get("m")
+  const isFetchingMissingMeetup =
+    mode === "meetups" &&
+    Boolean(meetupSlugFromQuery) &&
+    meetupsQuery.isFetching &&
+    !allMeetups.some((meetup) => meetup.slug === meetupSlugFromQuery)
+  const meetupsSelectionUnavailable =
+    meetupsLoading || meetupsError || isFetchingMissingMeetup
 
   const selectedSlug = useMemo(
     () =>
@@ -126,7 +133,7 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
   }, [allMeetups, deferredSearch])
 
   const selectedMeetupSlug = useMemo(() => {
-    const slugFromQuery = searchParams.get("m")
+    const slugFromQuery = meetupSlugFromQuery
 
     if (meetupsSelectionUnavailable && slugFromQuery) {
       return slugFromQuery
@@ -137,7 +144,12 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
       slugFromQuery,
       filteredMeetups[0]?.slug ?? null
     )
-  }, [allMeetups, filteredMeetups, meetupsSelectionUnavailable, searchParams])
+  }, [
+    allMeetups,
+    filteredMeetups,
+    meetupSlugFromQuery,
+    meetupsSelectionUnavailable,
+  ])
 
   const selectedCompany =
     filteredCompanies.find((company) => company.slug === selectedSlug) ??
