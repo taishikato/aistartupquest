@@ -6,6 +6,7 @@ import { LoaderCircle, Plus, X } from "lucide-react"
 
 import { CITY_TIMEZONES, type CityId } from "@/lib/city-config"
 import { meetupLocalInputToUtcIso } from "@/lib/meetup-datetime"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   TurnstileWidget,
@@ -27,6 +28,14 @@ const CITY_OPTIONS = [
 ] as const
 
 const WEBSITE_PATTERN = "https?://.+"
+const FIELD_BASE_CLASS =
+  "w-full border border-[#d5d9df] bg-white text-sm text-[#111827] transition-colors outline-none placeholder:text-[#9ca3af] focus:border-[#111827]"
+const INPUT_CLASS = cn(FIELD_BASE_CLASS, "h-11 px-3")
+const DATE_INPUT_CLASS = cn(INPUT_CLASS, "[color-scheme:light]")
+const TEXTAREA_CLASS = cn(FIELD_BASE_CLASS, "resize-none px-3 py-3 leading-6")
+const FIELD_LABEL_CLASS = cn(
+  "mb-2 block text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase"
+)
 
 export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
   const queryClient = useQueryClient()
@@ -183,7 +192,7 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
               setStatus("idle")
             }
           }}
-          className="h-11 border border-[#d5d9df] bg-white px-4 text-[12px] font-semibold tracking-[0.08em] text-[#111827] uppercase shadow-[0_10px_30px_rgba(15,23,42,0.12)] hover:bg-[#f8fafc]"
+          className="h-11 border-2 border-[#111827] bg-white px-4 text-[12px] font-semibold tracking-[0.08em] text-[#111827] uppercase shadow-[3px_3px_0_#111827] hover:bg-[#f8fafc]"
         >
           <Plus className="size-4" />
           Add meetup
@@ -191,31 +200,33 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
       </div>
 
       {isOpen ? (
-        <div className="absolute inset-0 z-30 flex justify-end bg-[rgba(15,23,42,0.16)]">
-          <div className="flex h-full w-full max-w-[420px] flex-col border-l border-[#d5d9df] bg-white shadow-[-12px_0_40px_rgba(15,23,42,0.16)]">
-            <div className="flex items-start justify-between gap-4 border-b border-[#e5e7eb] px-5 py-4">
-              <div>
-                <p className="text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
-                  Add meetup
-                </p>
-                <h2 className="mt-1 text-[20px] font-semibold text-[#111827]">
-                  Post an upcoming meetup
-                </h2>
-                <p className="mt-2 max-w-[28ch] text-sm leading-6 text-[#4b5563]">
-                  Listings are published immediately. Times use each city&apos;s
-                  local timezone (based on the city you select above).
-                </p>
+        <div className="absolute inset-0 z-30 flex justify-end bg-[rgba(17,24,39,0.18)]">
+          <div className="flex h-full w-full max-w-[420px] flex-col border-l-2 border-[#111827] bg-white text-[#111827] shadow-[-6px_0_0_rgba(17,24,39,0.16)]">
+            <div className="border-b border-[#d5d9df] bg-[#f8fafc] px-5 py-4">
+              <div className="flex items-start justify-between gap-4 border border-[#d5d9df] bg-white px-4 py-3">
+                <div>
+                  <p className="text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
+                    Add meetup
+                  </p>
+                  <h2 className="mt-2 text-[22px] leading-[1.15] font-semibold tracking-tight text-[#111827]">
+                    Post an upcoming meetup
+                  </h2>
+                  <p className="mt-3 max-w-[30ch] text-sm leading-6 text-[#4b5563]">
+                    Times use each city&apos;s local timezone based on the city
+                    you select above.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleClose}
+                  className="mt-0.5 border border-[#d5d9df] bg-white text-[#4b5563] hover:border-[#111827] hover:bg-[#f8fafc] hover:text-[#111827]"
+                  aria-label="Close meetup panel"
+                >
+                  <X className="size-4" />
+                </Button>
               </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={handleClose}
-                className="mt-0.5 border border-[#e5e7eb] bg-white text-[#4b5563] hover:bg-[#f9fafb]"
-                aria-label="Close meetup panel"
-              >
-                <X className="size-4" />
-              </Button>
             </div>
 
             <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
@@ -243,15 +254,13 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
               ) : (
                 <form className="space-y-4" onSubmit={handleSubmit}>
                   <label className="block">
-                    <span className="mb-2 block text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
-                      City
-                    </span>
+                    <span className={cn(FIELD_LABEL_CLASS)}>City</span>
                     <select
                       value={city}
                       onChange={(event) =>
                         setCity(event.target.value as CityId)
                       }
-                      className="h-11 w-full border border-[#d5d9df] bg-white px-3 text-sm text-[#111827] transition-colors outline-none focus:border-[#111827]"
+                      className={cn(INPUT_CLASS)}
                     >
                       {CITY_OPTIONS.map((option) => (
                         <option key={option.value} value={option.value}>
@@ -262,37 +271,33 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
                   </label>
 
                   <label className="block">
-                    <span className="mb-2 block text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
-                      Title
-                    </span>
+                    <span className={cn(FIELD_LABEL_CLASS)}>Title</span>
                     <input
                       type="text"
                       value={title}
                       onChange={(event) => setTitle(event.target.value)}
                       required
                       maxLength={200}
-                      className="h-11 w-full border border-[#d5d9df] bg-white px-3 text-sm text-[#111827] transition-colors outline-none placeholder:text-[#9ca3af] focus:border-[#111827]"
+                      className={cn(INPUT_CLASS)}
                       placeholder="Event title"
                     />
                   </label>
 
                   <label className="block">
-                    <span className="mb-2 block text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
-                      Description
-                    </span>
+                    <span className={cn(FIELD_LABEL_CLASS)}>Description</span>
                     <textarea
                       value={description}
                       onChange={(event) => setDescription(event.target.value)}
                       required
                       maxLength={5000}
                       rows={4}
-                      className="w-full resize-none border border-[#d5d9df] bg-white px-3 py-3 text-sm leading-6 text-[#111827] transition-colors outline-none placeholder:text-[#9ca3af] focus:border-[#111827]"
+                      className={cn(TEXTAREA_CLASS)}
                       placeholder="What is this meetup about?"
                     />
                   </label>
 
                   <label className="block">
-                    <span className="mb-2 block text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
+                    <span className={cn(FIELD_LABEL_CLASS)}>
                       Starts (local)
                     </span>
                     <input
@@ -300,71 +305,63 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
                       value={startsAtLocal}
                       onChange={(event) => setStartsAtLocal(event.target.value)}
                       required
-                      className="h-11 w-full border border-[#d5d9df] bg-white px-3 text-sm text-[#111827] transition-colors outline-none focus:border-[#111827]"
+                      className={cn(DATE_INPUT_CLASS)}
                     />
                   </label>
 
                   <label className="block">
-                    <span className="mb-2 block text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
+                    <span className={cn(FIELD_LABEL_CLASS)}>
                       Ends (local, optional)
                     </span>
                     <input
                       type="datetime-local"
                       value={endsAtLocal}
                       onChange={(event) => setEndsAtLocal(event.target.value)}
-                      className="h-11 w-full border border-[#d5d9df] bg-white px-3 text-sm text-[#111827] transition-colors outline-none focus:border-[#111827]"
+                      className={cn(DATE_INPUT_CLASS)}
                     />
                   </label>
 
                   <label className="block">
-                    <span className="mb-2 block text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
-                      Venue name
-                    </span>
+                    <span className={cn(FIELD_LABEL_CLASS)}>Venue name</span>
                     <input
                       type="text"
                       value={venueName}
                       onChange={(event) => setVenueName(event.target.value)}
                       required
                       maxLength={200}
-                      className="h-11 w-full border border-[#d5d9df] bg-white px-3 text-sm text-[#111827] transition-colors outline-none placeholder:text-[#9ca3af] focus:border-[#111827]"
+                      className={cn(INPUT_CLASS)}
                       placeholder="Venue or building"
                     />
                   </label>
 
                   <label className="block">
-                    <span className="mb-2 block text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
-                      Address
-                    </span>
+                    <span className={cn(FIELD_LABEL_CLASS)}>Address</span>
                     <input
                       type="text"
                       value={locationLabel}
                       onChange={(event) => setLocationLabel(event.target.value)}
                       required
                       maxLength={300}
-                      className="h-11 w-full border border-[#d5d9df] bg-white px-3 text-sm text-[#111827] transition-colors outline-none placeholder:text-[#9ca3af] focus:border-[#111827]"
+                      className={cn(INPUT_CLASS)}
                       placeholder="Street, neighborhood, postal code"
                     />
                   </label>
 
                   <label className="block">
-                    <span className="mb-2 block text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
-                      Organizer
-                    </span>
+                    <span className={cn(FIELD_LABEL_CLASS)}>Organizer</span>
                     <input
                       type="text"
                       value={organizerName}
                       onChange={(event) => setOrganizerName(event.target.value)}
                       required
                       maxLength={120}
-                      className="h-11 w-full border border-[#d5d9df] bg-white px-3 text-sm text-[#111827] transition-colors outline-none placeholder:text-[#9ca3af] focus:border-[#111827]"
+                      className={cn(INPUT_CLASS)}
                       placeholder="Host or group name"
                     />
                   </label>
 
                   <label className="block">
-                    <span className="mb-2 block text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
-                      Event link
-                    </span>
+                    <span className={cn(FIELD_LABEL_CLASS)}>Event link</span>
                     <input
                       type="url"
                       value={eventUrl}
@@ -372,13 +369,13 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
                       required
                       maxLength={2000}
                       pattern={WEBSITE_PATTERN}
-                      className="h-11 w-full border border-[#d5d9df] bg-white px-3 text-sm text-[#111827] transition-colors outline-none placeholder:text-[#9ca3af] focus:border-[#111827]"
+                      className={cn(INPUT_CLASS)}
                       placeholder="https://example.com/rsvp"
                     />
                   </label>
 
                   <label className="block">
-                    <span className="mb-2 block text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
+                    <span className={cn(FIELD_LABEL_CLASS)}>
                       Contact email (optional)
                     </span>
                     <input
@@ -386,14 +383,14 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
                       value={contactEmail}
                       onChange={(event) => setContactEmail(event.target.value)}
                       maxLength={255}
-                      className="h-11 w-full border border-[#d5d9df] bg-white px-3 text-sm text-[#111827] transition-colors outline-none placeholder:text-[#9ca3af] focus:border-[#111827]"
+                      className={cn(INPUT_CLASS)}
                       placeholder="Optional"
                     />
                   </label>
 
                   {siteKey ? (
                     <div className="space-y-2">
-                      <span className="block text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
+                      <span className={cn(FIELD_LABEL_CLASS, "mb-0")}>
                         Verification
                       </span>
                       <TurnstileWidget
@@ -415,10 +412,7 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
                     </div>
                   ) : null}
 
-                  <div className="flex items-center justify-between gap-3 pt-2">
-                    <p className="text-xs leading-5 text-[#6b7280]">
-                      This listing is published immediately.
-                    </p>
+                  <div className="flex justify-end pt-2">
                     <Button
                       type="submit"
                       disabled={
@@ -427,7 +421,7 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
                         !siteKey ||
                         !turnstileToken
                       }
-                      className="h-11 min-w-[148px] border border-[#111827] bg-[#111827] px-4 text-[12px] font-semibold tracking-[0.08em] text-white uppercase hover:bg-[#1f2937]"
+                      className="h-11 min-w-[148px] border-2 border-[#111827] bg-white px-4 text-[12px] font-semibold tracking-[0.08em] text-[#111827] uppercase shadow-[3px_3px_0_#111827] hover:bg-[#f8fafc]"
                     >
                       {status === "submitting" || isPending ? (
                         <>
