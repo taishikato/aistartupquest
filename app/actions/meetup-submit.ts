@@ -2,7 +2,7 @@
 
 import { headers } from "next/headers"
 
-import type { CityId } from "@/lib/city-config"
+import { CITY_TIMEZONES, type CityId } from "@/lib/city-config"
 import {
   buildMeetupGeocodeQuery,
   hashClientIp,
@@ -41,6 +41,19 @@ const VALID_CITIES = new Set<CityId>([
 const RATE_WINDOW_MS = 24 * 60 * 60 * 1000
 const RATE_MAX = 5
 const DUPLICATE_WINDOW_MS = 15 * 60 * 1000
+
+function localDateKey(date: Date, timeZone: string) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date)
+  const valueFor = (type: string) =>
+    parts.find((part) => part.type === type)?.value ?? ""
+
+  return `${valueFor("year")}-${valueFor("month")}-${valueFor("day")}`
+}
 
 async function getRequestIp(): Promise<string> {
   const h = await headers()
@@ -195,8 +208,12 @@ export async function submitMeetup(
   }
 
   const now = Date.now()
+  const timeZone = CITY_TIMEZONES[payload.city]
   const upcoming =
-    endsAtMs !== null ? endsAtMs >= now : startsAtMs >= now - 2 * 60 * 60 * 1000
+    endsAtMs !== null
+      ? endsAtMs >= now
+      : localDateKey(new Date(startsAtMs), timeZone) >=
+        localDateKey(new Date(now), timeZone)
 
   if (!upcoming) {
     return {
