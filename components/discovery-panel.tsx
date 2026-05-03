@@ -27,7 +27,6 @@ type DiscoveryPanelProps = {
   titleLines: [string, string]
   searchPlaceholder: string
   meetupSearchPlaceholder: string
-  timeZone: string
   search: string
   onSearchChange: (value: string) => void
   category: CompanyCategory | "All"
@@ -50,7 +49,6 @@ export function DiscoveryPanel({
   titleLines,
   searchPlaceholder,
   meetupSearchPlaceholder,
-  timeZone,
   search,
   onSearchChange,
   category,
@@ -273,7 +271,6 @@ export function DiscoveryPanel({
                   >
                     <MeetupCard
                       meetup={meetup}
-                      timeZone={timeZone}
                       compact
                       active={meetup.slug === selectedMeetup?.slug}
                       onSelect={onSelectMeetup}
@@ -307,7 +304,7 @@ export function DiscoveryPanel({
                 Could not load meetups.
               </p>
             ) : selectedMeetup ? (
-              <MeetupCard meetup={selectedMeetup} timeZone={timeZone} active />
+              <MeetupCard meetup={selectedMeetup} active />
             ) : (
               <p className="text-xs text-[#f0f7e6]/60">Nothing selected</p>
             )}

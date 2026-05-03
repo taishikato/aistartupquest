@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils"
 
 type MeetupCardProps = {
   meetup: Meetup
-  timeZone: string
   active?: boolean
   compact?: boolean
   onSelect?: (slug: string) => void

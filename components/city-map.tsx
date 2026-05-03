@@ -394,7 +394,6 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
               titleLines={config.titleLines}
               searchPlaceholder={config.searchPlaceholder}
               meetupSearchPlaceholder={config.meetupSearchPlaceholder}
-              timeZone={config.timezone}
               search={search}
               onSearchChange={setSearch}
               category={category}

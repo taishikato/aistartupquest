@@ -52,6 +52,7 @@
 - Map rendering lives in `components/map-shell.tsx`.
 - Company logos are shown in both cards and map markers. Keep those in sync.
 - In Supabase client queries, prefer `.match()` over `.eq()`.
+- After changing Supabase schema or views, run `nr genType` and commit the updated `types/supabase.ts`.
 
 ## Change Discipline
 
