@@ -111,11 +111,6 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
       return
     }
 
-    if (!trimmedXAccount) {
-      setErrorMessage("X account is required.")
-      return
-    }
-
     if (!turnstileToken) {
       setErrorMessage("Complete the verification challenge.")
       return
@@ -144,7 +139,7 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
         locationLabel: trimmedAddress,
         startsAt: startsAtUtc,
         endsAt: null,
-        organizerName: trimmedXAccount,
+        organizerName: trimmedXAccount || "Community",
         eventUrl: trimmedUrl,
         xAccount: trimmedXAccount,
       })
@@ -317,12 +312,13 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
                   </label>
 
                   <label className="block">
-                    <span className={cn(FIELD_LABEL_CLASS)}>X account</span>
+                    <span className={cn(FIELD_LABEL_CLASS)}>
+                      X account (optional)
+                    </span>
                     <input
                       type="text"
                       value={xAccount}
                       onChange={(event) => setXAccount(event.target.value)}
-                      required
                       maxLength={120}
                       className={cn(INPUT_CLASS)}
                       placeholder="@handle"

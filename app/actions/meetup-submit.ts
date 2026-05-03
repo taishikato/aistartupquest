@@ -126,7 +126,7 @@ export async function submitMeetup(
   const eventUrl = payload.eventUrl.trim()
   const xAccount = payload.xAccount.trim()
   const storedDescription = description || title
-  const storedOrganizerName = organizerName || xAccount
+  const storedOrganizerName = organizerName || xAccount || "Community"
 
   if (!VALID_CITIES.has(payload.city)) {
     return { status: "error", message: "City is invalid." }
@@ -160,10 +160,6 @@ export async function submitMeetup(
       status: "error",
       message: "Event link must be a valid http(s) URL.",
     }
-  }
-
-  if (xAccount.length < 1) {
-    return { status: "error", message: "X account is required." }
   }
 
   if (xAccount.length > 120) {
