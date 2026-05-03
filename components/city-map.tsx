@@ -14,6 +14,7 @@ import { usePathname, useSearchParams } from "next/navigation"
 import type { CityMapConfig } from "@/lib/city-config"
 import { YC_BOSS_SLUG, type Company, type CompanyCategory } from "@/lib/company"
 import type { DiscoveryMode, Meetup } from "@/lib/meetup"
+import { useCityMeetups } from "@/lib/use-city-meetups"
 import { cn } from "@/lib/utils"
 import { DiscoveryPanel } from "@/components/discovery-panel"
 import { MapShell } from "@/components/map-shell"
@@ -22,17 +23,13 @@ import { SelectedMeetupPanel } from "@/components/selected-meetup-panel"
 
 type CityMapProps = {
   companies: Company[]
-  meetups: Meetup[]
   config: CityMapConfig
 }
 
 const SELECTED_PANEL_STORAGE_EVENT = "selected-company-panel-storage"
+const EMPTY_MEETUPS: Meetup[] = []
 
-export function CityMap({
-  companies: allCompanies,
-  meetups: allMeetups,
-  config,
-}: CityMapProps) {
+export function CityMap({ companies: allCompanies, config }: CityMapProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [search, setSearch] = useState("")
@@ -55,6 +52,20 @@ export function CityMap({
   const mode = useMemo((): DiscoveryMode => {
     return searchParams.get("mode") === "meetups" ? "meetups" : "startups"
   }, [searchParams])
+  const meetupsQuery = useCityMeetups(config.city, mode === "meetups")
+  const meetupsLoading = mode === "meetups" && meetupsQuery.isLoading
+  const meetupsError = mode === "meetups" && meetupsQuery.isError
+  const allMeetups = meetupsError
+    ? EMPTY_MEETUPS
+    : (meetupsQuery.data ?? EMPTY_MEETUPS)
+  const meetupSlugFromQuery = searchParams.get("m")
+  const isFetchingMissingMeetup =
+    mode === "meetups" &&
+    Boolean(meetupSlugFromQuery) &&
+    meetupsQuery.isFetching &&
+    !allMeetups.some((meetup) => meetup.slug === meetupSlugFromQuery)
+  const meetupsSelectionUnavailable =
+    meetupsLoading || meetupsError || isFetchingMissingMeetup
 
   const selectedSlug = useMemo(
     () =>
@@ -121,15 +132,24 @@ export function CityMap({
       })
   }, [allMeetups, deferredSearch])
 
-  const selectedMeetupSlug = useMemo(
-    () =>
-      resolveSelectedMeetupSlug(
-        allMeetups,
-        searchParams.get("m"),
-        filteredMeetups[0]?.slug ?? null
-      ),
-    [allMeetups, filteredMeetups, searchParams]
-  )
+  const selectedMeetupSlug = useMemo(() => {
+    const slugFromQuery = meetupSlugFromQuery
+
+    if (meetupsSelectionUnavailable && slugFromQuery) {
+      return slugFromQuery
+    }
+
+    return resolveSelectedMeetupSlug(
+      allMeetups,
+      slugFromQuery,
+      filteredMeetups[0]?.slug ?? null
+    )
+  }, [
+    allMeetups,
+    filteredMeetups,
+    meetupSlugFromQuery,
+    meetupsSelectionUnavailable,
+  ])
 
   const selectedCompany =
     filteredCompanies.find((company) => company.slug === selectedSlug) ??
@@ -246,7 +266,9 @@ export function CityMap({
     } else {
       params.set("mode", "meetups")
       params.delete("c")
-      if (selectedMeetupSlug) {
+      if (meetupsSelectionUnavailable && searchParams.get("m")) {
+        params.set("m", searchParams.get("m")!)
+      } else if (selectedMeetupSlug) {
         params.set("m", selectedMeetupSlug)
       } else {
         params.delete("m")
@@ -269,6 +291,7 @@ export function CityMap({
     searchParams,
     selectedCompany,
     selectedMeetupSlug,
+    meetupsSelectionUnavailable,
   ])
 
   useEffect(() => {
@@ -365,6 +388,8 @@ export function CityMap({
               onModeChange={handleModeChange}
               companies={filteredCompanies}
               meetups={filteredMeetups}
+              meetupsLoading={meetupsLoading}
+              meetupsError={meetupsError}
               selectedCompany={selectedCompany}
               selectedMeetup={selectedMeetup}
               titleLines={config.titleLines}
@@ -389,6 +414,8 @@ export function CityMap({
             <SelectedMeetupPanel
               meetup={selectedMeetup}
               timeZone={config.timezone}
+              meetupsLoading={meetupsLoading}
+              meetupsError={meetupsError}
               collapsed={isSelectedPanelCollapsed}
               onToggleCollapsed={handleToggleSelectedPanel}
             />

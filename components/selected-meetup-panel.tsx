@@ -16,6 +16,8 @@ import { cn } from "@/lib/utils"
 export type SelectedMeetupPanelProps = {
   meetup: Meetup | null
   timeZone: string
+  meetupsLoading: boolean
+  meetupsError: boolean
   collapsed: boolean
   onToggleCollapsed: () => void
 }
@@ -23,6 +25,8 @@ export type SelectedMeetupPanelProps = {
 export function SelectedMeetupPanel({
   meetup,
   timeZone,
+  meetupsLoading,
+  meetupsError,
   collapsed,
   onToggleCollapsed,
 }: SelectedMeetupPanelProps) {
@@ -51,7 +55,7 @@ export function SelectedMeetupPanel({
               className="flex size-10 items-center justify-center border-2 border-[#5c4033] bg-[#8b6914] text-[9px] font-bold text-[#f4ecd2] shadow-[2px_2px_0_#342414]"
               aria-hidden
             >
-              {meetup ? meetup.title.slice(0, 2).toUpperCase() : "—"}
+              {meetup ? meetup.title.slice(0, 2).toUpperCase() : "..."}
             </div>
           </div>
         </div>
@@ -79,8 +83,11 @@ export function SelectedMeetupPanel({
           {!meetup ? (
             <div className="mt-4 border-2 border-[#3a3a5e] bg-[#1a1a2e] px-4 py-6">
               <p className="text-sm text-[#f0f7e6]/70">
-                Select a meetup from the list, or add the first one for this
-                city.
+                {meetupsLoading
+                  ? "Loading meetups for this city."
+                  : meetupsError
+                    ? "Could not load meetups. Please try again in a moment."
+                    : "Select a meetup from the list, or add the first one for this city."}
               </p>
             </div>
           ) : (
