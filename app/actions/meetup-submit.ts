@@ -22,7 +22,7 @@ export type MeetupSubmitPayload = {
   endsAt: string | null
   organizerName: string
   eventUrl: string
-  contactEmail: string
+  xAccount: string
 }
 
 export type MeetupSubmitResult =
@@ -124,7 +124,9 @@ export async function submitMeetup(
   const locationLabel = payload.locationLabel.trim()
   const organizerName = payload.organizerName.trim()
   const eventUrl = payload.eventUrl.trim()
-  const contactEmail = payload.contactEmail.trim()
+  const xAccount = payload.xAccount.trim()
+  const storedDescription = description || title
+  const storedOrganizerName = organizerName || xAccount
 
   if (!VALID_CITIES.has(payload.city)) {
     return { status: "error", message: "City is invalid." }
@@ -138,8 +140,11 @@ export async function submitMeetup(
     return { status: "error", message: "Title must be 1–200 characters." }
   }
 
-  if (description.length < 1 || description.length > 5000) {
-    return { status: "error", message: "Description must be 1–5000 characters." }
+  if (storedDescription.length < 1 || storedDescription.length > 5000) {
+    return {
+      status: "error",
+      message: "Description must be 1–5000 characters.",
+    }
   }
 
   if (venueName.length < 1 || venueName.length > 200) {
@@ -150,16 +155,26 @@ export async function submitMeetup(
     return { status: "error", message: "Address must be 1–300 characters." }
   }
 
-  if (organizerName.length < 1 || organizerName.length > 120) {
-    return { status: "error", message: "Organizer name must be 1–120 characters." }
-  }
-
   if (!eventUrl || !isValidHttpUrl(eventUrl) || eventUrl.length > 2000) {
-    return { status: "error", message: "Event link must be a valid http(s) URL." }
+    return {
+      status: "error",
+      message: "Event link must be a valid http(s) URL.",
+    }
   }
 
-  if (contactEmail.length > 255) {
-    return { status: "error", message: "Contact email is too long." }
+  if (xAccount.length < 1) {
+    return { status: "error", message: "X account is required." }
+  }
+
+  if (xAccount.length > 120) {
+    return { status: "error", message: "X account is too long." }
+  }
+
+  if (storedOrganizerName.length < 1 || storedOrganizerName.length > 120) {
+    return {
+      status: "error",
+      message: "Organizer name must be 1–120 characters.",
+    }
   }
 
   let startsAtMs: number
@@ -176,7 +191,10 @@ export async function submitMeetup(
         return { status: "error", message: "End time is invalid." }
       }
       if (endsAtMs <= startsAtMs) {
-        return { status: "error", message: "End time must be after start time." }
+        return {
+          status: "error",
+          message: "End time must be after start time.",
+        }
       }
     }
   } catch {
@@ -185,9 +203,7 @@ export async function submitMeetup(
 
   const now = Date.now()
   const upcoming =
-    endsAtMs !== null
-      ? endsAtMs >= now
-      : startsAtMs >= now - 2 * 60 * 60 * 1000
+    endsAtMs !== null ? endsAtMs >= now : startsAtMs >= now - 2 * 60 * 60 * 1000
 
   if (!upcoming) {
     return {
@@ -202,27 +218,32 @@ export async function submitMeetup(
 
   const turnstile = await verifyTurnstile(payload.turnstileToken, ip)
   if (!turnstile.ok) {
-    return { status: "error", message: turnstile.message ?? "Verification failed." }
+    return {
+      status: "error",
+      message: turnstile.message ?? "Verification failed.",
+    }
   }
 
   const payloadHash = hashMeetupPayload({
     city: payload.city,
     title,
-    description,
+    description: storedDescription,
     venueName,
     locationLabel,
     startsAt: payload.startsAt,
     endsAt: payload.endsAt,
-    organizerName,
+    organizerName: storedOrganizerName,
     eventUrl,
-    contactEmail,
+    xAccount,
   })
 
   const supabase = createAdminClient()
 
   // Same-payload cooldown: any prior attempt row (including failed geocode/insert)
   // blocks repeats within the window so we cannot hammer the geocoder.
-  const duplicateCutoff = new Date(Date.now() - DUPLICATE_WINDOW_MS).toISOString()
+  const duplicateCutoff = new Date(
+    Date.now() - DUPLICATE_WINDOW_MS
+  ).toISOString()
   const { data: duplicateAttempts, error: duplicateError } = await supabase
     .from("meetup_submission_attempts")
     .select("id")
@@ -252,7 +273,10 @@ export async function submitMeetup(
     .gte("created_at", rateCutoff)
 
   if (rateError) {
-    return { status: "error", message: "Could not verify rate limit. Try later." }
+    return {
+      status: "error",
+      message: "Could not verify rate limit. Try later.",
+    }
   }
 
   if ((rateCount ?? 0) >= RATE_MAX) {
@@ -267,7 +291,10 @@ export async function submitMeetup(
     .insert({ ip_hash: ipHash, payload_hash: payloadHash })
 
   if (attemptError) {
-    return { status: "error", message: "Could not record submission. Try again." }
+    return {
+      status: "error",
+      message: "Could not record submission. Try again.",
+    }
   }
 
   const query = buildMeetupGeocodeQuery(venueName, locationLabel, payload.city)
@@ -300,16 +327,16 @@ export async function submitMeetup(
         slug,
         city: payload.city,
         title,
-        description,
+        description: storedDescription,
         venue_name: venueName,
         location_label: locationLabel,
         latitude: coords.lat,
         longitude: coords.lng,
         starts_at: payload.startsAt,
         ends_at: payload.endsAt || null,
-        organizer_name: organizerName,
+        organizer_name: storedOrganizerName,
         event_url: eventUrl,
-        contact_email: contactEmail || null,
+        contact_email: xAccount || null,
         status: "published",
         payload_hash: payloadHash,
       })

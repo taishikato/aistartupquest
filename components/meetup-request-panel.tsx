@@ -44,13 +44,10 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
   const [city, setCity] = useState<CityId>(initialCity)
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
-  const [startsAtLocal, setStartsAtLocal] = useState("")
-  const [endsAtLocal, setEndsAtLocal] = useState("")
-  const [venueName, setVenueName] = useState("")
+  const [dateLocal, setDateLocal] = useState("")
   const [locationLabel, setLocationLabel] = useState("")
-  const [organizerName, setOrganizerName] = useState("")
   const [eventUrl, setEventUrl] = useState("")
-  const [contactEmail, setContactEmail] = useState("")
+  const [xAccount, setXAccount] = useState("")
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const [status, setStatus] = useState<"idle" | "submitting" | "success">(
     "idle"
@@ -63,13 +60,10 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
     setCity(initialCity)
     setTitle("")
     setDescription("")
-    setStartsAtLocal("")
-    setEndsAtLocal("")
-    setVenueName("")
+    setDateLocal("")
     setLocationLabel("")
-    setOrganizerName("")
     setEventUrl("")
-    setContactEmail("")
+    setXAccount("")
     setTurnstileToken(null)
     turnstileRef.current?.reset()
     setErrorMessage(null)
@@ -93,39 +87,32 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
 
     const trimmedTitle = title.trim()
     const trimmedDescription = description.trim()
-    const trimmedVenue = venueName.trim()
     const trimmedAddress = locationLabel.trim()
-    const trimmedOrganizer = organizerName.trim()
     const trimmedUrl = eventUrl.trim()
-    const trimmedEmail = contactEmail.trim()
+    const trimmedXAccount = xAccount.trim()
 
     if (!trimmedTitle) {
       setErrorMessage("Title is required.")
       return
     }
 
-    if (trimmedDescription.length < 1) {
-      setErrorMessage("Description is required.")
+    if (!dateLocal) {
+      setErrorMessage("Date is required.")
       return
     }
 
-    if (!startsAtLocal) {
-      setErrorMessage("Start date and time are required.")
-      return
-    }
-
-    if (!trimmedVenue || !trimmedAddress) {
-      setErrorMessage("Venue and address are required.")
-      return
-    }
-
-    if (!trimmedOrganizer) {
-      setErrorMessage("Organizer is required.")
+    if (!trimmedAddress) {
+      setErrorMessage("Address is required.")
       return
     }
 
     if (!trimmedUrl) {
-      setErrorMessage("Event link is required.")
+      setErrorMessage("Link is required.")
+      return
+    }
+
+    if (!trimmedXAccount) {
+      setErrorMessage("X account is required.")
       return
     }
 
@@ -135,16 +122,12 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
     }
 
     let startsAtUtc: string
-    let endsAtUtc: string | null = null
     const submittedCity = city
     const tz = CITY_TIMEZONES[city]
     try {
-      startsAtUtc = meetupLocalInputToUtcIso(startsAtLocal, tz)
-      if (endsAtLocal) {
-        endsAtUtc = meetupLocalInputToUtcIso(endsAtLocal, tz)
-      }
+      startsAtUtc = meetupLocalInputToUtcIso(`${dateLocal}T12:00`, tz)
     } catch {
-      setErrorMessage("Date and time are invalid.")
+      setErrorMessage("Date is invalid.")
       return
     }
 
@@ -157,13 +140,13 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
         city,
         title: trimmedTitle,
         description: trimmedDescription,
-        venueName: trimmedVenue,
+        venueName: trimmedAddress.slice(0, 200),
         locationLabel: trimmedAddress,
         startsAt: startsAtUtc,
-        endsAt: endsAtUtc,
-        organizerName: trimmedOrganizer,
+        endsAt: null,
+        organizerName: trimmedXAccount,
         eventUrl: trimmedUrl,
-        contactEmail: trimmedEmail,
+        xAccount: trimmedXAccount,
       })
 
       if (result.status === "error") {
@@ -212,8 +195,8 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
                     Post an upcoming meetup
                   </h2>
                   <p className="mt-3 max-w-[30ch] text-sm leading-6 text-[#4b5563]">
-                    Times use each city&apos;s local timezone based on the city
-                    you select above.
+                    Share a meetup with just the basics. The date uses the
+                    selected city&apos;s local timezone.
                   </p>
                 </div>
                 <Button
@@ -288,49 +271,21 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
                     <textarea
                       value={description}
                       onChange={(event) => setDescription(event.target.value)}
-                      required
                       maxLength={5000}
                       rows={4}
                       className={cn(TEXTAREA_CLASS)}
-                      placeholder="What is this meetup about?"
+                      placeholder="Optional"
                     />
                   </label>
 
                   <label className="block">
-                    <span className={cn(FIELD_LABEL_CLASS)}>
-                      Starts (local)
-                    </span>
+                    <span className={cn(FIELD_LABEL_CLASS)}>Date</span>
                     <input
-                      type="datetime-local"
-                      value={startsAtLocal}
-                      onChange={(event) => setStartsAtLocal(event.target.value)}
+                      type="date"
+                      value={dateLocal}
+                      onChange={(event) => setDateLocal(event.target.value)}
                       required
                       className={cn(DATE_INPUT_CLASS)}
-                    />
-                  </label>
-
-                  <label className="block">
-                    <span className={cn(FIELD_LABEL_CLASS)}>
-                      Ends (local, optional)
-                    </span>
-                    <input
-                      type="datetime-local"
-                      value={endsAtLocal}
-                      onChange={(event) => setEndsAtLocal(event.target.value)}
-                      className={cn(DATE_INPUT_CLASS)}
-                    />
-                  </label>
-
-                  <label className="block">
-                    <span className={cn(FIELD_LABEL_CLASS)}>Venue name</span>
-                    <input
-                      type="text"
-                      value={venueName}
-                      onChange={(event) => setVenueName(event.target.value)}
-                      required
-                      maxLength={200}
-                      className={cn(INPUT_CLASS)}
-                      placeholder="Venue or building"
                     />
                   </label>
 
@@ -348,20 +303,7 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
                   </label>
 
                   <label className="block">
-                    <span className={cn(FIELD_LABEL_CLASS)}>Organizer</span>
-                    <input
-                      type="text"
-                      value={organizerName}
-                      onChange={(event) => setOrganizerName(event.target.value)}
-                      required
-                      maxLength={120}
-                      className={cn(INPUT_CLASS)}
-                      placeholder="Host or group name"
-                    />
-                  </label>
-
-                  <label className="block">
-                    <span className={cn(FIELD_LABEL_CLASS)}>Event link</span>
+                    <span className={cn(FIELD_LABEL_CLASS)}>Link</span>
                     <input
                       type="url"
                       value={eventUrl}
@@ -370,21 +312,20 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
                       maxLength={2000}
                       pattern={WEBSITE_PATTERN}
                       className={cn(INPUT_CLASS)}
-                      placeholder="https://example.com/rsvp"
+                      placeholder="https://example.com"
                     />
                   </label>
 
                   <label className="block">
-                    <span className={cn(FIELD_LABEL_CLASS)}>
-                      Contact email (optional)
-                    </span>
+                    <span className={cn(FIELD_LABEL_CLASS)}>X account</span>
                     <input
-                      type="email"
-                      value={contactEmail}
-                      onChange={(event) => setContactEmail(event.target.value)}
-                      maxLength={255}
+                      type="text"
+                      value={xAccount}
+                      onChange={(event) => setXAccount(event.target.value)}
+                      required
+                      maxLength={120}
                       className={cn(INPUT_CLASS)}
-                      placeholder="Optional"
+                      placeholder="@handle"
                     />
                   </label>
 
