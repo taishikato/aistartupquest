@@ -153,18 +153,6 @@ const TERRAIN_PATCHES = [
   { x: 1008, y: 376, width: 112, height: 44, rotate: 12 },
 ] as const
 
-const SAND_PATCHES = [
-  { x: 360, y: 300, width: 122, height: 54 },
-  { x: 556, y: 304, width: 214, height: 78 },
-  { x: 830, y: 248, width: 104, height: 46 },
-] as const
-
-const SWAMP_PATCHES = [
-  { x: 164, y: 300, width: 70, height: 34 },
-  { x: 514, y: 366, width: 78, height: 36 },
-  { x: 850, y: 286, width: 72, height: 36 },
-] as const
-
 export function WorldMapSelect() {
   const [activeCityId, setActiveCityId] = useState<CityId>("sf")
   const activeCity = useMemo(
@@ -307,26 +295,6 @@ function WorldMapCanvas({
               <path d="M0 2H12M0 5H12M0 8H12" stroke="#1a1a2e" strokeWidth="1" />
               <path d="M0 3H12M0 9H12" stroke="#f8faf7" strokeWidth="1" />
             </pattern>
-            <pattern
-              id="sand-dither"
-              width="12"
-              height="12"
-              patternUnits="userSpaceOnUse"
-            >
-              <rect width="12" height="12" fill="#ffe6a3" />
-              <rect x="2" y="2" width="3" height="3" fill="#f2c46d" />
-              <rect x="8" y="7" width="2" height="2" fill="#fff7c7" />
-            </pattern>
-            <pattern
-              id="swamp-dither"
-              width="12"
-              height="12"
-              patternUnits="userSpaceOnUse"
-            >
-              <rect width="12" height="12" fill="#5630a8" />
-              <rect x="2" y="2" width="4" height="2" fill="#7d4fe0" />
-              <rect x="7" y="8" width="3" height="2" fill="#27135f" />
-            </pattern>
           </defs>
           <rect
             width={WORLD_MAP_WIDTH}
@@ -389,30 +357,6 @@ function WorldMapCanvas({
                 ry={patch.height / 2}
                 fill="url(#mountain-lines)"
                 transform={`rotate(${patch.rotate} ${patch.x} ${patch.y})`}
-              />
-            ))}
-          </g>
-          <g opacity="0.95" stroke="#a26a28" strokeWidth="1.4">
-            {SAND_PATCHES.map((patch, index) => (
-              <ellipse
-                key={`sand-${index}`}
-                cx={patch.x}
-                cy={patch.y}
-                rx={patch.width / 2}
-                ry={patch.height / 2}
-                fill="url(#sand-dither)"
-              />
-            ))}
-          </g>
-          <g opacity="0.9" stroke="#1a1a2e" strokeWidth="1.2">
-            {SWAMP_PATCHES.map((patch, index) => (
-              <ellipse
-                key={`swamp-${index}`}
-                cx={patch.x}
-                cy={patch.y}
-                rx={patch.width / 2}
-                ry={patch.height / 2}
-                fill="url(#swamp-dither)"
               />
             ))}
           </g>
