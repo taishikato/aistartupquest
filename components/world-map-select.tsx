@@ -5,7 +5,6 @@ import Image from "next/image"
 import Link from "next/link"
 
 import type { CityId } from "@/lib/city-config"
-import { cn } from "@/lib/utils"
 
 type WorldStageCity = {
   id: CityId
@@ -153,114 +152,46 @@ export function WorldMapSelect() {
   )
 
   return (
-    <main className="grid h-dvh overflow-hidden bg-[#f8faf7] text-[#1a1a2e]">
-      <div className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)]">
-        <header className="border-b-3 border-[#1a1a2e] bg-white px-4 py-3 sm:px-6">
-          <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-            <Link
-              href="/"
-              className="flex min-w-0 items-center gap-3"
-              aria-label="AI Startup Quest home"
-            >
-              <Image
-                src="/brand-mark.svg"
-                alt=""
-                width={34}
-                height={34}
-                className="shrink-0"
-                priority
-              />
-              <span className="truncate font-(family-name:--font-pixel) text-[11px] leading-5 text-[#1a1a2e] sm:text-sm">
-                AI Startup Quest
-              </span>
-            </Link>
-            <Link
-              href="/"
-              className="border-2 border-[#1a1a2e] bg-[#ffe66d] px-3 py-2 font-(family-name:--font-pixel) text-[8px] text-[#1a1a2e] shadow-[3px_3px_0_#1a1a2e] transition-colors hover:bg-[#fff4a8] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#4ecdc4] sm:text-[9px]"
-            >
-              3D Globe
-            </Link>
-          </div>
-        </header>
+    <main className="relative h-dvh overflow-hidden bg-[#5aa0d8] text-[#1a1a2e]">
+      <WorldMapCanvas
+        cities={WORLD_STAGE_CITIES}
+        activeCity={activeCity}
+        onActiveCityChange={setActiveCityId}
+      />
 
-        <section className="mx-auto grid min-h-0 w-full max-w-7xl grid-rows-[minmax(0,1fr)_minmax(190px,0.62fr)] gap-4 px-4 py-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_390px] lg:grid-rows-1 lg:gap-6 lg:py-6">
-          <div className="relative min-h-0 overflow-hidden border-3 border-[#1a1a2e] bg-[#5aa0d8] shadow-[6px_6px_0_#1a1a2e]">
-            <div className="absolute top-4 left-4 z-20 border-2 border-[#1a1a2e] bg-[#ffe66d] px-3 py-2 font-(family-name:--font-pixel) text-[8px] text-[#1a1a2e] shadow-[3px_3px_0_#ff6b6b]">
-              World Map
-            </div>
-            <div className="absolute right-4 bottom-4 z-20 border-2 border-[#1a1a2e] bg-white px-3 py-2 shadow-[3px_3px_0_#4ecdc4]">
-              <div className="font-(family-name:--font-pixel) text-[8px] text-[#ff6b6b]">
-                {activeCity.stage}
-              </div>
-              <div className="mt-1 font-(family-name:--font-pixel) text-[11px] text-[#1a1a2e]">
-                {activeCity.name}
-              </div>
-            </div>
+      <header className="pointer-events-none absolute top-0 right-0 left-0 z-30 flex items-start justify-between gap-3 p-4 sm:p-6">
+        <Link
+          href="/"
+          className="pointer-events-auto flex min-w-0 items-center gap-3 border-2 border-[#1a1a2e] bg-white px-3 py-2 shadow-[4px_4px_0_#1a1a2e]"
+          aria-label="AI Startup Quest home"
+        >
+          <Image
+            src="/brand-mark.svg"
+            alt=""
+            width={30}
+            height={30}
+            className="shrink-0"
+            priority
+          />
+          <span className="hidden truncate font-(family-name:--font-pixel) text-[11px] leading-5 text-[#1a1a2e] sm:block">
+            AI Startup Quest
+          </span>
+        </Link>
+        <div className="border-2 border-[#1a1a2e] bg-[#ffe66d] px-3 py-2 font-(family-name:--font-pixel) text-[8px] text-[#1a1a2e] shadow-[3px_3px_0_#ff6b6b] sm:text-[9px]">
+          World Map
+        </div>
+      </header>
 
-            <WorldMapCanvas
-              cities={WORLD_STAGE_CITIES}
-              activeCity={activeCity}
-              onActiveCityChange={setActiveCityId}
-            />
-          </div>
-
-          <aside className="flex min-h-0 flex-col border-3 border-[#1a1a2e] bg-white text-[#1a1a2e] shadow-[6px_6px_0_#4ecdc4]">
-            <div className="shrink-0 border-b-2 border-[#1a1a2e] px-4 py-4">
-              <p className="font-(family-name:--font-pixel) text-[8px] text-[#0f8f87]">
-                Select Stage
-              </p>
-              <h1 className="mt-3 font-(family-name:--font-pixel) text-base leading-7 text-[#1a1a2e] sm:text-lg">
-                City Startup Map
-              </h1>
-            </div>
-
-            <div className="min-h-0 flex-1 overflow-y-auto p-3">
-              <div className="grid gap-3">
-                {WORLD_STAGE_CITIES.map((city) => {
-                  const isActive = city.id === activeCity.id
-                  return (
-                    <Link
-                      key={city.id}
-                      href={city.href}
-                      onMouseEnter={() => setActiveCityId(city.id)}
-                      onFocus={() => setActiveCityId(city.id)}
-                      className={cn(
-                        "grid grid-cols-[64px_minmax(0,1fr)] gap-3 border-2 p-3 transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-[#4ecdc4]",
-                        isActive
-                          ? "border-[#1a1a2e] bg-[#fff4a8] shadow-[4px_4px_0_#1a1a2e]"
-                          : "border-[#1a1a2e] bg-[#f8faf7] hover:bg-[#e9fbf8]"
-                      )}
-                      aria-label={`Open ${city.name} AI Startup Map`}
-                    >
-                      <div
-                        className="grid h-12 place-items-center border-2 border-[#1a1a2e] font-(family-name:--font-pixel) text-[10px] text-[#1a1a2e] shadow-[3px_3px_0_#0f1022]"
-                        style={{ backgroundColor: city.accent }}
-                      >
-                        {city.code}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="font-(family-name:--font-pixel) text-[7px] text-[#4ecdc4]">
-                            {city.stage}
-                          </span>
-                          <span className="font-(family-name:--font-pixel) text-[6px] text-[#1a1a2e]/50">
-                            Ready
-                          </span>
-                        </div>
-                        <h2 className="mt-2 truncate font-(family-name:--font-pixel) text-[10px] text-[#1a1a2e]">
-                          {city.name}
-                        </h2>
-                        <p className="mt-1 truncate text-xs text-[#1a1a2e]/65">
-                          {city.region} / {city.tagline}
-                        </p>
-                      </div>
-                    </Link>
-                  )
-                })}
-              </div>
-            </div>
-          </aside>
-        </section>
+      <div className="pointer-events-none absolute right-4 bottom-4 z-30 max-w-[min(360px,calc(100vw-32px))] border-2 border-[#1a1a2e] bg-white px-4 py-3 shadow-[4px_4px_0_#4ecdc4] sm:right-6 sm:bottom-6">
+        <div className="font-(family-name:--font-pixel) text-[8px] text-[#ff6b6b]">
+          {activeCity.stage}
+        </div>
+        <div className="mt-2 font-(family-name:--font-pixel) text-[13px] leading-5 text-[#1a1a2e]">
+          {activeCity.name}
+        </div>
+        <div className="mt-1 truncate text-xs text-[#1a1a2e]/65">
+          {activeCity.region} / {activeCity.tagline}
+        </div>
       </div>
     </main>
   )
@@ -311,8 +242,8 @@ function WorldMapCanvas({
   }, [worldData])
 
   return (
-    <div className="absolute inset-0 flex items-start justify-center px-3 pt-20 pb-5 sm:px-5 sm:pt-24 sm:pb-8">
-      <div className="relative aspect-video max-h-full w-full max-w-[1160px] overflow-hidden border-2 border-[#1a1a2e] bg-[#4b83c2] shadow-[4px_4px_0_#1a1a2e]">
+    <div className="absolute inset-0 flex items-center justify-center p-3 sm:p-5">
+      <div className="relative h-full w-full overflow-hidden border-3 border-[#1a1a2e] bg-[#4b83c2] shadow-[6px_6px_0_#1a1a2e]">
         <svg
           viewBox={`0 0 ${WORLD_MAP_WIDTH} ${WORLD_MAP_HEIGHT}`}
           role="img"
