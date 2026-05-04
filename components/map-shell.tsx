@@ -46,6 +46,7 @@ function cityHrefWithMode(baseHref: string, mapMode: DiscoveryMode) {
 
 const MAP_STYLE_URL =
   "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
+const STARTUP_ROBOT_MONSTER_SRC = "/map-assets/startup-robot-monster.png"
 // Oblique camera reads closer to isometric / retro city builders.
 const MAP_PITCH = 54
 const MAP_BEARING = -24
@@ -369,33 +370,33 @@ function makeLogoBadge(
   categoryColor: string
 ) {
   const OL = "#342414"
-  const sz = dense ? (active ? 24 : 20) : active ? 28 : 24
+  const sz = dense ? (active ? 34 : 28) : active ? 42 : 34
   // border-box: inner pad = sz - borders - padding
-  const innerSz = Math.max(8, sz - 8)
-  const rawLogoSz = dense ? (active ? 18 : 14) : active ? 22 : 18
-  const logoSz = Math.min(rawLogoSz, Math.max(6, innerSz - 2))
+  const innerSz = Math.max(18, sz - 6)
+  const rawLogoSz = dense ? (active ? 27 : 22) : active ? 34 : 27
+  const logoSz = Math.min(rawLogoSz, Math.max(14, innerSz - 3))
   const badge = sd({
     width: `${sz}px`,
     height: `${sz}px`,
-    border: `2px solid ${OL}`,
+    border: `1px solid ${OL}`,
     background: categoryColor,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    padding: "2px",
+    padding: "1px",
     boxSizing: "border-box",
     boxShadow: active
-      ? `0 0 0 2px rgba(255,242,199,0.7), 2px 2px 0 ${OL}`
-      : `2px 2px 0 ${OL}`,
-    marginBottom: "2px",
+      ? `0 0 0 1px rgba(255,242,199,0.75), 2px 2px 0 ${OL}`
+      : `2px 2px 0 rgba(52,36,20,0.9)`,
+    marginBottom: dense ? "-2px" : "-3px",
     position: "relative",
-    zIndex: "5",
+    zIndex: "7",
   })
   const inner = sd({
     width: `${innerSz}px`,
     height: `${innerSz}px`,
     background: "#fffefc",
-    border: `1px solid ${OL}`,
+    border: "0",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -421,11 +422,8 @@ function makeLogoBadge(
 function createSpriteMarker(company: Company, active: boolean, dense: boolean) {
   const accent = CATEGORY_COLORS[company.category]
   const OL = "#342414"
-  // Robot body sizes
-  const w = dense ? (active ? 28 : 22) : active ? 34 : 28
-  const h = dense ? (active ? 34 : 26) : active ? 42 : 34
-  const bw = active ? 3 : 2
-  const badgeW = dense ? (active ? 24 : 20) : active ? 28 : 24
+  const monsterSize = dense ? (active ? 46 : 38) : active ? 58 : 48
+  const badge = makeLogoBadge(company, active, dense, accent)
 
   const wrapper = sd({
     display: "flex",
@@ -434,130 +432,56 @@ function createSpriteMarker(company: Company, active: boolean, dense: boolean) {
   })
   const sprite = createFloatingMarkerFrame(company)
 
-  // Logo badge on top
-  sprite.appendChild(makeLogoBadge(company, active, dense, accent))
+  const stage = sd({
+    width: `${monsterSize}px`,
+    height: `${monsterSize}px`,
+    position: "relative",
+    display: "flex",
+    alignItems: "flex-end",
+    justifyContent: "center",
+    filter: active
+      ? `drop-shadow(0 0 4px ${accent}) drop-shadow(3px 3px 0 ${OL})`
+      : `drop-shadow(3px 3px 0 ${OL})`,
+  })
 
-  // High-contrast category bar (readable when markers overlap)
+  const monster = document.createElement("img")
+  monster.src = STARTUP_ROBOT_MONSTER_SRC
+  monster.alt = ""
+  monster.draggable = false
+  Object.assign(monster.style, {
+    width: `${monsterSize}px`,
+    height: `${monsterSize}px`,
+    imageRendering: "pixelated",
+    objectFit: "contain",
+    pointerEvents: "none",
+    userSelect: "none",
+  })
+
+  stage.appendChild(monster)
+  sprite.appendChild(badge)
+  sprite.appendChild(stage)
+
   sprite.appendChild(
     sd({
-      width: `${badgeW}px`,
-      height: "5px",
+      width: `${Math.round(monsterSize * 0.48)}px`,
+      height: dense ? "5px" : "6px",
       background: accent,
       border: `2px solid ${OL}`,
-      marginTop: "-1px",
-      marginBottom: "2px",
+      marginTop: dense ? "-2px" : "-3px",
       boxShadow: `2px 2px 0 ${OL}`,
       position: "relative",
       zIndex: "4",
     })
   )
 
-  // === ROBOT SPRITE (all companies) ===
-  // Antenna
-  const dotSz = Math.max(6, Math.round(w * 0.18))
-  const antenna = sd({
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    marginBottom: "-2px",
-    position: "relative",
-    zIndex: "2",
-  })
-  antenna.appendChild(
-    sd({
-      width: `${dotSz}px`,
-      height: `${dotSz}px`,
-      background: accent,
-      border: `2px solid ${OL}`,
-    })
-  )
-  antenna.appendChild(
-    sd({
-      width: `${Math.max(3, Math.round(w * 0.08))}px`,
-      height: `${Math.round(h * 0.2)}px`,
-      background: "#8a8a9a",
-      borderLeft: `2px solid ${OL}`,
-      borderRight: `2px solid ${OL}`,
-    })
-  )
-  sprite.appendChild(antenna)
-
-  // Robot head — cool gray so category accent pops on land and water.
-  const head = sd({
-    width: `${w}px`,
-    height: `${Math.round(h * 0.5)}px`,
-    background: "#9aa3b0",
-    border: `${bw}px solid ${OL}`,
-    boxShadow: `4px 4px 0 ${OL}`,
-    position: "relative",
-  })
-  // Eyes (category colored)
-  const eSz = Math.max(5, Math.round(w * 0.16))
-  for (const side of ["left", "right"] as const) {
-    head.appendChild(
-      sd({
-        position: "absolute",
-        top: `${Math.round(h * 0.06)}px`,
-        [side]: `${Math.round(w * 0.14)}px`,
-        width: `${eSz}px`,
-        height: `${eSz}px`,
-        background: accent,
-        border: `2px solid ${OL}`,
-      })
-    )
-  }
-  // Mouth
-  head.appendChild(
-    sd({
-      position: "absolute",
-      bottom: `${Math.round(h * 0.06)}px`,
-      left: "50%",
-      transform: "translateX(-50%)",
-      width: `${Math.round(w * 0.45)}px`,
-      height: `${Math.max(3, Math.round(h * 0.05))}px`,
-      background: OL,
-    })
-  )
-  sprite.appendChild(head)
-
-  // Robot body
-  sprite.appendChild(
-    sd({
-      width: `${Math.round(w * 0.75)}px`,
-      height: `${Math.round(h * 0.3)}px`,
-      background: "#8a92a2",
-      border: `${bw}px solid ${OL}`,
-      marginTop: "-2px",
-    })
-  )
-
-  // Feet
-  const feet = sd({
-    display: "flex",
-    gap: `${Math.round(w * 0.15)}px`,
-    marginTop: "-1px",
-  })
-  for (let i = 0; i < 2; i++) {
-    feet.appendChild(
-      sd({
-        width: `${Math.round(w * 0.28)}px`,
-        height: `${Math.round(h * 0.1)}px`,
-        background: "#6a6a7a",
-        border: `2px solid ${OL}`,
-      })
-    )
-  }
-  sprite.appendChild(feet)
-
   wrapper.appendChild(sprite)
 
-  // Ground shadow (chunky pixel ellipse, no blur)
   wrapper.appendChild(
     sd({
-      width: `${Math.round(w * 0.85)}px`,
-      height: "6px",
+      width: `${Math.round(monsterSize * 0.68)}px`,
+      height: dense ? "5px" : "6px",
       background: "rgba(52,36,20,0.35)",
-      marginTop: "2px",
+      marginTop: "1px",
       boxShadow: "0 0 0 1px rgba(52,36,20,0.15)",
     })
   )
@@ -923,11 +847,11 @@ function createFallback(monogram: string, active: boolean, dense: boolean) {
   el.textContent = monogram
   el.style.fontSize = dense
     ? active
-      ? "10px"
-      : "8px"
+      ? "13px"
+      : "11px"
     : active
-      ? "12px"
-      : "9px"
+      ? "16px"
+      : "13px"
   el.style.fontWeight = "700"
   el.style.lineHeight = "1"
   el.style.color = "#342414"
