@@ -180,10 +180,7 @@ export function WorldMapSelect() {
       </header>
 
       <div className="pointer-events-none absolute right-4 bottom-4 z-30 max-w-[min(360px,calc(100vw-32px))] border-2 border-[#1a1a2e] bg-white px-4 py-3 shadow-[4px_4px_0_#4ecdc4] sm:right-6 sm:bottom-6">
-        <div className="font-(family-name:--font-pixel) text-[8px] text-[#ff6b6b]">
-          {activeCity.stage}
-        </div>
-        <div className="mt-2 font-(family-name:--font-pixel) text-[13px] leading-5 text-[#1a1a2e]">
+        <div className="font-(family-name:--font-pixel) text-[13px] leading-5 text-[#1a1a2e]">
           {activeCity.name}
         </div>
         <div className="mt-1 truncate text-xs text-[#1a1a2e]/65">
@@ -242,24 +239,26 @@ function WorldMapCanvas({
   }, [worldData])
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center p-3 sm:p-5">
-      <div className="relative h-full w-full overflow-hidden border-3 border-[#1a1a2e] bg-[#173bbb] shadow-[6px_6px_0_#1a1a2e]">
+    <div className="absolute inset-0">
+      <div className="relative h-full w-full overflow-hidden bg-[#173bbb]">
         <svg
           viewBox={`0 0 ${WORLD_MAP_WIDTH} ${WORLD_MAP_HEIGHT}`}
           role="img"
           aria-label="World map with selectable startup city stages"
           className="h-full w-full"
-          preserveAspectRatio="xMidYMid meet"
+          preserveAspectRatio="xMidYMid slice"
         >
           <defs>
             <pattern
-              id="ocean-lines"
-              width="16"
-              height="16"
+              id="ocean-bits"
+              width="18"
+              height="18"
               patternUnits="userSpaceOnUse"
             >
-              <path d="M0 15H16" stroke="#5fd1ff" strokeWidth="1" />
-              <path d="M0 7H16" stroke="#244ec4" strokeWidth="2" />
+              <rect width="18" height="18" fill="#173bbb" />
+              <rect x="2" y="3" width="4" height="4" fill="#2454d5" />
+              <rect x="12" y="10" width="3" height="3" fill="#0f2e9d" />
+              <rect x="8" y="15" width="5" height="2" fill="#2b66ee" />
             </pattern>
             <pattern
               id="grass-dither"
@@ -280,33 +279,9 @@ function WorldMapCanvas({
           <rect
             width={WORLD_MAP_WIDTH}
             height={WORLD_MAP_HEIGHT}
-            fill="url(#ocean-lines)"
-            opacity="0.5"
+            fill="url(#ocean-bits)"
+            opacity="1"
           />
-          <g opacity="0.2">
-            {Array.from({ length: 11 }, (_, index) => (
-              <line
-                key={`lat-${index}`}
-                x1="0"
-                x2={WORLD_MAP_WIDTH}
-                y1={index * 60}
-                y2={index * 60}
-                stroke="#72d5ff"
-                strokeWidth="1.5"
-              />
-            ))}
-            {Array.from({ length: 13 }, (_, index) => (
-              <line
-                key={`lon-${index}`}
-                x1={index * 100}
-                x2={index * 100}
-                y1="0"
-                y2={WORLD_MAP_HEIGHT}
-                stroke="#0d2372"
-                strokeWidth="1"
-              />
-            ))}
-          </g>
           <g stroke="#164018" strokeLinejoin="miter" strokeWidth="2.2">
             {countryPaths.map((country) => (
               <path key={country.id} d={country.d} fill={country.fill} />
@@ -371,7 +346,6 @@ function WorldMapCanvas({
             )
           })}
         </div>
-        <div className="pointer-events-none absolute inset-0 border-[10px] border-[#1a1a2e]/8" />
       </div>
     </div>
   )
