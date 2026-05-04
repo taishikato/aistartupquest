@@ -1037,7 +1037,7 @@ export function MapShell({
   }, [])
 
   useEffect(() => {
-    const map = mapRef.current
+    const map = mapReady
     if (!map) {
       return
     }
@@ -1179,6 +1179,7 @@ export function MapShell({
     companies,
     denseMeetups,
     denseStartups,
+    mapReady,
     meetups,
     mode,
     onSelectCompany,
