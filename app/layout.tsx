@@ -31,8 +31,8 @@ export const metadata: Metadata = {
     images: [ogImage],
   },
   icons: {
-    icon: [{ url: "/brand-mark.svg", type: "image/svg+xml" }],
-    apple: "/brand-mark.svg",
+    icon: [{ url: "/brand-mark.png", type: "image/png" }],
+    apple: "/brand-mark.png",
   },
 }
 

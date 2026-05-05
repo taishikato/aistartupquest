@@ -347,7 +347,7 @@ export function MapLibreWorldSelect() {
           aria-label="Back to RPG world map"
         >
           <Image
-            src="/brand-mark.svg"
+            src="/brand-mark.png"
             alt=""
             width={30}
             height={30}

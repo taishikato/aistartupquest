@@ -37,7 +37,7 @@ export function WorldMapSelect() {
           aria-label="AI Startup Quest home"
         >
           <Image
-            src="/brand-mark.svg"
+            src="/brand-mark.png"
             alt=""
             width={30}
             height={30}
