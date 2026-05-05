@@ -1,15 +1,13 @@
-import { Suspense } from "react"
+import type { Metadata } from "next"
 
-import { sfMapConfig } from "@/lib/city-config"
-import { loadCityMapPageData } from "@/lib/city-page-data"
-import { CityMap } from "@/components/city-map"
+import { WorldMapSelect } from "@/components/world-map-select"
 
-export default async function Page() {
-  const { companies } = await loadCityMapPageData("sf")
+export const metadata: Metadata = {
+  title: "AI Startup Quest: Choose a City Startup Map",
+  description:
+    "Choose a city stage and jump into an AI startup map for San Francisco, Toronto, New York, London, Vancouver, or Tokyo.",
+}
 
-  return (
-    <Suspense fallback={null}>
-      <CityMap key="sf" companies={companies} config={sfMapConfig} />
-    </Suspense>
-  )
+export default function Page() {
+  return <WorldMapSelect />
 }

@@ -1,10 +1,4 @@
-export type CityId =
-  | "sf"
-  | "toronto"
-  | "ny"
-  | "london"
-  | "vancouver"
-  | "tokyo"
+export type CityId = "sf" | "toronto" | "ny" | "london" | "vancouver" | "tokyo"
 
 /** IANA timezone per city (meetup local wall time + display). */
 export const CITY_TIMEZONES: Record<CityId, string> = {
@@ -94,7 +88,7 @@ export const torontoMapConfig: CityMapConfig = {
   switchOptions: [
     {
       city: "sf",
-      href: "/",
+      href: "/sf",
       label: "SF",
       ariaLabel: "Open SF AI Startup Map",
     },
@@ -138,7 +132,7 @@ export const nyMapConfig: CityMapConfig = {
   switchOptions: [
     {
       city: "sf",
-      href: "/",
+      href: "/sf",
       label: "SF",
       ariaLabel: "Open SF AI Startup Map",
     },
@@ -182,7 +176,7 @@ export const londonMapConfig: CityMapConfig = {
   switchOptions: [
     {
       city: "sf",
-      href: "/",
+      href: "/sf",
       label: "SF",
       ariaLabel: "Open SF AI Startup Map",
     },
@@ -226,7 +220,7 @@ export const vancouverMapConfig: CityMapConfig = {
   switchOptions: [
     {
       city: "sf",
-      href: "/",
+      href: "/sf",
       label: "SF",
       ariaLabel: "Open SF AI Startup Map",
     },
@@ -265,12 +259,12 @@ export const tokyoMapConfig: CityMapConfig = {
   searchPlaceholder: "Sakana, legal, healthcare...",
   meetupSearchPlaceholder: "Meetup title, venue, topic...",
   initialSelectedSlug: "sakana-ai",
-  mapCenter: [139.7670, 35.6804],
+  mapCenter: [139.767, 35.6804],
   sourceHref: "https://github.com/taishikato/aistartupquest",
   switchOptions: [
     {
       city: "sf",
-      href: "/",
+      href: "/sf",
       label: "SF",
       ariaLabel: "Open SF AI Startup Map",
     },
