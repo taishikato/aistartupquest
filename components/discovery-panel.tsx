@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { Search } from "lucide-react"
 
 import {
@@ -95,9 +96,12 @@ export function DiscoveryPanel({
     <aside className="flex h-full min-h-0 flex-col overflow-hidden border-r-3 border-[#1a1a2e] bg-[#1a1a2e] text-[#f0f7e6]">
       <div className="shrink-0 border-b-2 border-[#3a3a5e] bg-[#1a1a2e] px-5 pt-5 pb-4 shadow-[0_6px_14px_rgba(26,26,46,0.5)]">
         <div className="space-y-3">
-          <div className="flex items-start gap-3">
+          <Link
+            href="/"
+            className="flex items-start gap-3 transition-opacity hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4ecdc4]"
+          >
             <Image
-              src="/brand-mark.svg"
+              src="/brand-mark.png"
               alt=""
               width={40}
               height={40}
@@ -109,7 +113,7 @@ export function DiscoveryPanel({
               <br />
               {titleLines[1]}
             </h1>
-          </div>
+          </Link>
           <div className="font-(family-name:--font-pixel) text-[8px] text-[#4ecdc4]">
             {boardCount} {boardLabel}
           </div>
