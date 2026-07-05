@@ -151,10 +151,13 @@ export type Database = {
           id: number
           latitude: number
           location_label: string
+          location_precision: string
           longitude: number
           organizer_name: string | null
           payload_hash: string | null
           slug: string
+          source: string
+          source_event_id: string | null
           status: string
           title: string
           updated_at: string
@@ -170,10 +173,13 @@ export type Database = {
           id?: never
           latitude: number
           location_label: string
+          location_precision?: string
           longitude: number
           organizer_name?: string | null
           payload_hash?: string | null
           slug: string
+          source?: string
+          source_event_id?: string | null
           status?: string
           title: string
           updated_at?: string
@@ -189,10 +195,13 @@ export type Database = {
           id?: never
           latitude?: number
           location_label?: string
+          location_precision?: string
           longitude?: number
           organizer_name?: string | null
           payload_hash?: string | null
           slug?: string
+          source?: string
+          source_event_id?: string | null
           status?: string
           title?: string
           updated_at?: string
@@ -210,9 +219,11 @@ export type Database = {
           event_url: string | null
           latitude: number | null
           location_label: string | null
+          location_precision: string | null
           longitude: number | null
           organizer_name: string | null
           slug: string | null
+          source: string | null
           status: string | null
           title: string | null
           venue_name: string | null
@@ -224,9 +235,11 @@ export type Database = {
           event_url?: string | null
           latitude?: number | null
           location_label?: string | null
+          location_precision?: string | null
           longitude?: number | null
           organizer_name?: string | null
           slug?: string | null
+          source?: string | null
           status?: string | null
           title?: string | null
           venue_name?: string | null
@@ -238,9 +251,11 @@ export type Database = {
           event_url?: string | null
           latitude?: number | null
           location_label?: string | null
+          location_precision?: string | null
           longitude?: number | null
           organizer_name?: string | null
           slug?: string | null
+          source?: string | null
           status?: string | null
           title?: string | null
           venue_name?: string | null
