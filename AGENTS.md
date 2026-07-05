@@ -14,9 +14,16 @@
 
 ## Project Overview
 
-- This project is a Next.js 16 app for browsing San Francisco AI startups on a map.
-- The UI is intentionally simple and product-like, not editorial or playful.
+- This project is a Next.js 16 app for browsing AI startups and community events on city maps (SF, Toronto, NY, London, Vancouver, Tokyo).
+- The brand is a pixel-art RPG: users explore each city's AI ecosystem like a game world.
 - The map is powered by `maplibre-gl`.
+
+## Brand Language
+
+- Core metaphor: cities are game worlds, startups are sprites/bosses on the map, meetups and events are quests on the guild notice board, event sources (e.g. Cursor) are guilds.
+- Use the game metaphor for atmosphere only: markers, frames, icons, pixel type, microcopy accents.
+- Action words stay plain and product-like (Register, RSVP, Search, Add meetup). Never make users decode game vocabulary to act.
+- City-level events hide the venue by design; frame it as part of the experience ("Venue shared after registration"), never as a limitation.
 
 ## Commands
 
@@ -28,11 +35,12 @@
 
 ## UI Rules
 
-- Keep the app `light` only. Do not reintroduce system dark mode or a dark-mode toggle.
-- The page should be white-first and neutral. Do not use dark navy backgrounds.
-- Do not add rounded corners unless explicitly requested.
-- Do not add decorative gradients, glassmorphism, or editorial styling unless explicitly requested.
-- Keep the layout flat, clean, and product-focused.
+- The app is a dark pixel-RPG theme; there is no light/dark toggle. Do not add one.
+- Palette: navy backgrounds (`#1a1a2e`, `#151527`, `#23233b`), `#3a3a5e` borders, `#f0f7e6` text, teal `#4ecdc4` and yellow `#ffe66d` accents; wood/parchment browns (`#8b6914`, `#95602f`, `#ead9ab`) for meetup/quest elements.
+- Pixel aesthetic: hard 2-3px borders, offset pixel shadows (e.g. `shadow-[3px_3px_0_...]`), the pixel font (`--font-pixel`) for small headings and labels.
+- Never use rounded corners.
+- Never use gradients, glassmorphism, blur, or smooth drop shadows; keep everything hard-edged.
+- Despite the game skin, layouts stay clean and scannable: dates, cities, and links must be readable at a glance.
 - Use Tailwind CSS for styling.
 - When composing conditional `className` values in JavaScript or TypeScript, use the `cn` helper from `lib/utils.ts`.
 - In forms, label optional fields with `(optional)` next to the field name.
