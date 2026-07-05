@@ -22,16 +22,16 @@ import {
   getCompanyMonogram,
   type Company,
 } from "@/lib/company"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { CompanyRequestPanel } from "@/components/company-request-panel"
-import { MeetupRequestPanel } from "@/components/meetup-request-panel"
-import { PixelClouds } from "@/components/pixel-clouds"
 import {
   spreadOverlappingMeetups,
   type DiscoveryMode,
   type Meetup,
 } from "@/lib/meetup"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { CompanyRequestPanel } from "@/components/company-request-panel"
+import { MeetupRequestPanel } from "@/components/meetup-request-panel"
+import { PixelClouds } from "@/components/pixel-clouds"
 
 type MapShellProps = {
   mode: DiscoveryMode
@@ -79,8 +79,7 @@ function shouldSkipBoundsRefit(
   skipFirstBoundsRefitRef: MutableRefObject<boolean>,
   skipNextBoundsRefitRef: MutableRefObject<boolean>
 ) {
-  const skip =
-    skipFirstBoundsRefitRef.current || skipNextBoundsRefitRef.current
+  const skip = skipFirstBoundsRefitRef.current || skipNextBoundsRefitRef.current
 
   skipFirstBoundsRefitRef.current = false
   skipNextBoundsRefitRef.current = false
@@ -893,15 +892,14 @@ export function MapShell({
   const [mapReady, setMapReady] = useState<MapLibreMap | null>(null)
   const denseStartups = companies.length >= 60
   const denseMeetups = meetups.length >= 60
-  const spreadMeetups = useMemo(() => spreadOverlappingMeetups(meetups), [
-    meetups,
-  ])
+  const spreadMeetups = useMemo(
+    () => spreadOverlappingMeetups(meetups),
+    [meetups]
+  )
 
   useEffect(() => {
     selectedSlugRef.current =
-      mode === "startups"
-        ? selectedCompany.slug
-        : selectedMeetup?.slug ?? ""
+      mode === "startups" ? selectedCompany.slug : (selectedMeetup?.slug ?? "")
   }, [mode, selectedCompany.slug, selectedMeetup?.slug])
 
   useEffect(() => {

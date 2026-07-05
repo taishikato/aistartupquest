@@ -37,7 +37,9 @@ describe("validateCursorEvent", () => {
   })
 
   it("rejects bad dates and urls", () => {
-    expect(validateCursorEvent({ ...validEvent, date: "Aug 15" }).ok).toBe(false)
+    expect(validateCursorEvent({ ...validEvent, date: "Aug 15" }).ok).toBe(
+      false
+    )
     expect(validateCursorEvent({ ...validEvent, url: "luma.com/x" }).ok).toBe(
       false
     )

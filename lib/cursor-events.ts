@@ -57,7 +57,10 @@ export function validateCursorEvent(input: unknown): ValidationResult {
     return { ok: false, reason: `url must be https: ${candidate.url}` }
   }
   for (const field of ["organizer", "description"] as const) {
-    if (candidate[field] !== undefined && typeof candidate[field] !== "string") {
+    if (
+      candidate[field] !== undefined &&
+      typeof candidate[field] !== "string"
+    ) {
       return { ok: false, reason: `field must be a string: ${field}` }
     }
   }

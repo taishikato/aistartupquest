@@ -77,8 +77,16 @@ describe("spreadOverlappingMeetups", () => {
   })
 
   it("offsets duplicate coordinates deterministically", () => {
-    const a = makeMeetup({ slug: "a", coordinates: [-122.4167, 37.7793] })
-    const b = makeMeetup({ slug: "b", coordinates: [-122.4167, 37.7793] })
+    const a = makeMeetup({
+      slug: "a",
+      coordinates: [-122.4167, 37.7793],
+      locationPrecision: "city",
+    })
+    const b = makeMeetup({
+      slug: "b",
+      coordinates: [-122.4167, 37.7793],
+      locationPrecision: "city",
+    })
     const [ra, rb] = spreadOverlappingMeetups([a, b])
     expect(ra.coordinates).toEqual(a.coordinates)
     expect(rb.coordinates).not.toEqual(b.coordinates)
@@ -88,5 +96,12 @@ describe("spreadOverlappingMeetups", () => {
     expect(spreadOverlappingMeetups([a, b])).toEqual(
       spreadOverlappingMeetups([a, b])
     )
+  })
+
+  it("keeps duplicate exact coordinates untouched", () => {
+    const a = makeMeetup({ slug: "a", coordinates: [-122.4167, 37.7793] })
+    const b = makeMeetup({ slug: "b", coordinates: [-122.4167, 37.7793] })
+
+    expect(spreadOverlappingMeetups([a, b])).toEqual([a, b])
   })
 })

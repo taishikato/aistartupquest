@@ -145,6 +145,10 @@ const SPREAD_RADIUS = 0.004
 export function spreadOverlappingMeetups(meetups: Meetup[]): Meetup[] {
   const seen = new Map<string, number>()
   return meetups.map((meetup) => {
+    if (meetup.locationPrecision === "exact") {
+      return meetup
+    }
+
     const key = meetup.coordinates.map((c) => c.toFixed(5)).join(",")
     const index = seen.get(key) ?? 0
     seen.set(key, index + 1)

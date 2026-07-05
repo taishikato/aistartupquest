@@ -41,9 +41,7 @@ export function MeetupCard({
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="text-sm font-bold text-[#f0f7e6]">
-              {meetup.title}
-            </h3>
+            <h3 className="text-sm font-bold text-[#f0f7e6]">{meetup.title}</h3>
             {meetup.source === "cursor" ? (
               <span className="shrink-0 border border-[#3a3a5e] bg-[#23233b] px-1.5 py-0.5 font-(family-name:--font-pixel) text-[7px] tracking-[0.16em] text-[#4ecdc4] uppercase">
                 Cursor

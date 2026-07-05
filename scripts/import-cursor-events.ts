@@ -1,6 +1,5 @@
 import { readFileSync } from "node:fs"
 import { resolve } from "node:path"
-
 import { createClient } from "@supabase/supabase-js"
 
 import type { Database } from "@/types/supabase"
@@ -41,7 +40,9 @@ async function main() {
     }
     const city = mapCursorCity(result.event.city)
     if (!city) {
-      skipped.push(`#${index} (${result.event.title}): unsupported city "${result.event.city}"`)
+      skipped.push(
+        `#${index} (${result.event.title}): unsupported city "${result.event.city}"`
+      )
       continue
     }
     rows.push(buildCursorMeetupRow(result.event, city))
