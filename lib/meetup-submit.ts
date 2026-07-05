@@ -1,15 +1,6 @@
 import { createHash } from "node:crypto"
 
-import type { CityId } from "@/lib/city-config"
-
-const CITY_GEO_LABELS: Record<CityId, string> = {
-  sf: "San Francisco",
-  toronto: "Toronto",
-  ny: "New York",
-  london: "London",
-  vancouver: "Vancouver",
-  tokyo: "Tokyo",
-}
+import { CITY_GEO_LABELS, type CityId } from "@/lib/city-config"
 
 export function buildMeetupGeocodeQuery(
   venueName: string,

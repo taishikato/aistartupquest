@@ -2,7 +2,7 @@
 
 import { Calendar, MapPin } from "lucide-react"
 
-import type { Meetup } from "@/lib/meetup"
+import { meetupVenueDisplay, type Meetup } from "@/lib/meetup"
 import { formatMeetupDate } from "@/lib/meetup-datetime"
 import { cn } from "@/lib/utils"
 
@@ -20,6 +20,7 @@ export function MeetupCard({
   onSelect,
 }: MeetupCardProps) {
   const when = formatMeetupDate(meetup.eventDate)
+  const venue = meetupVenueDisplay(meetup)
 
   const body = (
     <article
@@ -39,7 +40,14 @@ export function MeetupCard({
           MTG
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="text-sm font-bold text-[#f0f7e6]">{meetup.title}</h3>
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="text-sm font-bold text-[#f0f7e6]">{meetup.title}</h3>
+            {meetup.source === "cursor" ? (
+              <span className="shrink-0 border border-[#3a3a5e] bg-[#23233b] px-1.5 py-0.5 font-(family-name:--font-pixel) text-[7px] tracking-[0.16em] text-[#4ecdc4] uppercase">
+                Cursor
+              </span>
+            ) : null}
+          </div>
           <div className="mt-1.5 flex flex-col gap-1 text-[10px] text-[#f0f7e6]/55">
             <span className="inline-flex items-center gap-1">
               <Calendar className="size-3 shrink-0 text-[#4ecdc4]" />
@@ -47,7 +55,7 @@ export function MeetupCard({
             </span>
             <span className="inline-flex items-center gap-1">
               <MapPin className="size-3 shrink-0 text-[#4ecdc4]" />
-              {meetup.venueName}
+              {venue.primary}
             </span>
           </div>
         </div>

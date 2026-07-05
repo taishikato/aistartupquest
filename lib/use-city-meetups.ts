@@ -7,7 +7,7 @@ import { filterAndSortUpcomingMeetups, meetupFromPublicRow } from "@/lib/meetup"
 import { createClient } from "@/lib/supabase/client"
 
 const PUBLIC_MEETUP_COLUMNS =
-  "slug, city, title, description, venue_name, location_label, latitude, longitude, event_date, organizer_name, event_url, status"
+  "slug, city, title, description, venue_name, location_label, latitude, longitude, event_date, organizer_name, event_url, status, source, location_precision"
 
 export function useCityMeetups(city: CityId, enabled: boolean) {
   return useQuery({

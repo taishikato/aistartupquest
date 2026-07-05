@@ -1,6 +1,5 @@
 "use client"
 
-import Script from "next/script"
 import {
   forwardRef,
   useCallback,
@@ -9,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react"
+import Script from "next/script"
 
 export type TurnstileWidgetHandle = {
   /** Clears the widget and issues a new challenge (invalidates the prior token). */

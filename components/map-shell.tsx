@@ -1,6 +1,12 @@
 "use client"
 
-import { useEffect, useRef, useState, type MutableRefObject } from "react"
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type MutableRefObject,
+} from "react"
 import { Github, Volume2, VolumeX } from "lucide-react"
 import maplibregl, {
   type ExpressionSpecification,
@@ -16,13 +22,16 @@ import {
   getCompanyMonogram,
   type Company,
 } from "@/lib/company"
+import {
+  spreadOverlappingMeetups,
+  type DiscoveryMode,
+  type Meetup,
+} from "@/lib/meetup"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { CompanyRequestPanel } from "@/components/company-request-panel"
 import { MeetupRequestPanel } from "@/components/meetup-request-panel"
 import { PixelClouds } from "@/components/pixel-clouds"
-import type { Meetup } from "@/lib/meetup"
-import type { DiscoveryMode } from "@/lib/meetup"
 
 type MapShellProps = {
   mode: DiscoveryMode
@@ -70,8 +79,7 @@ function shouldSkipBoundsRefit(
   skipFirstBoundsRefitRef: MutableRefObject<boolean>,
   skipNextBoundsRefitRef: MutableRefObject<boolean>
 ) {
-  const skip =
-    skipFirstBoundsRefitRef.current || skipNextBoundsRefitRef.current
+  const skip = skipFirstBoundsRefitRef.current || skipNextBoundsRefitRef.current
 
   skipFirstBoundsRefitRef.current = false
   skipNextBoundsRefitRef.current = false
@@ -732,8 +740,11 @@ function createMeetupSignboardMarker(
   const woodDark = "#5c3a1e"
   const paper = active ? "#f5e7bf" : "#ead9ab"
   const paperLine = "#8c6b3d"
-  const plank = dense ? (active ? 24 : 22) : active ? 28 : 24
-  const h = dense ? (active ? 30 : 28) : active ? 36 : 32
+  const isCityPrecision = meetup.locationPrecision === "city"
+  const basePlank = dense ? (active ? 24 : 22) : active ? 28 : 24
+  const baseH = dense ? (active ? 30 : 28) : active ? 36 : 32
+  const plank = isCityPrecision ? basePlank + 4 : basePlank
+  const h = isCityPrecision ? baseH + 4 : baseH
 
   const wrapper = sd({
     display: "flex",
@@ -742,6 +753,35 @@ function createMeetupSignboardMarker(
   })
 
   const float = createFloatingMarkerFrameFromSlug(meetup.slug)
+
+  if (isCityPrecision) {
+    const questIndicator = sd({
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      marginBottom: "2px",
+    })
+
+    questIndicator.appendChild(
+      sd({
+        width: "6px",
+        height: "12px",
+        background: "#ffe66d",
+        border: "2px solid #342414",
+      })
+    )
+    questIndicator.appendChild(sd({ height: "2px" }))
+    questIndicator.appendChild(
+      sd({
+        width: "6px",
+        height: "6px",
+        background: "#ffe66d",
+        border: "2px solid #342414",
+      })
+    )
+
+    float.appendChild(questIndicator)
+  }
 
   const posts = sd({
     display: "flex",
@@ -884,12 +924,14 @@ export function MapShell({
   const [mapReady, setMapReady] = useState<MapLibreMap | null>(null)
   const denseStartups = companies.length >= 60
   const denseMeetups = meetups.length >= 60
+  const spreadMeetups = useMemo(
+    () => spreadOverlappingMeetups(meetups),
+    [meetups]
+  )
 
   useEffect(() => {
     selectedSlugRef.current =
-      mode === "startups"
-        ? selectedCompany.slug
-        : selectedMeetup?.slug ?? ""
+      mode === "startups" ? selectedCompany.slug : (selectedMeetup?.slug ?? "")
   }, [mode, selectedCompany.slug, selectedMeetup?.slug])
 
   useEffect(() => {
@@ -1037,7 +1079,7 @@ export function MapShell({
       }
     } else {
       const dense = denseMeetups
-      meetups.forEach((meetup) => {
+      spreadMeetups.forEach((meetup) => {
         const active = meetup.slug === selectedSlugRef.current
         const element = document.createElement("button")
         element.type = "button"
@@ -1057,14 +1099,14 @@ export function MapShell({
         markersRef.current.set(meetup.slug, marker)
       })
 
-      const markerSetSignature = [...meetups]
+      const markerSetSignature = [...spreadMeetups]
         .map((m) => m.slug)
         .sort()
         .join("|")
       const modeMarkerSetSignature = `meetups:${markerSetSignature}`
       const shouldRefit =
         modeMarkerSetSignature !== mapMarkersSignatureRef.current &&
-        meetups.length > 0
+        spreadMeetups.length > 0
       mapMarkersSignatureRef.current = modeMarkerSetSignature
 
       if (shouldRefit) {
@@ -1075,11 +1117,11 @@ export function MapShell({
           )
         ) {
           const bounds = new maplibregl.LngLatBounds()
-          meetups.forEach((m) => bounds.extend(m.coordinates))
+          spreadMeetups.forEach((m) => bounds.extend(m.coordinates))
 
-          if (meetups.length === 1) {
+          if (spreadMeetups.length === 1) {
             map.jumpTo({
-              center: meetups[0].coordinates,
+              center: spreadMeetups[0].coordinates,
               zoom: 12.5,
               pitch: MAP_PITCH,
               bearing: MAP_BEARING,
@@ -1104,10 +1146,10 @@ export function MapShell({
     denseMeetups,
     denseStartups,
     mapReady,
-    meetups,
     mode,
     onSelectCompany,
     onSelectMeetup,
+    spreadMeetups,
   ])
 
   useEffect(() => {
@@ -1128,7 +1170,7 @@ export function MapShell({
       markersRef.current.forEach((marker, slug) => {
         const button = marker.getElement() as HTMLButtonElement
         const active = slug === selectedMeetup?.slug
-        const meetup = meetups.find((item) => item.slug === slug)
+        const meetup = spreadMeetups.find((item) => item.slug === slug)
 
         button.style.zIndex = active ? "10" : "1"
         if (meetup) {
@@ -1142,10 +1184,10 @@ export function MapShell({
     companies,
     denseMeetups,
     denseStartups,
-    meetups,
     mode,
     selectedCompany,
     selectedMeetup,
+    spreadMeetups,
   ])
 
   useEffect(() => {

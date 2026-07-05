@@ -94,9 +94,17 @@ export function WorldMapSelect() {
             aria-pressed={isSoundOn}
           >
             {isSoundOn ? (
-              <Volume2 className="size-5" aria-hidden="true" strokeWidth={2.4} />
+              <Volume2
+                className="size-5"
+                aria-hidden="true"
+                strokeWidth={2.4}
+              />
             ) : (
-              <VolumeX className="size-5" aria-hidden="true" strokeWidth={2.4} />
+              <VolumeX
+                className="size-5"
+                aria-hidden="true"
+                strokeWidth={2.4}
+              />
             )}
           </button>
         </div>
