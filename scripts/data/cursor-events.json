@@ -1,1 +1,23 @@
-[]
+[
+  {
+    "id": "cursor-1yyu",
+    "title": "Cafe Cursor London",
+    "city": "London",
+    "date": "2026-07-11",
+    "url": "https://luma.com/cursor-1yyu"
+  },
+  {
+    "id": "cursor-tokyoai-0731",
+    "title": "Cursor Tokyo AI Meetup",
+    "city": "Tokyo",
+    "date": "2026-07-31",
+    "url": "https://luma.com/cursor-tokyoai-0731"
+  },
+  {
+    "id": "hlx6e9er",
+    "title": "Cursor for PMs Toronto - August",
+    "city": "Toronto",
+    "date": "2026-08-19",
+    "url": "https://luma.com/hlx6e9er"
+  }
+]

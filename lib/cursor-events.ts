@@ -89,6 +89,10 @@ export function buildCursorMeetupRow(
 ): CursorMeetupRow {
   const [longitude, latitude] = CITY_MAP_CENTERS[city]
   const idHash = createHash("sha256").update(event.id).digest("hex").slice(0, 8)
+  const description =
+    event.description !== undefined && event.description.trim() !== ""
+      ? event.description
+      : `Cursor community event in ${CITY_GEO_LABELS[city]}. Venue is shared with registered guests.`
   const payloadHash = createHash("sha256")
     .update(
       JSON.stringify({
@@ -107,7 +111,7 @@ export function buildCursorMeetupRow(
     slug: `${slugifyMeetupBase(event.title, city, event.date)}-${idHash}`,
     city,
     title: event.title,
-    description: event.description ?? "",
+    description,
     venue_name: CITY_GEO_LABELS[city],
     location_label: "Venue shared after registration",
     latitude,

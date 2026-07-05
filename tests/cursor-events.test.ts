@@ -73,4 +73,19 @@ describe("buildCursorMeetupRow", () => {
       buildCursorMeetupRow(validEvent, "sf")
     )
   })
+
+  it("uses a city-specific fallback description when the event has none", () => {
+    expect(buildCursorMeetupRow(validEvent, "sf").description).toBe(
+      "Cursor community event in San Francisco. Venue is shared with registered guests."
+    )
+  })
+
+  it("passes through a non-empty event description", () => {
+    expect(
+      buildCursorMeetupRow(
+        { ...validEvent, description: "Hands-on session" },
+        "sf"
+      ).description
+    ).toBe("Hands-on session")
+  })
 })
