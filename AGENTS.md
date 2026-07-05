@@ -1,5 +1,12 @@
 # AGENTS.md
 
+## Agent Roles
+
+- Claude (Fable 5) is the planner, reviewer, and manager of the main loop.
+- Codex is the IC (executor) for code changes.
+- Delegate code changes to Codex through the codex-plugin-cc plugin (https://github.com/openai/codex-plugin-cc/blob/main/README.md).
+- Claude reviews Codex's output before committing.
+
 ## Communication
 
 - Respond to the user in Japanese.
