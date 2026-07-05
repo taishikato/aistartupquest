@@ -101,7 +101,7 @@ export function SelectedMeetupPanel({
                 </span>
               </div>
 
-              <div className="flex min-h-0 flex-1 flex-col justify-between overflow-y-auto px-5 py-6">
+              <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-5 py-6">
                 <div>
                   <h2 className="text-[22px] leading-[1.15] font-bold tracking-tight text-[#f0f7e6]">
                     {meetup.title}
@@ -112,7 +112,7 @@ export function SelectedMeetupPanel({
                   </p>
                 </div>
 
-                <div className="mt-6 space-y-4 border-t-2 border-[#3a3a5e] pt-4">
+                <div className="mt-5 space-y-4 border-t-2 border-[#3a3a5e] pt-5">
                   <div className="flex items-start gap-2 text-sm text-[#f0f7e6]/78">
                     <MapPin className="mt-0.5 size-4 shrink-0 text-[#4ecdc4]" />
                     <div>
@@ -137,9 +137,11 @@ export function SelectedMeetupPanel({
                     href={meetup.eventUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-2 border-2 border-[#3a3a5e] bg-[#23233b] px-3 py-2 text-sm text-[#4ecdc4] transition-colors hover:border-[#4ecdc4]"
+                    className="inline-flex items-center gap-2 border-2 border-[#1a1a2e] bg-[#4ecdc4] px-4 py-2 text-sm font-bold text-[#1a1a2e] shadow-[3px_3px_0_#0c0c18] transition-transform hover:-translate-y-0.5"
                   >
-                    RSVP / event link
+                    {meetup.locationPrecision === "city"
+                      ? "Register"
+                      : "RSVP / event link"}
                     <ArrowUpRight className="size-4" />
                   </a>
                 </div>

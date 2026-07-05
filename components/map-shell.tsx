@@ -740,8 +740,11 @@ function createMeetupSignboardMarker(
   const woodDark = "#5c3a1e"
   const paper = active ? "#f5e7bf" : "#ead9ab"
   const paperLine = "#8c6b3d"
-  const plank = dense ? (active ? 24 : 22) : active ? 28 : 24
-  const h = dense ? (active ? 30 : 28) : active ? 36 : 32
+  const isCityPrecision = meetup.locationPrecision === "city"
+  const basePlank = dense ? (active ? 24 : 22) : active ? 28 : 24
+  const baseH = dense ? (active ? 30 : 28) : active ? 36 : 32
+  const plank = isCityPrecision ? basePlank + 4 : basePlank
+  const h = isCityPrecision ? baseH + 4 : baseH
 
   const wrapper = sd({
     display: "flex",
@@ -750,6 +753,35 @@ function createMeetupSignboardMarker(
   })
 
   const float = createFloatingMarkerFrameFromSlug(meetup.slug)
+
+  if (isCityPrecision) {
+    const questIndicator = sd({
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      marginBottom: "2px",
+    })
+
+    questIndicator.appendChild(
+      sd({
+        width: "6px",
+        height: "12px",
+        background: "#ffe66d",
+        border: "2px solid #342414",
+      })
+    )
+    questIndicator.appendChild(sd({ height: "2px" }))
+    questIndicator.appendChild(
+      sd({
+        width: "6px",
+        height: "6px",
+        background: "#ffe66d",
+        border: "2px solid #342414",
+      })
+    )
+
+    float.appendChild(questIndicator)
+  }
 
   const posts = sd({
     display: "flex",
