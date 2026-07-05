@@ -1,9 +1,13 @@
 import type { Database } from "@/types/supabase"
-import { CITY_TIMEZONES, type CityId } from "@/lib/city-config"
+import { CITY_GEO_LABELS, CITY_TIMEZONES, type CityId } from "@/lib/city-config"
 
 export type MeetupStatus = "published" | "cancelled" | "hidden"
 
 export type DiscoveryMode = "startups" | "meetups"
+
+export type MeetupSource = "community" | "cursor"
+
+export type MeetupLocationPrecision = "exact" | "city"
 
 export type Meetup = {
   slug: string
@@ -18,6 +22,8 @@ export type Meetup = {
   eventUrl: string
   contactEmail: string | null
   status: MeetupStatus
+  source: MeetupSource
+  locationPrecision: MeetupLocationPrecision
 }
 
 type MeetupRow = Pick<
@@ -35,6 +41,8 @@ type MeetupRow = Pick<
   | "event_url"
   | "contact_email"
   | "status"
+  | "source"
+  | "location_precision"
 >
 
 type PublicMeetupRow =
@@ -67,6 +75,9 @@ export function meetupFromRow(row: MeetupRow): Meetup {
     eventUrl: row.event_url,
     contactEmail: row.contact_email,
     status: row.status as MeetupStatus,
+    source: (row.source ?? "community") as MeetupSource,
+    locationPrecision: (row.location_precision ??
+      "exact") as MeetupLocationPrecision,
   }
 }
 
@@ -84,6 +95,9 @@ export function meetupFromPublicRow(row: PublicMeetupRow): Meetup {
     eventUrl: row.event_url as string,
     contactEmail: null,
     status: row.status as MeetupStatus,
+    source: (row.source ?? "community") as MeetupSource,
+    locationPrecision: (row.location_precision ??
+      "exact") as MeetupLocationPrecision,
   }
 }
 
@@ -111,4 +125,39 @@ export function filterAndSortUpcomingMeetups(meetups: Meetup[]): Meetup[] {
       }
       return a.title.localeCompare(b.title)
     })
+}
+
+export function meetupVenueDisplay(meetup: Meetup): {
+  primary: string
+  secondary: string
+} {
+  if (meetup.locationPrecision === "city") {
+    return {
+      primary: CITY_GEO_LABELS[meetup.city],
+      secondary: "Venue shared after registration",
+    }
+  }
+  return { primary: meetup.venueName, secondary: meetup.locationLabel }
+}
+
+const SPREAD_RADIUS = 0.004
+
+export function spreadOverlappingMeetups(meetups: Meetup[]): Meetup[] {
+  const seen = new Map<string, number>()
+  return meetups.map((meetup) => {
+    const key = meetup.coordinates.map((c) => c.toFixed(5)).join(",")
+    const index = seen.get(key) ?? 0
+    seen.set(key, index + 1)
+    if (index === 0) {
+      return meetup
+    }
+    const angle = ((index - 1) * Math.PI) / 3
+    return {
+      ...meetup,
+      coordinates: [
+        meetup.coordinates[0] + SPREAD_RADIUS * Math.cos(angle),
+        meetup.coordinates[1] + SPREAD_RADIUS * Math.sin(angle),
+      ],
+    }
+  })
 }
