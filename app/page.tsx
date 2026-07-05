@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 
-import { WorldMapSelect } from "@/components/world-map-select"
+import { WorldGlobeSelect } from "@/components/world-globe-select"
 
 export const metadata: Metadata = {
   title: "AI Startup Quest: Choose a City Startup Map",
@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 }
 
 export default function Page() {
-  return <WorldMapSelect />
+  return <WorldGlobeSelect />
 }
