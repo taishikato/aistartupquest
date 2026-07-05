@@ -27,7 +27,9 @@ const MAPLIBRE_MARKER_OFFSETS: Record<CityId, [number, number]> = {
   tokyo: [0, 0],
 }
 
-async function loadWorldStyle(signal: AbortSignal): Promise<StyleSpecification> {
+async function loadWorldStyle(
+  signal: AbortSignal
+): Promise<StyleSpecification> {
   const response = await fetch(MAP_STYLE_URL, { signal })
 
   if (!response.ok) {
@@ -56,7 +58,12 @@ function setPaintPropertyIfLayerExists(
 }
 
 function applyWorldStageStyle(map: MapLibreMap) {
-  setPaintPropertyIfLayerExists(map, "background", "background-color", "#a5c76e")
+  setPaintPropertyIfLayerExists(
+    map,
+    "background",
+    "background-color",
+    "#a5c76e"
+  )
   setPaintPropertyIfLayerExists(map, "water", "fill-color", "#4b83c2")
   setPaintPropertyIfLayerExists(map, "water_shadow", "fill-color", "#325f97")
   setPaintPropertyIfLayerExists(map, "waterway", "line-color", "#4479b1")
@@ -322,7 +329,11 @@ export function MapLibreWorldSelect() {
 
     WORLD_STAGE_CITIES.forEach((city) => {
       const marker = new maplibregl.Marker({
-        element: createCityMarker(city, city.id === activeCityId, setActiveCityId),
+        element: createCityMarker(
+          city,
+          city.id === activeCityId,
+          setActiveCityId
+        ),
         anchor: "bottom",
         offset: MAPLIBRE_MARKER_OFFSETS[city.id],
       })
