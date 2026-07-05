@@ -3,20 +3,17 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import maplibregl, {
-  type Map as MapLibreMap,
-  type Marker,
-  type StyleSpecification,
-} from "maplibre-gl"
+import maplibregl, { type Map as MapLibreMap, type Marker } from "maplibre-gl"
 
 import type { CityId } from "@/lib/city-config"
+import {
+  applyRpgAtlasPaint,
+  loadWorldAtlasStyle,
+} from "@/lib/world-atlas-style"
 import {
   WORLD_STAGE_CITIES,
   type WorldStageCity,
 } from "@/lib/world-stage-cities"
-
-const MAP_STYLE_URL =
-  "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
 
 const MAPLIBRE_MARKER_OFFSETS: Record<CityId, [number, number]> = {
   sf: [0, 0],
@@ -25,168 +22,6 @@ const MAPLIBRE_MARKER_OFFSETS: Record<CityId, [number, number]> = {
   ny: [0, 0],
   london: [0, 0],
   tokyo: [0, 0],
-}
-
-async function loadWorldStyle(
-  signal: AbortSignal
-): Promise<StyleSpecification> {
-  const response = await fetch(MAP_STYLE_URL, { signal })
-
-  if (!response.ok) {
-    throw new Error(`Failed to load map style: ${response.status}`)
-  }
-
-  const style = (await response.json()) as StyleSpecification
-
-  return {
-    ...style,
-    projection: { type: "mercator" },
-  }
-}
-
-function setPaintPropertyIfLayerExists(
-  map: MapLibreMap,
-  layerId: string,
-  property: string,
-  value: unknown
-) {
-  if (!map.getLayer(layerId)) {
-    return
-  }
-
-  map.setPaintProperty(layerId, property, value)
-}
-
-function applyWorldStageStyle(map: MapLibreMap) {
-  setPaintPropertyIfLayerExists(
-    map,
-    "background",
-    "background-color",
-    "#a5c76e"
-  )
-  setPaintPropertyIfLayerExists(map, "water", "fill-color", "#4b83c2")
-  setPaintPropertyIfLayerExists(map, "water_shadow", "fill-color", "#325f97")
-  setPaintPropertyIfLayerExists(map, "waterway", "line-color", "#4479b1")
-  setPaintPropertyIfLayerExists(map, "waterway", "line-width", 2.4)
-
-  setPaintPropertyIfLayerExists(map, "landcover", "fill-color", "#7ea64a")
-  setPaintPropertyIfLayerExists(map, "landcover", "fill-opacity", 0.96)
-  ;["park_national_park", "park_nature_reserve"].forEach((id) => {
-    setPaintPropertyIfLayerExists(map, id, "fill-color", "#5f9235")
-    setPaintPropertyIfLayerExists(map, id, "fill-opacity", 0.92)
-  })
-
-  setPaintPropertyIfLayerExists(
-    map,
-    "landuse_residential",
-    "fill-color",
-    "#ddd2ac"
-  )
-  setPaintPropertyIfLayerExists(map, "landuse", "fill-color", "#d6c99a")
-  setPaintPropertyIfLayerExists(map, "landuse", "fill-opacity", 0.88)
-
-  const roadCases = [
-    "road_service_case",
-    "road_minor_case",
-    "road_pri_case_ramp",
-    "road_trunk_case_ramp",
-    "road_mot_case_ramp",
-    "road_sec_case_noramp",
-    "road_pri_case_noramp",
-    "road_trunk_case_noramp",
-    "road_mot_case_noramp",
-    "tunnel_service_case",
-    "tunnel_minor_case",
-    "tunnel_sec_case",
-    "tunnel_pri_case",
-    "tunnel_trunk_case",
-    "tunnel_mot_case",
-    "bridge_service_case",
-    "bridge_minor_case",
-    "bridge_sec_case",
-    "bridge_pri_case",
-    "bridge_trunk_case",
-    "bridge_mot_case",
-  ]
-  roadCases.forEach((id) =>
-    setPaintPropertyIfLayerExists(map, id, "line-color", "#3f3427")
-  )
-
-  const roadFills = [
-    "road_service_fill",
-    "road_minor_fill",
-    "road_pri_fill_ramp",
-    "road_trunk_fill_ramp",
-    "road_mot_fill_ramp",
-    "road_sec_fill_noramp",
-    "road_pri_fill_noramp",
-    "road_trunk_fill_noramp",
-    "road_mot_fill_noramp",
-    "tunnel_service_fill",
-    "tunnel_minor_fill",
-    "tunnel_sec_fill",
-    "tunnel_pri_fill",
-    "tunnel_trunk_fill",
-    "tunnel_mot_fill",
-    "bridge_service_fill",
-    "bridge_minor_fill",
-    "bridge_sec_fill",
-    "bridge_pri_fill",
-    "bridge_trunk_fill",
-    "bridge_mot_fill",
-  ]
-  roadFills.forEach((id) =>
-    setPaintPropertyIfLayerExists(map, id, "line-color", "#958868")
-  )
-
-  setPaintPropertyIfLayerExists(map, "road_path", "line-color", "#735d3a")
-  setPaintPropertyIfLayerExists(map, "rail", "line-color", "#5a5650")
-  setPaintPropertyIfLayerExists(map, "rail_dash", "line-color", "#b1aa94")
-
-  setPaintPropertyIfLayerExists(
-    map,
-    "boundary_country_outline",
-    "line-color",
-    "#f3e2a5"
-  )
-  setPaintPropertyIfLayerExists(
-    map,
-    "boundary_country_outline",
-    "line-opacity",
-    0.78
-  )
-  setPaintPropertyIfLayerExists(map, "boundary_county", "line-color", "#8d6c49")
-  setPaintPropertyIfLayerExists(map, "boundary_state", "line-color", "#725536")
-
-  const placeLabels = [
-    "place_hamlet",
-    "place_suburbs",
-    "place_villages",
-    "place_town",
-    "place_city_r6",
-    "place_city_r5",
-    "place_state",
-    "place_country_1",
-    "place_country_2",
-  ]
-  placeLabels.forEach((id) => {
-    setPaintPropertyIfLayerExists(map, id, "text-color", "#3d2e1f")
-    setPaintPropertyIfLayerExists(map, id, "text-halo-color", "#d9cb97")
-    setPaintPropertyIfLayerExists(map, id, "text-halo-width", 1.5)
-  })
-
-  const waterLabels = [
-    "watername_ocean",
-    "watername_sea",
-    "watername_lake",
-    "watername_lake_line",
-    "waterway_label",
-  ]
-  waterLabels.forEach((id) => {
-    setPaintPropertyIfLayerExists(map, id, "text-color", "#244e82")
-    setPaintPropertyIfLayerExists(map, id, "text-halo-color", "#78a7db")
-    setPaintPropertyIfLayerExists(map, id, "text-halo-width", 1)
-  })
 }
 
 function createCityMarker(
@@ -271,7 +106,7 @@ export function MapLibreWorldSelect() {
     const markers = markersRef.current
     let disposed = false
 
-    loadWorldStyle(controller.signal)
+    loadWorldAtlasStyle(controller.signal)
       .then((style) => {
         if (disposed || !containerRef.current || mapRef.current) {
           return
@@ -279,7 +114,10 @@ export function MapLibreWorldSelect() {
 
         const map = new maplibregl.Map({
           container: containerRef.current,
-          style,
+          style: {
+            ...style,
+            projection: { type: "mercator" },
+          },
           center: [18, 24],
           zoom: 1.08,
           minZoom: 0.48,
@@ -293,7 +131,7 @@ export function MapLibreWorldSelect() {
           "bottom-right"
         )
         map.on("load", () => {
-          applyWorldStageStyle(map)
+          applyRpgAtlasPaint(map)
           map.resize()
           setMapReady(map)
         })

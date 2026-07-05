@@ -13,8 +13,13 @@ import maplibregl, {
 import cursorCommunityEvents from "@/lib/data/cursor-community-events.json"
 import { cn } from "@/lib/utils"
 import { artLatitude, GLOBE_CAMERA, WORLD_ART_STYLE } from "@/lib/world-art-map"
+import {
+  applyRpgAtlasPaint,
+  loadWorldAtlasStyle,
+} from "@/lib/world-atlas-style"
 
 type WorldView = "mercator" | "globe"
+type MapStyle = "art" | "atlas"
 
 type CursorCommunityCity = {
   name: string
@@ -172,9 +177,14 @@ export function EventsWorldMap() {
   const rotationFrameRef = useRef<number | null>(null)
   const rotationStoppedByUserRef = useRef(false)
   const viewRef = useRef<WorldView>("mercator")
+  const mapStyleRef = useRef<MapStyle>("art")
+  const atlasStyleRef = useRef<StyleSpecification | null>(null)
+  const atlasStylePromiseRef = useRef<Promise<StyleSpecification> | null>(null)
+  const styleRequestIdRef = useRef(0)
   const [mapReady, setMapReady] = useState<MapLibreMap | null>(null)
   const [selectedCity, setSelectedCity] = useState<string | null>(null)
   const [view, setView] = useState<WorldView>("mercator")
+  const [mapStyle, setMapStyle] = useState<MapStyle>("art")
   const upcomingCities = useMemo(() => getUpcomingCities(), [])
   const selectedCityEvents = selectedCity
     ? (upcomingCities.find((city) => city.name === selectedCity)?.events ?? [])
@@ -187,6 +197,10 @@ export function EventsWorldMap() {
   useEffect(() => {
     viewRef.current = view
   }, [view])
+
+  useEffect(() => {
+    mapStyleRef.current = mapStyle
+  }, [mapStyle])
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) {
@@ -286,7 +300,10 @@ export function EventsWorldMap() {
         anchor: "bottom",
         opacityWhenCovered: "0",
       })
-        .setLngLat([city.lon, artLatitude(city.lat)])
+        .setLngLat([
+          city.lon,
+          mapStyleRef.current === "art" ? artLatitude(city.lat) : city.lat,
+        ])
         .addTo(map)
     )
 
@@ -364,6 +381,118 @@ export function EventsWorldMap() {
     }
   }
 
+  const applyAtlasPaintAfterStyleLoad = (
+    map: MapLibreMap,
+    requestId: number
+  ) => {
+    const applyPaint = () => {
+      if (
+        mapRef.current !== map ||
+        styleRequestIdRef.current !== requestId ||
+        mapStyleRef.current !== "atlas"
+      ) {
+        return
+      }
+
+      applyRpgAtlasPaint(map)
+    }
+
+    if (map.isStyleLoaded()) {
+      applyPaint()
+      return
+    }
+
+    map.once("idle", applyPaint)
+  }
+
+  const getAtlasStyle = async (signal: AbortSignal) => {
+    if (atlasStyleRef.current) {
+      return atlasStyleRef.current
+    }
+
+    atlasStylePromiseRef.current ??= loadWorldAtlasStyle(signal).then(
+      (style) => {
+        atlasStyleRef.current = style
+        return style
+      }
+    )
+
+    return atlasStylePromiseRef.current
+  }
+
+  /**
+   * The hand-drawn artwork needs artLatitude() to land pins on its
+   * distorted continents; the atlas is real geography, so pins use
+   * their true latitudes there.
+   */
+  const repositionMarkers = (nextMapStyle: MapStyle) => {
+    markersRef.current.forEach((marker, index) => {
+      const city = upcomingCities[index]
+
+      if (!city) {
+        return
+      }
+
+      marker.setLngLat([
+        city.lon,
+        nextMapStyle === "art" ? artLatitude(city.lat) : city.lat,
+      ])
+    })
+  }
+
+  const switchMapStyle = (nextMapStyle: MapStyle) => {
+    const map = mapRef.current
+
+    if (!map || mapStyle === nextMapStyle) {
+      return
+    }
+
+    styleRequestIdRef.current += 1
+    const requestId = styleRequestIdRef.current
+
+    if (nextMapStyle === "art") {
+      mapStyleRef.current = "art"
+      setMapStyle("art")
+      map.setStyle({
+        ...EVENTS_ART_STYLE,
+        projection: { type: viewRef.current },
+      })
+      repositionMarkers("art")
+      return
+    }
+
+    mapStyleRef.current = "atlas"
+    setMapStyle("atlas")
+    getAtlasStyle(new AbortController().signal)
+      .then((atlasStyle) => {
+        if (mapRef.current !== map || styleRequestIdRef.current !== requestId) {
+          return
+        }
+
+        map.setStyle({
+          ...atlasStyle,
+          projection: { type: viewRef.current },
+        })
+        repositionMarkers("atlas")
+        applyAtlasPaintAfterStyleLoad(map, requestId)
+      })
+      .catch((error: unknown) => {
+        console.error(error)
+
+        if (mapRef.current !== map || styleRequestIdRef.current !== requestId) {
+          return
+        }
+
+        mapStyleRef.current = "art"
+        setMapStyle("art")
+        map.setStyle({
+          ...EVENTS_ART_STYLE,
+          projection: { type: viewRef.current },
+        })
+        repositionMarkers("art")
+      })
+  }
+
   return (
     <main className="relative h-dvh overflow-hidden bg-[#123a9b] text-[#1a1a2e]">
       <div className="absolute inset-0">
@@ -399,31 +528,63 @@ export function EventsWorldMap() {
       </header>
 
       <div className="pointer-events-none absolute top-4 right-0 left-0 z-30 flex justify-center px-4 sm:top-6">
-        <div className="pointer-events-auto flex shadow-[3px_3px_0_#1a1a2e]">
-          <button
-            type="button"
-            onClick={() => switchView("mercator")}
-            className={cn(
-              "border-2 border-[#1a1a2e] px-4 py-2 font-(family-name:--font-pixel) text-[9px] leading-4 text-[#1a1a2e] transition-colors",
-              view === "mercator" ? "bg-[#ffe66d]" : "bg-white"
-            )}
-            aria-pressed={view === "mercator"}
-          >
-            MAP
-          </button>
-          <button
-            type="button"
-            onClick={() => switchView("globe")}
-            className={cn(
-              "-ml-0.5 border-2 border-[#1a1a2e] px-4 py-2 font-(family-name:--font-pixel) text-[9px] leading-4 text-[#1a1a2e] transition-colors",
-              view === "globe" ? "bg-[#ffe66d]" : "bg-white"
-            )}
-            aria-pressed={view === "globe"}
-          >
-            GLOBE
-          </button>
+        <div className="pointer-events-auto flex flex-wrap justify-center gap-3">
+          <div className="flex shadow-[3px_3px_0_#1a1a2e]">
+            <button
+              type="button"
+              onClick={() => switchView("mercator")}
+              className={cn(
+                "border-2 border-[#1a1a2e] px-4 py-2 font-(family-name:--font-pixel) text-[9px] leading-4 text-[#1a1a2e] transition-colors",
+                view === "mercator" ? "bg-[#ffe66d]" : "bg-white"
+              )}
+              aria-pressed={view === "mercator"}
+            >
+              MAP
+            </button>
+            <button
+              type="button"
+              onClick={() => switchView("globe")}
+              className={cn(
+                "-ml-0.5 border-2 border-[#1a1a2e] px-4 py-2 font-(family-name:--font-pixel) text-[9px] leading-4 text-[#1a1a2e] transition-colors",
+                view === "globe" ? "bg-[#ffe66d]" : "bg-white"
+              )}
+              aria-pressed={view === "globe"}
+            >
+              GLOBE
+            </button>
+          </div>
+          <div className="flex shadow-[3px_3px_0_#1a1a2e]">
+            <button
+              type="button"
+              onClick={() => switchMapStyle("art")}
+              className={cn(
+                "border-2 border-[#1a1a2e] px-4 py-2 font-(family-name:--font-pixel) text-[9px] leading-4 text-[#1a1a2e] transition-colors",
+                mapStyle === "art" ? "bg-[#ffe66d]" : "bg-white"
+              )}
+              aria-pressed={mapStyle === "art"}
+            >
+              ART
+            </button>
+            <button
+              type="button"
+              onClick={() => switchMapStyle("atlas")}
+              className={cn(
+                "-ml-0.5 border-2 border-[#1a1a2e] px-4 py-2 font-(family-name:--font-pixel) text-[9px] leading-4 text-[#1a1a2e] transition-colors",
+                mapStyle === "atlas" ? "bg-[#ffe66d]" : "bg-white"
+              )}
+              aria-pressed={mapStyle === "atlas"}
+            >
+              ATLAS
+            </button>
+          </div>
         </div>
       </div>
+
+      {mapStyle === "atlas" ? (
+        <div className="pointer-events-none absolute right-4 bottom-4 z-30 border border-[#1a1a2e] bg-white/85 px-1.5 text-[10px] leading-4 text-[#1a1a2e] sm:right-6 sm:bottom-6">
+          (c) CARTO (c) OpenStreetMap
+        </div>
+      ) : null}
 
       <section className="pointer-events-none absolute bottom-4 left-4 z-30 max-w-[min(400px,calc(100vw-32px))] sm:bottom-6 sm:left-6">
         {selectedCity ? (
