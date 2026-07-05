@@ -5,57 +5,28 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Volume2, VolumeX } from "lucide-react"
-import maplibregl, {
-  type Map as MapLibreMap,
-  type Marker,
-  type StyleSpecification,
-} from "maplibre-gl"
+import maplibregl, { type Map as MapLibreMap, type Marker } from "maplibre-gl"
 
 import type { CityId } from "@/lib/city-config"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
+import {
+  artLatitude,
+  FLAT_CAMERA,
+  GLOBE_CAMERA,
+  WORLD_ART_STYLE,
+} from "@/lib/world-art-map"
 import {
   WORLD_STAGE_CITIES,
   type WorldStageCity,
 } from "@/lib/world-stage-cities"
 import { WorldMapSelect } from "@/components/world-map-select"
 
-const GLOBE_STYLE: StyleSpecification = {
-  version: 8,
-  projection: { type: "globe" },
-  sources: {
-    world: {
-      type: "image",
-      url: "/map-assets/rpg-world-map.webp",
-      coordinates: [
-        [-180, 85],
-        [180, 85],
-        [180, -85],
-        [-180, -85],
-      ],
-    },
-  },
-  layers: [
-    {
-      id: "background",
-      type: "background",
-      paint: {
-        "background-color": "#123a9b",
-      },
-    },
-    {
-      id: "world",
-      type: "raster",
-      source: "world",
-      paint: {
-        "raster-fade-duration": 0,
-        "raster-resampling": "nearest",
-      },
-    },
-  ],
-}
+type WorldView = "globe" | "flat"
 
-const GLOBE_CENTER: [number, number] = [-40, 30]
+/** "globe" = rotating 3D globe, "flat" = full-world mercator map. */
+const WORLD_VIEW = "flat" as WorldView
+
 const IDLE_ROTATION_DEGREES_PER_FRAME = 0.015
 
 type MeetupCountByCity = Partial<Record<CityId, number>>
@@ -130,7 +101,6 @@ function createCityMarker({
   const button = document.createElement("button")
   button.type = "button"
   button.setAttribute("aria-label", `Open ${city.name} AI Startup Map`)
-  button.style.position = "relative"
   button.style.display = "block"
   button.style.width = "70px"
   button.style.height = "70px"
@@ -325,10 +295,15 @@ export function WorldGlobeSelect() {
     try {
       const map = new maplibregl.Map({
         container: containerRef.current,
-        style: GLOBE_STYLE,
-        center: GLOBE_CENTER,
-        zoom: 1.75,
-        minZoom: 1.2,
+        style: {
+          ...WORLD_ART_STYLE,
+          projection: { type: WORLD_VIEW === "globe" ? "globe" : "mercator" },
+        },
+        center:
+          WORLD_VIEW === "globe" ? GLOBE_CAMERA.center : FLAT_CAMERA.center,
+        zoom: WORLD_VIEW === "globe" ? GLOBE_CAMERA.zoom : FLAT_CAMERA.zoom,
+        minZoom:
+          WORLD_VIEW === "globe" ? GLOBE_CAMERA.minZoom : FLAT_CAMERA.minZoom,
         maxZoom: 4.5,
         minPitch: 0,
         maxPitch: 0,
@@ -355,7 +330,10 @@ export function WorldGlobeSelect() {
         didLoad = true
         map.resize()
         setMapReady(map)
-        rotationFrameRef.current = window.requestAnimationFrame(rotate)
+
+        if (WORLD_VIEW === "globe") {
+          rotationFrameRef.current = window.requestAnimationFrame(rotate)
+        }
       })
 
       map.on("error", () => {
@@ -402,7 +380,7 @@ export function WorldGlobeSelect() {
         anchor: "bottom",
         offset: [city.signDx ?? 0, city.signDy ?? 0],
       })
-        .setLngLat([city.lon, city.lat])
+        .setLngLat([city.lon, artLatitude(city.lat)])
         .addTo(map)
 
       markersRef.current.set(city.id, marker)
