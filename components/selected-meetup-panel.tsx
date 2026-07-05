@@ -9,7 +9,7 @@ import {
   User,
 } from "lucide-react"
 
-import type { Meetup } from "@/lib/meetup"
+import { meetupVenueDisplay, type Meetup } from "@/lib/meetup"
 import { formatMeetupDate } from "@/lib/meetup-datetime"
 import { cn } from "@/lib/utils"
 
@@ -28,6 +28,8 @@ export function SelectedMeetupPanel({
   collapsed,
   onToggleCollapsed,
 }: SelectedMeetupPanelProps) {
+  const venue = meetup ? meetupVenueDisplay(meetup) : null
+
   return (
     <aside
       className={cn(
@@ -115,10 +117,10 @@ export function SelectedMeetupPanel({
                     <MapPin className="mt-0.5 size-4 shrink-0 text-[#4ecdc4]" />
                     <div>
                       <div className="font-medium text-[#f0f7e6]">
-                        {meetup.venueName}
+                        {venue?.primary}
                       </div>
                       <div className="mt-0.5 text-[#f0f7e6]/65">
-                        {meetup.locationLabel}
+                        {venue?.secondary}
                       </div>
                     </div>
                   </div>
