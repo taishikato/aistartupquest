@@ -4,7 +4,11 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { format } from "date-fns"
-import maplibregl, { type Map as MapLibreMap, type Marker } from "maplibre-gl"
+import maplibregl, {
+  type Map as MapLibreMap,
+  type Marker,
+  type StyleSpecification,
+} from "maplibre-gl"
 
 import cursorCommunityEvents from "@/lib/data/cursor-community-events.json"
 import { cn } from "@/lib/utils"
@@ -31,6 +35,35 @@ type CityWithEvents = CursorCommunityCity & {
 }
 
 const IDLE_ROTATION_DEGREES_PER_FRAME = 0.015
+
+/**
+ * Softened rendering of the shared artwork for this page: linear
+ * resampling smooths the chunky pixels and negative saturation/contrast
+ * tone down the heavy greens without touching the source image.
+ */
+const EVENTS_ART_STYLE: StyleSpecification = {
+  ...WORLD_ART_STYLE,
+  layers: [
+    {
+      id: "background",
+      type: "background",
+      paint: {
+        "background-color": "#2b5590",
+      },
+    },
+    {
+      id: "world",
+      type: "raster",
+      source: "world",
+      paint: {
+        "raster-fade-duration": 0,
+        "raster-resampling": "linear",
+        "raster-saturation": -0.35,
+        "raster-contrast": -0.08,
+      },
+    },
+  ],
+}
 
 /**
  * Unlike the stage-select page, events span both hemispheres, so the flat
@@ -182,7 +215,7 @@ export function EventsWorldMap() {
       const map = new maplibregl.Map({
         container: containerRef.current,
         style: {
-          ...WORLD_ART_STYLE,
+          ...EVENTS_ART_STYLE,
           projection: { type: "mercator" },
         },
         center: EVENTS_FLAT_CAMERA.center,
