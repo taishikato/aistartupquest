@@ -115,6 +115,13 @@ export function SpaceBackdrop({ className }: SpaceBackdropProps) {
           75% { transform: translate3d(-48px, 44px, 0); }
         }
 
+        @keyframes sq-space-planet {
+          0%, 100% { transform: translate3d(0, 0, 0); }
+          25% { transform: translate3d(-46px, 28px, 0); }
+          50% { transform: translate3d(-84px, -8px, 0); }
+          75% { transform: translate3d(-38px, -36px, 0); }
+        }
+
         @keyframes sq-space-shoot {
           0% { transform: translate3d(0, 0, 0); opacity: 0; }
           4% { opacity: 1; }
@@ -150,6 +157,10 @@ export function SpaceBackdrop({ className }: SpaceBackdropProps) {
           animation: sq-space-wander 36s ease-in-out infinite;
         }
 
+        .sq-space-planet {
+          animation: sq-space-planet 48s ease-in-out infinite;
+        }
+
         .sq-space-shoot {
           animation: sq-space-shoot 11s linear infinite;
         }
@@ -181,7 +192,7 @@ export function SpaceBackdrop({ className }: SpaceBackdropProps) {
         </div>
       ))}
 
-      <div className="sq-space-drift-slower absolute top-[12%] right-[8%] h-14 w-16">
+      <div className="sq-space-planet absolute top-[12%] right-[8%] h-14 w-16">
         <div className="absolute top-6 left-1/2 h-2 w-[52px] -translate-x-1/2 -rotate-[18deg] border-[4px] border-[#342414] bg-[#8a5fae]" />
         <div className="absolute top-3 left-1/2 size-7 -translate-x-1/2 border-[4px] border-[#342414] bg-[#b07ab0]" />
       </div>
