@@ -18,6 +18,8 @@ import {
   loadWorldAtlasStyle,
 } from "@/lib/world-atlas-style"
 
+import { SpaceBackdrop } from "./space-backdrop"
+
 type WorldView = "mercator" | "globe"
 type MapStyle = "art" | "atlas"
 
@@ -55,7 +57,7 @@ const EVENTS_ART_STYLE: StyleSpecification = {
       id: "background",
       type: "background",
       paint: {
-        "background-color": "#2b5590",
+        "background-color": "rgba(0, 0, 0, 0)",
       },
     },
     {
@@ -533,9 +535,10 @@ export function EventsWorldMap() {
   }, [startIdleRotation, stopIdleRotation, switchMapStyle])
 
   return (
-    <main className="relative h-dvh overflow-hidden bg-[#123a9b] text-[#1a1a2e]">
+    <main className="relative h-dvh overflow-hidden bg-[#0a0a1f] text-[#1a1a2e]">
       <div className="absolute inset-0">
-        <div ref={containerRef} className="h-full w-full bg-[#123a9b]" />
+        <SpaceBackdrop />
+        <div ref={containerRef} className="h-full w-full" />
       </div>
 
       <header className="pointer-events-none absolute top-0 left-0 z-30 p-4 sm:p-6">

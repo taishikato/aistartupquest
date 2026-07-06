@@ -35,12 +35,47 @@ export function applyRpgAtlasPaint(map: MapLibreMap) {
     }
   })
 
-  setPaintPropertyIfLayerExists(
-    map,
-    "background",
-    "background-color",
-    "#9cc465"
-  )
+  setPaintPropertyIfLayerExists(map, "background", "background-opacity", 0)
+
+  if (!map.getSource("rpg-land-base")) {
+    map.addSource("rpg-land-base", {
+      type: "geojson",
+      data: {
+        type: "Feature",
+        properties: {},
+        geometry: {
+          type: "Polygon",
+          coordinates: [
+            [
+              [-180, -85],
+              [180, -85],
+              [180, 85],
+              [-180, 85],
+              [-180, -85],
+            ],
+          ],
+        },
+      },
+    })
+  }
+
+  if (!map.getLayer("rpg-land-base-fill")) {
+    const firstLayerId = map.getStyle().layers[0]?.id
+    map.addLayer(
+      {
+        id: "rpg-land-base-fill",
+        type: "fill",
+        source: "rpg-land-base",
+        paint: { "fill-color": "#9cc465" },
+      },
+      map.getLayer("landcover")
+        ? "landcover"
+        : map.getLayer("rpg-urban-fill")
+          ? "rpg-urban-fill"
+          : firstLayerId
+    )
+  }
+
   setPaintPropertyIfLayerExists(map, "water", "fill-color", "#3f78c8")
   setPaintPropertyIfLayerExists(map, "water_shadow", "fill-color", "#2c5aa8")
   setPaintPropertyIfLayerExists(map, "waterway", "line-color", "#4479b1")
