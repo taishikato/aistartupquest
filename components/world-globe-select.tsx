@@ -13,7 +13,6 @@ import { cn } from "@/lib/utils"
 import {
   artLatitude,
   artLatitudeOnGlobe,
-  artPosition,
   FLAT_CAMERA,
   GLOBE_CAMERA,
   WORLD_ART_STYLE,
@@ -32,12 +31,12 @@ const WORLD_VIEW = "flat" as WorldView
 const IDLE_ROTATION_DEGREES_PER_FRAME = 0.015
 
 /** The artwork position remap depends on the projection (see lib/world-art-map). */
-function markerPositionForView(lon: number, lat: number): [number, number] {
-  const [artLon, artLat] = artPosition(lon, lat)
-
+function markerPositionForView(city: WorldStageCity): [number, number] {
   return [
-    artLon,
-    WORLD_VIEW === "globe" ? artLatitudeOnGlobe(artLat) : artLatitude(artLat),
+    city.artLon,
+    WORLD_VIEW === "globe"
+      ? artLatitudeOnGlobe(city.artLat)
+      : artLatitude(city.artLat),
   ]
 }
 
@@ -392,7 +391,7 @@ export function WorldGlobeSelect() {
         anchor: "bottom",
         offset: [city.signDx ?? 0, city.signDy ?? 0],
       })
-        .setLngLat(markerPositionForView(city.lon, city.lat))
+        .setLngLat(markerPositionForView(city))
         .addTo(map)
 
       markersRef.current.set(city.id, marker)

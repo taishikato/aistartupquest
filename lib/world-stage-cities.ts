@@ -10,6 +10,9 @@ export type WorldStageCity = {
   tagline: string
   lat: number
   lon: number
+  /** Hand-measured equirectangular position where the artwork draws this city. */
+  artLon: number
+  artLat: number
   accent: string
   signDx?: number
   signDy?: number
@@ -26,6 +29,8 @@ export const WORLD_STAGE_CITIES: WorldStageCity[] = [
     tagline: "Founders, labs, frontier models",
     lat: 37.7749,
     lon: -122.4194,
+    artLon: -138.8,
+    artLat: 18.4,
     accent: "#ff6b6b",
     signDx: -24,
     signDy: 12,
@@ -40,6 +45,8 @@ export const WORLD_STAGE_CITIES: WorldStageCity[] = [
     tagline: "Robotics, climate, applied AI",
     lat: 49.2827,
     lon: -123.1207,
+    artLon: -142.5,
+    artLat: 38.5,
     accent: "#4ecdc4",
     signDx: -8,
     signDy: -10,
@@ -54,6 +61,8 @@ export const WORLD_STAGE_CITIES: WorldStageCity[] = [
     tagline: "Research depth, enterprise AI",
     lat: 43.6532,
     lon: -79.3832,
+    artLon: -96.2,
+    artLat: 35.2,
     accent: "#ffe66d",
     signDx: -15,
     signDy: -4,
@@ -68,6 +77,8 @@ export const WORLD_STAGE_CITIES: WorldStageCity[] = [
     tagline: "Media, finance, creative tools",
     lat: 40.7128,
     lon: -74.006,
+    artLon: -88.3,
+    artLat: 26.7,
     accent: "#7bd88f",
     signDx: 18,
     signDy: 4,
@@ -82,6 +93,8 @@ export const WORLD_STAGE_CITIES: WorldStageCity[] = [
     tagline: "Agents, voice, regulated markets",
     lat: 51.5074,
     lon: -0.1278,
+    artLon: -15.6,
+    artLat: 45.0,
     accent: "#a78bfa",
   },
   {
@@ -94,6 +107,8 @@ export const WORLD_STAGE_CITIES: WorldStageCity[] = [
     tagline: "Research, hardware, consumer AI",
     lat: 35.6762,
     lon: 139.6503,
+    artLon: 130.5,
+    artLat: 25.1,
     accent: "#f472b6",
   },
 ]

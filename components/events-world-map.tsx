@@ -33,6 +33,9 @@ type CursorCommunityCity = {
   name: string
   lat: number
   lon: number
+  /** Hand-measured equirectangular position where the artwork draws this city. */
+  artLon?: number
+  artLat?: number
 }
 
 type CursorCommunityEvent = {
@@ -283,7 +286,7 @@ export function EventsWorldMap() {
         anchor: "bottom",
         opacityWhenCovered: "0",
       })
-        .setLngLat(markerPosition(city.lon, city.lat))
+        .setLngLat(markerPosition(city))
         .addTo(map)
     )
 
@@ -355,12 +358,15 @@ export function EventsWorldMap() {
    * current style/view refs, so callers must update those first.
    */
   const markerPosition = useCallback(
-    (lon: number, lat: number): [number, number] => {
+    (city: CursorCommunityCity): [number, number] => {
       if (mapStyleRef.current !== "art") {
-        return [lon, lat]
+        return [city.lon, city.lat]
       }
 
-      const [artLon, artLat] = artPosition(lon, lat)
+      const [artLon, artLat] =
+        city.artLon !== undefined && city.artLat !== undefined
+          ? [city.artLon, city.artLat]
+          : artPosition(city.lon, city.lat)
 
       return [
         artLon,
@@ -380,7 +386,7 @@ export function EventsWorldMap() {
         return
       }
 
-      marker.setLngLat(markerPosition(city.lon, city.lat))
+      marker.setLngLat(markerPosition(city))
     })
   }, [markerPosition, upcomingCities])
 
