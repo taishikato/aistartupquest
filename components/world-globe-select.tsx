@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils"
 import {
   artLatitude,
   artLatitudeOnGlobe,
+  artPosition,
   FLAT_CAMERA,
   GLOBE_CAMERA,
   WORLD_ART_STYLE,
@@ -30,9 +31,14 @@ const WORLD_VIEW = "flat" as WorldView
 
 const IDLE_ROTATION_DEGREES_PER_FRAME = 0.015
 
-/** The artwork latitude remap depends on the projection (see lib/world-art-map). */
-function markerLatitudeForView(lat: number): number {
-  return WORLD_VIEW === "globe" ? artLatitudeOnGlobe(lat) : artLatitude(lat)
+/** The artwork position remap depends on the projection (see lib/world-art-map). */
+function markerPositionForView(lon: number, lat: number): [number, number] {
+  const [artLon, artLat] = artPosition(lon, lat)
+
+  return [
+    artLon,
+    WORLD_VIEW === "globe" ? artLatitudeOnGlobe(artLat) : artLatitude(artLat),
+  ]
 }
 
 type MeetupCountByCity = Partial<Record<CityId, number>>
@@ -386,7 +392,7 @@ export function WorldGlobeSelect() {
         anchor: "bottom",
         offset: [city.signDx ?? 0, city.signDy ?? 0],
       })
-        .setLngLat([city.lon, markerLatitudeForView(city.lat)])
+        .setLngLat(markerPositionForView(city.lon, city.lat))
         .addTo(map)
 
       markersRef.current.set(city.id, marker)

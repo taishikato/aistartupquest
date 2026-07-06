@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils"
 import {
   artLatitude,
   artLatitudeOnGlobe,
+  artPosition,
   GLOBE_CAMERA,
   WORLD_ART_STYLE,
 } from "@/lib/world-art-map"
@@ -282,7 +283,7 @@ export function EventsWorldMap() {
         anchor: "bottom",
         opacityWhenCovered: "0",
       })
-        .setLngLat([city.lon, markerLatitude(city.lat)])
+        .setLngLat(markerPosition(city.lon, city.lat))
         .addTo(map)
     )
 
@@ -353,15 +354,23 @@ export function EventsWorldMap() {
    * real geography, so pins use their true latitudes there. Reads the
    * current style/view refs, so callers must update those first.
    */
-  const markerLatitude = useCallback((lat: number) => {
-    if (mapStyleRef.current !== "art") {
-      return lat
-    }
+  const markerPosition = useCallback(
+    (lon: number, lat: number): [number, number] => {
+      if (mapStyleRef.current !== "art") {
+        return [lon, lat]
+      }
 
-    return viewRef.current === "globe"
-      ? artLatitudeOnGlobe(lat)
-      : artLatitude(lat)
-  }, [])
+      const [artLon, artLat] = artPosition(lon, lat)
+
+      return [
+        artLon,
+        viewRef.current === "globe"
+          ? artLatitudeOnGlobe(artLat)
+          : artLatitude(artLat),
+      ]
+    },
+    []
+  )
 
   const repositionMarkers = useCallback(() => {
     markersRef.current.forEach((marker, index) => {
@@ -371,9 +380,9 @@ export function EventsWorldMap() {
         return
       }
 
-      marker.setLngLat([city.lon, markerLatitude(city.lat)])
+      marker.setLngLat(markerPosition(city.lon, city.lat))
     })
-  }, [markerLatitude, upcomingCities])
+  }, [markerPosition, upcomingCities])
 
   const switchMapStyle = useCallback(
     (
