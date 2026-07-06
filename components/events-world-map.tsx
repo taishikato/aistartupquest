@@ -15,7 +15,6 @@ import { cn } from "@/lib/utils"
 import { artLatitude, GLOBE_CAMERA, WORLD_ART_STYLE } from "@/lib/world-art-map"
 import {
   applyRpgAtlasPaint,
-  ATLAS_PIXEL_RATIO,
   loadWorldAtlasStyle,
 } from "@/lib/world-atlas-style"
 
@@ -41,6 +40,8 @@ type CityWithEvents = CursorCommunityCity & {
 }
 
 const IDLE_ROTATION_DEGREES_PER_FRAME = 0.015
+const ZOOM_TO_ATLAS = 2.7
+const ZOOM_TO_ART = 2.4
 
 /**
  * Softened rendering of the shared artwork for this page: linear
@@ -178,14 +179,16 @@ export function EventsWorldMap() {
   const rotationFrameRef = useRef<number | null>(null)
   const rotationStoppedByUserRef = useRef(false)
   const viewRef = useRef<WorldView>("globe")
-  const mapStyleRef = useRef<MapStyle>("atlas")
+  const mapStyleRef = useRef<MapStyle>("art")
+  const userStylePinnedRef = useRef(false)
+  const switchingRef = useRef(false)
   const atlasStyleRef = useRef<StyleSpecification | null>(null)
   const atlasStylePromiseRef = useRef<Promise<StyleSpecification> | null>(null)
   const styleRequestIdRef = useRef(0)
   const [mapReady, setMapReady] = useState<MapLibreMap | null>(null)
   const [selectedCity, setSelectedCity] = useState<string | null>(null)
   const [view, setView] = useState<WorldView>("globe")
-  const [mapStyle, setMapStyle] = useState<MapStyle>("atlas")
+  const [mapStyle, setMapStyle] = useState<MapStyle>("art")
   const upcomingCities = useMemo(() => getUpcomingCities(), [])
   const selectedCityEvents = selectedCity
     ? (upcomingCities.find((city) => city.name === selectedCity)?.events ?? [])
@@ -256,126 +259,6 @@ export function EventsWorldMap() {
   }, [mapStyle])
 
   useEffect(() => {
-    if (!containerRef.current || mapRef.current) {
-      return
-    }
-
-    let disposed = false
-    const atlasAbortController = new AbortController()
-    const canvasListeners: Array<{
-      type: keyof HTMLElementEventMap
-      listener: EventListener
-    }> = []
-
-    const stopRotationPermanently = () => {
-      rotationStoppedByUserRef.current = true
-      stopIdleRotation()
-    }
-
-    const initializeMap = async () => {
-      let initialView: WorldView = "globe"
-      let initialMapStyle: MapStyle = "atlas"
-      let initialCamera = GLOBE_CAMERA
-      let initialPixelRatio = ATLAS_PIXEL_RATIO
-      let initialStyle: StyleSpecification
-
-      try {
-        const atlasStyle = await getAtlasStyle(atlasAbortController.signal)
-
-        initialStyle = {
-          ...atlasStyle,
-          projection: { type: "globe" },
-        }
-      } catch (error) {
-        if (atlasAbortController.signal.aborted) {
-          return
-        }
-
-        console.error(error)
-        initialView = "mercator"
-        initialMapStyle = "art"
-        initialCamera = EVENTS_FLAT_CAMERA
-        initialPixelRatio = Math.min(window.devicePixelRatio, 2)
-        initialStyle = {
-          ...EVENTS_ART_STYLE,
-          projection: { type: "mercator" },
-        }
-      }
-
-      if (disposed || !containerRef.current) {
-        return
-      }
-
-      viewRef.current = initialView
-      mapStyleRef.current = initialMapStyle
-      setView(initialView)
-      setMapStyle(initialMapStyle)
-
-      const map = new maplibregl.Map({
-        container: containerRef.current,
-        style: initialStyle,
-        center: initialCamera.center,
-        zoom: initialCamera.zoom,
-        minZoom: initialCamera.minZoom,
-        maxZoom: 4.5,
-        minPitch: 0,
-        maxPitch: 0,
-        pixelRatio: initialPixelRatio,
-        attributionControl: false,
-        renderWorldCopies: false,
-        dragRotate: false,
-        touchPitch: false,
-      })
-
-      mapRef.current = map
-
-      const canvas = map.getCanvas()
-      ;(["pointerdown", "wheel", "touchstart"] as const).forEach((type) => {
-        canvas.addEventListener(type, stopRotationPermanently, { once: true })
-        canvasListeners.push({ type, listener: stopRotationPermanently })
-      })
-
-      map.once("load", () => {
-        if (disposed) {
-          return
-        }
-
-        if (initialMapStyle === "atlas") {
-          applyRpgAtlasPaint(map)
-        }
-
-        map.resize()
-        setMapReady(map)
-
-        if (initialView === "globe") {
-          startIdleRotation()
-        }
-      })
-
-      map.on("error", (error) => {
-        console.error(error)
-      })
-    }
-
-    void initializeMap()
-
-    return () => {
-      disposed = true
-      atlasAbortController.abort()
-      stopIdleRotation()
-      const map = mapRef.current
-      canvasListeners.forEach(({ type, listener }) => {
-        map?.getCanvas().removeEventListener(type, listener)
-      })
-      markersRef.current.forEach((marker) => marker.remove())
-      markersRef.current = []
-      map?.remove()
-      mapRef.current = null
-      setMapReady(null)
-    }
-  }, [getAtlasStyle, startIdleRotation, stopIdleRotation])
-
-  useEffect(() => {
     const map = mapReady
 
     if (!map) {
@@ -434,113 +317,225 @@ export function EventsWorldMap() {
     }
   }
 
-  const applyAtlasPaintAfterStyleLoad = (
-    map: MapLibreMap,
-    requestId: number
-  ) => {
-    const applyPaint = () => {
-      if (
-        mapRef.current !== map ||
-        styleRequestIdRef.current !== requestId ||
-        mapStyleRef.current !== "atlas"
-      ) {
+  const applyAtlasPaintAfterStyleLoad = useCallback(
+    (map: MapLibreMap, requestId: number) => {
+      const applyPaint = () => {
+        if (
+          mapRef.current !== map ||
+          styleRequestIdRef.current !== requestId ||
+          mapStyleRef.current !== "atlas"
+        ) {
+          return
+        }
+
+        applyRpgAtlasPaint(map)
+      }
+
+      if (map.isStyleLoaded()) {
+        applyPaint()
         return
       }
 
-      applyRpgAtlasPaint(map)
-    }
-
-    if (map.isStyleLoaded()) {
-      applyPaint()
-      return
-    }
-
-    map.once("idle", applyPaint)
-  }
+      map.once("idle", applyPaint)
+    },
+    []
+  )
 
   /**
    * The hand-drawn artwork needs artLatitude() to land pins on its
    * distorted continents; the atlas is real geography, so pins use
    * their true latitudes there.
    */
-  const repositionMarkers = (nextMapStyle: MapStyle) => {
-    markersRef.current.forEach((marker, index) => {
-      const city = upcomingCities[index]
+  const repositionMarkers = useCallback(
+    (nextMapStyle: MapStyle) => {
+      markersRef.current.forEach((marker, index) => {
+        const city = upcomingCities[index]
 
-      if (!city) {
+        if (!city) {
+          return
+        }
+
+        marker.setLngLat([
+          city.lon,
+          nextMapStyle === "art" ? artLatitude(city.lat) : city.lat,
+        ])
+      })
+    },
+    [upcomingCities]
+  )
+
+  const switchMapStyle = useCallback(
+    (
+      nextMapStyle: MapStyle,
+      { source = "manual" }: { source?: "auto" | "manual" } = {}
+    ) => {
+      const map = mapRef.current
+
+      if (
+        !map ||
+        mapStyleRef.current === nextMapStyle ||
+        switchingRef.current
+      ) {
         return
       }
 
-      marker.setLngLat([
-        city.lon,
-        nextMapStyle === "art" ? artLatitude(city.lat) : city.lat,
-      ])
-    })
-  }
+      switchingRef.current = true
+      styleRequestIdRef.current += 1
+      const requestId = styleRequestIdRef.current
 
-  const switchMapStyle = (nextMapStyle: MapStyle) => {
-    const map = mapRef.current
-
-    if (!map || mapStyle === nextMapStyle) {
-      return
-    }
-
-    styleRequestIdRef.current += 1
-    const requestId = styleRequestIdRef.current
-
-    if (nextMapStyle === "art") {
-      mapStyleRef.current = "art"
-      setMapStyle("art")
-      map.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-      map.setStyle({
-        ...EVENTS_ART_STYLE,
-        projection: { type: viewRef.current },
-      })
-      repositionMarkers("art")
-      return
-    }
-
-    mapStyleRef.current = "atlas"
-    setMapStyle("atlas")
-    map.setPixelRatio(ATLAS_PIXEL_RATIO)
-    getAtlasStyle(new AbortController().signal)
-      .then((atlasStyle) => {
-        if (mapRef.current !== map || styleRequestIdRef.current !== requestId) {
-          return
-        }
-
-        map.setStyle({
-          ...atlasStyle,
-          projection: { type: viewRef.current },
-        })
-        repositionMarkers("atlas")
-        applyAtlasPaintAfterStyleLoad(map, requestId)
-      })
-      .catch((error: unknown) => {
-        console.error(error)
-
-        if (mapRef.current !== map || styleRequestIdRef.current !== requestId) {
-          return
-        }
-
+      if (nextMapStyle === "art") {
         mapStyleRef.current = "art"
         setMapStyle("art")
-        map.setPixelRatio(Math.min(window.devicePixelRatio, 2))
         map.setStyle({
           ...EVENTS_ART_STYLE,
           projection: { type: viewRef.current },
         })
         repositionMarkers("art")
+        switchingRef.current = false
+        return
+      }
+
+      mapStyleRef.current = "atlas"
+      setMapStyle("atlas")
+      getAtlasStyle(new AbortController().signal)
+        .then((atlasStyle) => {
+          if (
+            mapRef.current !== map ||
+            styleRequestIdRef.current !== requestId
+          ) {
+            return
+          }
+
+          map.setStyle({
+            ...atlasStyle,
+            projection: { type: viewRef.current },
+          })
+          repositionMarkers("atlas")
+          applyAtlasPaintAfterStyleLoad(map, requestId)
+          switchingRef.current = false
+        })
+        .catch((error: unknown) => {
+          console.error(error)
+
+          if (
+            mapRef.current !== map ||
+            styleRequestIdRef.current !== requestId
+          ) {
+            return
+          }
+
+          if (source === "auto") {
+            userStylePinnedRef.current = true
+          }
+
+          mapStyleRef.current = "art"
+          setMapStyle("art")
+          map.setStyle({
+            ...EVENTS_ART_STYLE,
+            projection: { type: viewRef.current },
+          })
+          repositionMarkers("art")
+          switchingRef.current = false
+        })
+    },
+    [applyAtlasPaintAfterStyleLoad, getAtlasStyle, repositionMarkers]
+  )
+
+  useEffect(() => {
+    if (!containerRef.current || mapRef.current) {
+      return
+    }
+
+    let disposed = false
+    const canvasListeners: Array<{
+      type: keyof HTMLElementEventMap
+      listener: EventListener
+    }> = []
+
+    const stopRotationPermanently = () => {
+      rotationStoppedByUserRef.current = true
+      stopIdleRotation()
+    }
+
+    const map = new maplibregl.Map({
+      container: containerRef.current,
+      style: {
+        ...EVENTS_ART_STYLE,
+        projection: { type: "globe" },
+      },
+      center: GLOBE_CAMERA.center,
+      zoom: GLOBE_CAMERA.zoom,
+      minZoom: GLOBE_CAMERA.minZoom,
+      maxZoom: 4.5,
+      minPitch: 0,
+      maxPitch: 0,
+      attributionControl: false,
+      renderWorldCopies: false,
+      dragRotate: false,
+      touchPitch: false,
+    })
+
+    mapRef.current = map
+
+    const canvas = map.getCanvas()
+    ;(["pointerdown", "wheel", "touchstart"] as const).forEach((type) => {
+      canvas.addEventListener(type, stopRotationPermanently, { once: true })
+      canvasListeners.push({ type, listener: stopRotationPermanently })
+    })
+
+    const handleZoom = () => {
+      if (userStylePinnedRef.current || switchingRef.current) {
+        return
+      }
+
+      const currentMapStyle = mapStyleRef.current
+      const zoom = map.getZoom()
+
+      if (currentMapStyle === "art" && zoom >= ZOOM_TO_ATLAS) {
+        switchMapStyle("atlas", { source: "auto" })
+        return
+      }
+
+      if (currentMapStyle === "atlas" && zoom <= ZOOM_TO_ART) {
+        switchMapStyle("art", { source: "auto" })
+      }
+    }
+
+    map.once("load", () => {
+      if (disposed) {
+        return
+      }
+
+      map.resize()
+      setMapReady(map)
+      map.on("zoom", handleZoom)
+      startIdleRotation()
+    })
+
+    map.on("error", (error) => {
+      console.error(error)
+    })
+
+    return () => {
+      disposed = true
+      stopIdleRotation()
+      map.off("zoom", handleZoom)
+      const currentMap = mapRef.current
+      canvasListeners.forEach(({ type, listener }) => {
+        currentMap?.getCanvas().removeEventListener(type, listener)
       })
-  }
+      markersRef.current.forEach((marker) => marker.remove())
+      markersRef.current = []
+      currentMap?.remove()
+      mapRef.current = null
+      setMapReady(null)
+    }
+  }, [startIdleRotation, stopIdleRotation, switchMapStyle])
 
   return (
     <main className="relative h-dvh overflow-hidden bg-[#123a9b] text-[#1a1a2e]">
       <div className="absolute inset-0">
-        <div
-          ref={containerRef}
-          className="h-full w-full bg-[#123a9b] [image-rendering:pixelated]"
-        />
+        <div ref={containerRef} className="h-full w-full bg-[#123a9b]" />
       </div>
 
       <header className="pointer-events-none absolute top-0 left-0 z-30 p-4 sm:p-6">
@@ -597,7 +592,10 @@ export function EventsWorldMap() {
           <div className="flex shadow-[3px_3px_0_#1a1a2e]">
             <button
               type="button"
-              onClick={() => switchMapStyle("art")}
+              onClick={() => {
+                userStylePinnedRef.current = true
+                switchMapStyle("art")
+              }}
               className={cn(
                 "border-2 border-[#1a1a2e] px-4 py-2 font-(family-name:--font-pixel) text-[9px] leading-4 text-[#1a1a2e] transition-colors",
                 mapStyle === "art" ? "bg-[#ffe66d]" : "bg-white"
@@ -608,7 +606,10 @@ export function EventsWorldMap() {
             </button>
             <button
               type="button"
-              onClick={() => switchMapStyle("atlas")}
+              onClick={() => {
+                userStylePinnedRef.current = true
+                switchMapStyle("atlas")
+              }}
               className={cn(
                 "-ml-0.5 border-2 border-[#1a1a2e] px-4 py-2 font-(family-name:--font-pixel) text-[9px] leading-4 text-[#1a1a2e] transition-colors",
                 mapStyle === "atlas" ? "bg-[#ffe66d]" : "bg-white"

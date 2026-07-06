@@ -3,9 +3,6 @@ import type { Map as MapLibreMap, StyleSpecification } from "maplibre-gl"
 export const WORLD_ATLAS_STYLE_URL =
   "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
 
-// Low backing-store resolution + CSS image-rendering pixelated = genuine chunky 8-bit rendering of the vector map.
-export const ATLAS_PIXEL_RATIO = 0.35
-
 export async function loadWorldAtlasStyle(
   signal: AbortSignal
 ): Promise<StyleSpecification> {
