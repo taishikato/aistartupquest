@@ -39,15 +39,47 @@ export function applyRpgAtlasPaint(map: MapLibreMap) {
     map,
     "background",
     "background-color",
-    "#8fbf52"
+    "#9cc465"
   )
   setPaintPropertyIfLayerExists(map, "water", "fill-color", "#3f78c8")
   setPaintPropertyIfLayerExists(map, "water_shadow", "fill-color", "#2c5aa8")
   setPaintPropertyIfLayerExists(map, "waterway", "line-color", "#4479b1")
   setPaintPropertyIfLayerExists(map, "waterway", "line-width", 2.4)
 
-  setPaintPropertyIfLayerExists(map, "landcover", "fill-color", "#79a943")
+  setPaintPropertyIfLayerExists(map, "landcover", "fill-color", [
+    "match",
+    ["get", "class"],
+    "wood",
+    "#55923c",
+    "grass",
+    "#8fbf52",
+    "#79a943",
+  ])
   setPaintPropertyIfLayerExists(map, "landcover", "fill-opacity", 0.96)
+
+  if (!map.getSource("rpg-urban-areas")) {
+    map.addSource("rpg-urban-areas", {
+      type: "geojson",
+      data: "/map-data/ne-urban-areas.json",
+    })
+  }
+
+  if (!map.getLayer("rpg-urban-fill")) {
+    map.addLayer(
+      {
+        id: "rpg-urban-fill",
+        type: "fill",
+        source: "rpg-urban-areas",
+        paint: { "fill-color": "#d8bd8a", "fill-opacity": 0.9 },
+      },
+      map.getLayer("water_shadow")
+        ? "water_shadow"
+        : map.getLayer("water")
+          ? "water"
+          : undefined
+    )
+  }
+
   ;["park_national_park", "park_nature_reserve"].forEach((id) => {
     setPaintPropertyIfLayerExists(map, id, "fill-color", "#5f9235")
     setPaintPropertyIfLayerExists(map, id, "fill-opacity", 0.92)
