@@ -322,7 +322,12 @@ export function EventsWorldMap() {
     })
 
     if (nextView === "globe") {
+      // Pins on the stylized artwork cannot be accurate on the globe
+      // drape, so the globe always uses the atlas.
+      switchMapStyle("atlas", { source: "auto" })
       startIdleRotation()
+    } else {
+      switchMapStyle("art", { source: "auto" })
     }
   }
 
@@ -379,6 +384,10 @@ export function EventsWorldMap() {
   )
 
   const repositionMarkers = useCallback(() => {
+    // Pins are hidden during the brief art-globe boot moment: the art
+    // drape on the globe cannot place them truthfully.
+    const hidden = mapStyleRef.current === "art" && viewRef.current === "globe"
+
     markersRef.current.forEach((marker, index) => {
       const city = upcomingCities[index]
 
@@ -386,6 +395,7 @@ export function EventsWorldMap() {
         return
       }
 
+      marker.getElement().style.visibility = hidden ? "hidden" : "visible"
       marker.setLngLat(markerPosition(city))
     })
   }, [markerPosition, upcomingCities])
@@ -510,7 +520,11 @@ export function EventsWorldMap() {
     })
 
     const handleZoom = () => {
-      if (userStylePinnedRef.current || switchingRef.current) {
+      if (
+        viewRef.current !== "mercator" ||
+        userStylePinnedRef.current ||
+        switchingRef.current
+      ) {
         return
       }
 
@@ -536,6 +550,9 @@ export function EventsWorldMap() {
       setMapReady(map)
       map.on("zoom", handleZoom)
       startIdleRotation()
+      // The map boots on the art globe for the title-screen moment, then
+      // settles on the accurate atlas.
+      switchMapStyle("atlas", { source: "auto" })
     })
 
     map.on("error", (error) => {
@@ -614,36 +631,6 @@ export function EventsWorldMap() {
               aria-pressed={view === "globe"}
             >
               GLOBE
-            </button>
-          </div>
-          <div className="flex shadow-[3px_3px_0_#1a1a2e]">
-            <button
-              type="button"
-              onClick={() => {
-                userStylePinnedRef.current = true
-                switchMapStyle("art")
-              }}
-              className={cn(
-                "border-2 border-[#1a1a2e] px-4 py-2 font-(family-name:--font-pixel) text-[9px] leading-4 text-[#1a1a2e] transition-colors",
-                mapStyle === "art" ? "bg-[#ffe66d]" : "bg-white"
-              )}
-              aria-pressed={mapStyle === "art"}
-            >
-              ART
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                userStylePinnedRef.current = true
-                switchMapStyle("atlas")
-              }}
-              className={cn(
-                "-ml-0.5 border-2 border-[#1a1a2e] px-4 py-2 font-(family-name:--font-pixel) text-[9px] leading-4 text-[#1a1a2e] transition-colors",
-                mapStyle === "atlas" ? "bg-[#ffe66d]" : "bg-white"
-              )}
-              aria-pressed={mapStyle === "atlas"}
-            >
-              ATLAS
             </button>
           </div>
         </div>
