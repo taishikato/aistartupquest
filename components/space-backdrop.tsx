@@ -89,17 +89,37 @@ export function SpaceBackdrop({ className }: SpaceBackdropProps) {
 
         @keyframes sq-space-drift {
           0% { transform: translate3d(0, 0, 0); }
-          100% { transform: translate3d(14px, -10px, 0); }
+          100% { transform: translate3d(34px, -22px, 0); }
         }
 
         @keyframes sq-space-bob {
           0%, 100% { transform: translate3d(0, 0, 0); }
-          50% { transform: translate3d(0, -6px, 0); }
+          50% { transform: translate3d(0, -10px, 0); }
         }
 
         @keyframes sq-space-spin {
-          0%, 100% { transform: rotate(-8deg); }
-          50% { transform: rotate(8deg); }
+          0%, 100% { transform: rotate(-10deg); }
+          50% { transform: rotate(10deg); }
+        }
+
+        @keyframes sq-space-orbit {
+          0% { transform: translate3d(-12vw, 0, 0); }
+          50% { transform: translate3d(50vw, 5vh, 0); }
+          100% { transform: translate3d(115vw, -2vh, 0); }
+        }
+
+        @keyframes sq-space-wander {
+          0%, 100% { transform: translate3d(0, 0, 0); }
+          25% { transform: translate3d(-52px, -34px, 0); }
+          50% { transform: translate3d(-110px, 8px, 0); }
+          75% { transform: translate3d(-48px, 44px, 0); }
+        }
+
+        @keyframes sq-space-shoot {
+          0% { transform: translate3d(0, 0, 0); opacity: 0; }
+          4% { opacity: 1; }
+          14% { transform: translate3d(42vw, 14vh, 0); opacity: 0; }
+          100% { transform: translate3d(42vw, 14vh, 0); opacity: 0; }
         }
 
         .sq-space-twinkle {
@@ -107,19 +127,36 @@ export function SpaceBackdrop({ className }: SpaceBackdropProps) {
         }
 
         .sq-space-drift-slow {
-          animation: sq-space-drift 92s linear infinite alternate;
+          animation: sq-space-drift 26s ease-in-out infinite alternate;
         }
 
         .sq-space-drift-slower {
-          animation: sq-space-drift 118s linear infinite alternate-reverse;
+          animation: sq-space-drift 38s ease-in-out infinite alternate-reverse;
         }
 
         .sq-space-bob {
-          animation: sq-space-bob 7s ease-in-out infinite;
+          animation: sq-space-bob 5s ease-in-out infinite;
         }
 
         .sq-space-spin {
-          animation: sq-space-spin 16s ease-in-out infinite;
+          animation: sq-space-spin 12s ease-in-out infinite;
+        }
+
+        .sq-space-orbit {
+          animation: sq-space-orbit 70s linear infinite;
+        }
+
+        .sq-space-wander {
+          animation: sq-space-wander 36s ease-in-out infinite;
+        }
+
+        .sq-space-shoot {
+          animation: sq-space-shoot 11s linear infinite;
+        }
+
+        .sq-space-shoot-late {
+          animation: sq-space-shoot 17s linear infinite;
+          animation-delay: 6s;
         }
       `}</style>
 
@@ -128,7 +165,7 @@ export function SpaceBackdrop({ className }: SpaceBackdropProps) {
           key={layer}
           className="absolute inset-0"
           style={{
-            animation: `sq-space-drift ${80 + layer * 20}s linear infinite alternate`,
+            animation: `sq-space-drift ${40 + layer * 14}s ease-in-out infinite alternate`,
           }}
         >
           {SPACE_STARS.filter((star) => star.layer === layer).map((star) => (
@@ -151,7 +188,7 @@ export function SpaceBackdrop({ className }: SpaceBackdropProps) {
 
       <div className="sq-space-drift-slow absolute bottom-[16%] left-[9%] size-[14px] border-[3px] border-[#342414] bg-[#d9d9c9]" />
 
-      <div className="sq-space-drift-slow absolute top-[18%] left-[10%]">
+      <div className="sq-space-orbit absolute top-[14%] left-0">
         <div className="sq-space-spin relative h-5 w-[46px]">
           <div className="absolute top-1 left-0 h-1.5 w-3.5 border-2 border-[#342414] bg-[#4466aa]" />
           <div className="absolute top-0 left-1/2 h-3.5 w-2.5 -translate-x-1/2 border-2 border-[#342414] bg-[#c0c0c8]" />
@@ -159,14 +196,19 @@ export function SpaceBackdrop({ className }: SpaceBackdropProps) {
         </div>
       </div>
 
-      {/* eslint-disable-next-line @next/next/no-img-element -- Decorative pixel sprite should render as a raw img. */}
-      <img
-        src="/map-assets/startup-robot-monster.png"
-        alt=""
-        width={64}
-        height={64}
-        className="sq-space-bob absolute right-[10%] bottom-[12%] h-16 w-16 opacity-95 [image-rendering:pixelated]"
-      />
+      <div className="sq-space-shoot absolute top-[8%] left-[4%] h-[2px] w-[10px] bg-[#f0f7e6]" />
+      <div className="sq-space-shoot-late absolute top-[30%] left-[36%] h-[2px] w-[10px] bg-[#dff7ff]" />
+
+      <div className="sq-space-wander absolute right-[10%] bottom-[12%]">
+        {/* eslint-disable-next-line @next/next/no-img-element -- Decorative pixel sprite should render as a raw img. */}
+        <img
+          src="/map-assets/startup-robot-monster.png"
+          alt=""
+          width={64}
+          height={64}
+          className="sq-space-bob h-16 w-16 opacity-95 [image-rendering:pixelated]"
+        />
+      </div>
     </div>
   )
 }
