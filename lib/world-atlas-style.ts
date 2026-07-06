@@ -3,6 +3,9 @@ import type { Map as MapLibreMap, StyleSpecification } from "maplibre-gl"
 export const WORLD_ATLAS_STYLE_URL =
   "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
 
+// Low backing-store resolution + CSS image-rendering pixelated = genuine chunky 8-bit rendering of the vector map.
+export const ATLAS_PIXEL_RATIO = 0.35
+
 export async function loadWorldAtlasStyle(
   signal: AbortSignal
 ): Promise<StyleSpecification> {
@@ -29,18 +32,24 @@ function setPaintPropertyIfLayerExists(
 }
 
 export function applyRpgAtlasPaint(map: MapLibreMap) {
+  map.getStyle().layers.forEach((layer) => {
+    if (layer.type === "symbol") {
+      map.setLayoutProperty(layer.id, "visibility", "none")
+    }
+  })
+
   setPaintPropertyIfLayerExists(
     map,
     "background",
     "background-color",
-    "#a5c76e"
+    "#8fbf52"
   )
-  setPaintPropertyIfLayerExists(map, "water", "fill-color", "#4b83c2")
-  setPaintPropertyIfLayerExists(map, "water_shadow", "fill-color", "#325f97")
+  setPaintPropertyIfLayerExists(map, "water", "fill-color", "#3f78c8")
+  setPaintPropertyIfLayerExists(map, "water_shadow", "fill-color", "#2c5aa8")
   setPaintPropertyIfLayerExists(map, "waterway", "line-color", "#4479b1")
   setPaintPropertyIfLayerExists(map, "waterway", "line-width", 2.4)
 
-  setPaintPropertyIfLayerExists(map, "landcover", "fill-color", "#7ea64a")
+  setPaintPropertyIfLayerExists(map, "landcover", "fill-color", "#79a943")
   setPaintPropertyIfLayerExists(map, "landcover", "fill-opacity", 0.96)
   ;["park_national_park", "park_nature_reserve"].forEach((id) => {
     setPaintPropertyIfLayerExists(map, id, "fill-color", "#5f9235")

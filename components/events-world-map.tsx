@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { format } from "date-fns"
@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils"
 import { artLatitude, GLOBE_CAMERA, WORLD_ART_STYLE } from "@/lib/world-art-map"
 import {
   applyRpgAtlasPaint,
+  ATLAS_PIXEL_RATIO,
   loadWorldAtlasStyle,
 } from "@/lib/world-atlas-style"
 
@@ -176,15 +177,15 @@ export function EventsWorldMap() {
   const markersRef = useRef<Marker[]>([])
   const rotationFrameRef = useRef<number | null>(null)
   const rotationStoppedByUserRef = useRef(false)
-  const viewRef = useRef<WorldView>("mercator")
-  const mapStyleRef = useRef<MapStyle>("art")
+  const viewRef = useRef<WorldView>("globe")
+  const mapStyleRef = useRef<MapStyle>("atlas")
   const atlasStyleRef = useRef<StyleSpecification | null>(null)
   const atlasStylePromiseRef = useRef<Promise<StyleSpecification> | null>(null)
   const styleRequestIdRef = useRef(0)
   const [mapReady, setMapReady] = useState<MapLibreMap | null>(null)
   const [selectedCity, setSelectedCity] = useState<string | null>(null)
-  const [view, setView] = useState<WorldView>("mercator")
-  const [mapStyle, setMapStyle] = useState<MapStyle>("art")
+  const [view, setView] = useState<WorldView>("globe")
+  const [mapStyle, setMapStyle] = useState<MapStyle>("atlas")
   const upcomingCities = useMemo(() => getUpcomingCities(), [])
   const selectedCityEvents = selectedCity
     ? (upcomingCities.find((city) => city.name === selectedCity)?.events ?? [])
@@ -193,6 +194,58 @@ export function EventsWorldMap() {
     (total, city) => total + city.events.length,
     0
   )
+
+  const stopIdleRotation = useCallback(() => {
+    if (rotationFrameRef.current !== null) {
+      window.cancelAnimationFrame(rotationFrameRef.current)
+      rotationFrameRef.current = null
+    }
+  }, [])
+
+  const startIdleRotation = useCallback(() => {
+    stopIdleRotation()
+
+    if (rotationStoppedByUserRef.current) {
+      return
+    }
+
+    rotationFrameRef.current = window.requestAnimationFrame(function rotate() {
+      const rotatingMap = mapRef.current
+
+      if (
+        !rotatingMap ||
+        viewRef.current !== "globe" ||
+        rotationStoppedByUserRef.current
+      ) {
+        rotationFrameRef.current = null
+        return
+      }
+
+      const center = rotatingMap.getCenter()
+      rotatingMap.jumpTo({
+        center: [center.lng + IDLE_ROTATION_DEGREES_PER_FRAME, center.lat],
+      })
+      rotationFrameRef.current = window.requestAnimationFrame(rotate)
+    })
+  }, [stopIdleRotation])
+
+  const getAtlasStyle = useCallback(async (signal: AbortSignal) => {
+    if (atlasStyleRef.current) {
+      return atlasStyleRef.current
+    }
+
+    atlasStylePromiseRef.current ??= loadWorldAtlasStyle(signal)
+      .then((style) => {
+        atlasStyleRef.current = style
+        return style
+      })
+      .catch((error: unknown) => {
+        atlasStylePromiseRef.current = null
+        throw error
+      })
+
+    return atlasStylePromiseRef.current
+  }, [])
 
   useEffect(() => {
     viewRef.current = view
@@ -208,36 +261,66 @@ export function EventsWorldMap() {
     }
 
     let disposed = false
+    const atlasAbortController = new AbortController()
     const canvasListeners: Array<{
       type: keyof HTMLElementEventMap
       listener: EventListener
     }> = []
 
-    const stopRotation = () => {
-      if (rotationFrameRef.current !== null) {
-        window.cancelAnimationFrame(rotationFrameRef.current)
-        rotationFrameRef.current = null
-      }
-    }
-
     const stopRotationPermanently = () => {
       rotationStoppedByUserRef.current = true
-      stopRotation()
+      stopIdleRotation()
     }
 
-    try {
-      const map = new maplibregl.Map({
-        container: containerRef.current,
-        style: {
+    const initializeMap = async () => {
+      let initialView: WorldView = "globe"
+      let initialMapStyle: MapStyle = "atlas"
+      let initialCamera = GLOBE_CAMERA
+      let initialPixelRatio = ATLAS_PIXEL_RATIO
+      let initialStyle: StyleSpecification
+
+      try {
+        const atlasStyle = await getAtlasStyle(atlasAbortController.signal)
+
+        initialStyle = {
+          ...atlasStyle,
+          projection: { type: "globe" },
+        }
+      } catch (error) {
+        if (atlasAbortController.signal.aborted) {
+          return
+        }
+
+        console.error(error)
+        initialView = "mercator"
+        initialMapStyle = "art"
+        initialCamera = EVENTS_FLAT_CAMERA
+        initialPixelRatio = Math.min(window.devicePixelRatio, 2)
+        initialStyle = {
           ...EVENTS_ART_STYLE,
           projection: { type: "mercator" },
-        },
-        center: EVENTS_FLAT_CAMERA.center,
-        zoom: EVENTS_FLAT_CAMERA.zoom,
-        minZoom: EVENTS_FLAT_CAMERA.minZoom,
+        }
+      }
+
+      if (disposed || !containerRef.current) {
+        return
+      }
+
+      viewRef.current = initialView
+      mapStyleRef.current = initialMapStyle
+      setView(initialView)
+      setMapStyle(initialMapStyle)
+
+      const map = new maplibregl.Map({
+        container: containerRef.current,
+        style: initialStyle,
+        center: initialCamera.center,
+        zoom: initialCamera.zoom,
+        minZoom: initialCamera.minZoom,
         maxZoom: 4.5,
         minPitch: 0,
         maxPitch: 0,
+        pixelRatio: initialPixelRatio,
         attributionControl: false,
         renderWorldCopies: false,
         dragRotate: false,
@@ -257,20 +340,29 @@ export function EventsWorldMap() {
           return
         }
 
+        if (initialMapStyle === "atlas") {
+          applyRpgAtlasPaint(map)
+        }
+
         map.resize()
         setMapReady(map)
+
+        if (initialView === "globe") {
+          startIdleRotation()
+        }
       })
 
       map.on("error", (error) => {
         console.error(error)
       })
-    } catch (error) {
-      console.error(error)
     }
+
+    void initializeMap()
 
     return () => {
       disposed = true
-      stopRotation()
+      atlasAbortController.abort()
+      stopIdleRotation()
       const map = mapRef.current
       canvasListeners.forEach(({ type, listener }) => {
         map?.getCanvas().removeEventListener(type, listener)
@@ -281,7 +373,7 @@ export function EventsWorldMap() {
       mapRef.current = null
       setMapReady(null)
     }
-  }, [])
+  }, [getAtlasStyle, startIdleRotation, stopIdleRotation])
 
   useEffect(() => {
     const map = mapReady
@@ -337,47 +429,8 @@ export function EventsWorldMap() {
       duration: 700,
     })
 
-    if (nextView === "globe" && !rotationStoppedByUserRef.current) {
-      rotationFrameRef.current = window.requestAnimationFrame(() => {
-        const currentMap = mapRef.current
-
-        if (
-          !currentMap ||
-          viewRef.current !== "globe" ||
-          rotationStoppedByUserRef.current
-        ) {
-          rotationFrameRef.current = null
-          return
-        }
-
-        const center = currentMap.getCenter()
-        currentMap.jumpTo({
-          center: [center.lng + IDLE_ROTATION_DEGREES_PER_FRAME, center.lat],
-        })
-        rotationFrameRef.current = window.requestAnimationFrame(
-          function rotate() {
-            const rotatingMap = mapRef.current
-
-            if (
-              !rotatingMap ||
-              viewRef.current !== "globe" ||
-              rotationStoppedByUserRef.current
-            ) {
-              rotationFrameRef.current = null
-              return
-            }
-
-            const nextCenter = rotatingMap.getCenter()
-            rotatingMap.jumpTo({
-              center: [
-                nextCenter.lng + IDLE_ROTATION_DEGREES_PER_FRAME,
-                nextCenter.lat,
-              ],
-            })
-            rotationFrameRef.current = window.requestAnimationFrame(rotate)
-          }
-        )
-      })
+    if (nextView === "globe") {
+      startIdleRotation()
     }
   }
 
@@ -403,21 +456,6 @@ export function EventsWorldMap() {
     }
 
     map.once("idle", applyPaint)
-  }
-
-  const getAtlasStyle = async (signal: AbortSignal) => {
-    if (atlasStyleRef.current) {
-      return atlasStyleRef.current
-    }
-
-    atlasStylePromiseRef.current ??= loadWorldAtlasStyle(signal).then(
-      (style) => {
-        atlasStyleRef.current = style
-        return style
-      }
-    )
-
-    return atlasStylePromiseRef.current
   }
 
   /**
@@ -453,6 +491,7 @@ export function EventsWorldMap() {
     if (nextMapStyle === "art") {
       mapStyleRef.current = "art"
       setMapStyle("art")
+      map.setPixelRatio(Math.min(window.devicePixelRatio, 2))
       map.setStyle({
         ...EVENTS_ART_STYLE,
         projection: { type: viewRef.current },
@@ -463,6 +502,7 @@ export function EventsWorldMap() {
 
     mapStyleRef.current = "atlas"
     setMapStyle("atlas")
+    map.setPixelRatio(ATLAS_PIXEL_RATIO)
     getAtlasStyle(new AbortController().signal)
       .then((atlasStyle) => {
         if (mapRef.current !== map || styleRequestIdRef.current !== requestId) {
@@ -485,6 +525,7 @@ export function EventsWorldMap() {
 
         mapStyleRef.current = "art"
         setMapStyle("art")
+        map.setPixelRatio(Math.min(window.devicePixelRatio, 2))
         map.setStyle({
           ...EVENTS_ART_STYLE,
           projection: { type: viewRef.current },
