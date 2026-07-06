@@ -55,12 +55,21 @@ export const FLAT_CAMERA: WorldCamera = {
 const MERCATOR_Y_85 = Math.asinh(Math.tan((85 * Math.PI) / 180))
 
 /**
- * The artwork is equirectangular (linear latitude over +-90) but MapLibre
- * drapes image sources linearly in mercator space over +-85, which pushes
- * the drawn continents poleward. Remap a real latitude to the latitude
- * where the artwork draws it so markers land on the art.
+ * The artwork is equirectangular (linear latitude over +-90) but in the
+ * mercator projection MapLibre drapes image sources linearly in mercator
+ * space over +-85, which pushes the drawn continents poleward. Remap a
+ * real latitude to the latitude where the artwork draws it so markers
+ * land on the art.
  */
 export function artLatitude(lat: number): number {
   const mercatorY = MERCATOR_Y_85 * (lat / 90)
   return (Math.atan(Math.sinh(mercatorY)) * 180) / Math.PI
+}
+
+/**
+ * On the globe projection the image is draped near-linearly in latitude,
+ * so only the +-90 -> +-85 squeeze of the artwork needs compensating.
+ */
+export function artLatitudeOnGlobe(lat: number): number {
+  return (lat * 85) / 90
 }

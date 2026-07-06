@@ -12,6 +12,7 @@ import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import {
   artLatitude,
+  artLatitudeOnGlobe,
   FLAT_CAMERA,
   GLOBE_CAMERA,
   WORLD_ART_STYLE,
@@ -28,6 +29,11 @@ type WorldView = "globe" | "flat"
 const WORLD_VIEW = "flat" as WorldView
 
 const IDLE_ROTATION_DEGREES_PER_FRAME = 0.015
+
+/** The artwork latitude remap depends on the projection (see lib/world-art-map). */
+function markerLatitudeForView(lat: number): number {
+  return WORLD_VIEW === "globe" ? artLatitudeOnGlobe(lat) : artLatitude(lat)
+}
 
 type MeetupCountByCity = Partial<Record<CityId, number>>
 
@@ -380,7 +386,7 @@ export function WorldGlobeSelect() {
         anchor: "bottom",
         offset: [city.signDx ?? 0, city.signDy ?? 0],
       })
-        .setLngLat([city.lon, artLatitude(city.lat)])
+        .setLngLat([city.lon, markerLatitudeForView(city.lat)])
         .addTo(map)
 
       markersRef.current.set(city.id, marker)

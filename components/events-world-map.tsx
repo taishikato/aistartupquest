@@ -12,7 +12,12 @@ import maplibregl, {
 
 import cursorCommunityEvents from "@/lib/data/cursor-community-events.json"
 import { cn } from "@/lib/utils"
-import { artLatitude, GLOBE_CAMERA, WORLD_ART_STYLE } from "@/lib/world-art-map"
+import {
+  artLatitude,
+  artLatitudeOnGlobe,
+  GLOBE_CAMERA,
+  WORLD_ART_STYLE,
+} from "@/lib/world-art-map"
 import {
   applyRpgAtlasPaint,
   loadWorldAtlasStyle,
@@ -277,10 +282,7 @@ export function EventsWorldMap() {
         anchor: "bottom",
         opacityWhenCovered: "0",
       })
-        .setLngLat([
-          city.lon,
-          mapStyleRef.current === "art" ? artLatitude(city.lat) : city.lat,
-        ])
+        .setLngLat([city.lon, markerLatitude(city.lat)])
         .addTo(map)
     )
 
@@ -307,6 +309,7 @@ export function EventsWorldMap() {
     viewRef.current = nextView
     setView(nextView)
     map.setProjection({ type: nextView })
+    repositionMarkers()
     map.setMinZoom(camera.minZoom)
     map.easeTo({
       center: camera.center,
@@ -344,27 +347,33 @@ export function EventsWorldMap() {
   )
 
   /**
-   * The hand-drawn artwork needs artLatitude() to land pins on its
-   * distorted continents; the atlas is real geography, so pins use
-   * their true latitudes there.
+   * The hand-drawn artwork needs a latitude remap to land pins on its
+   * drawn continents, and the remap depends on the projection (MapLibre
+   * drapes the image differently on mercator vs globe); the atlas is
+   * real geography, so pins use their true latitudes there. Reads the
+   * current style/view refs, so callers must update those first.
    */
-  const repositionMarkers = useCallback(
-    (nextMapStyle: MapStyle) => {
-      markersRef.current.forEach((marker, index) => {
-        const city = upcomingCities[index]
+  const markerLatitude = useCallback((lat: number) => {
+    if (mapStyleRef.current !== "art") {
+      return lat
+    }
 
-        if (!city) {
-          return
-        }
+    return viewRef.current === "globe"
+      ? artLatitudeOnGlobe(lat)
+      : artLatitude(lat)
+  }, [])
 
-        marker.setLngLat([
-          city.lon,
-          nextMapStyle === "art" ? artLatitude(city.lat) : city.lat,
-        ])
-      })
-    },
-    [upcomingCities]
-  )
+  const repositionMarkers = useCallback(() => {
+    markersRef.current.forEach((marker, index) => {
+      const city = upcomingCities[index]
+
+      if (!city) {
+        return
+      }
+
+      marker.setLngLat([city.lon, markerLatitude(city.lat)])
+    })
+  }, [markerLatitude, upcomingCities])
 
   const switchMapStyle = useCallback(
     (
@@ -392,7 +401,7 @@ export function EventsWorldMap() {
           ...EVENTS_ART_STYLE,
           projection: { type: viewRef.current },
         })
-        repositionMarkers("art")
+        repositionMarkers()
         switchingRef.current = false
         return
       }
@@ -412,7 +421,7 @@ export function EventsWorldMap() {
             ...atlasStyle,
             projection: { type: viewRef.current },
           })
-          repositionMarkers("atlas")
+          repositionMarkers()
           applyAtlasPaintAfterStyleLoad(map, requestId)
           switchingRef.current = false
         })
@@ -436,7 +445,7 @@ export function EventsWorldMap() {
             ...EVENTS_ART_STYLE,
             projection: { type: viewRef.current },
           })
-          repositionMarkers("art")
+          repositionMarkers()
           switchingRef.current = false
         })
     },
