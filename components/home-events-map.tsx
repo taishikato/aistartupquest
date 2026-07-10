@@ -318,6 +318,7 @@ export function HomeEventsMap() {
 
     const controller = new AbortController()
     let disposed = false
+    let sidebarPaddingCleanup: (() => void) | null = null
     const canvasListeners: Array<{
       type: keyof HTMLElementEventMap
       listener: EventListener
@@ -354,6 +355,22 @@ export function HomeEventsMap() {
 
         mapRef.current = map
 
+        // Keep camera center in the visible area beside the fixed sidebar.
+        const sidebarMediaQuery = window.matchMedia("(min-width: 768px)")
+        const syncSidebarPadding = () => {
+          map.setPadding({
+            left: sidebarMediaQuery.matches ? 380 : 0,
+            top: 0,
+            right: 0,
+            bottom: 0,
+          })
+        }
+        syncSidebarPadding()
+        sidebarMediaQuery.addEventListener("change", syncSidebarPadding)
+        sidebarPaddingCleanup = () => {
+          sidebarMediaQuery.removeEventListener("change", syncSidebarPadding)
+        }
+
         const canvas = map.getCanvas()
         ;(["pointerdown", "wheel", "touchstart"] as const).forEach((type) => {
           canvas.addEventListener(type, stopRotationPermanently, { once: true })
@@ -386,6 +403,7 @@ export function HomeEventsMap() {
       disposed = true
       controller.abort()
       stopIdleRotation()
+      sidebarPaddingCleanup?.()
       canvasListeners.forEach(({ type, listener }) => {
         mapRef.current?.getCanvas().removeEventListener(type, listener)
       })
