@@ -83,58 +83,53 @@ function createEventCityMarker({
 }) {
   const button = document.createElement("button")
   button.type = "button"
+  button.className = active
+    ? "quest-event-marker is-active"
+    : "quest-event-marker"
   button.setAttribute("aria-label", `Show Cursor events in ${city.name}`)
-  button.style.display = "flex"
-  button.style.flexDirection = "column"
-  button.style.alignItems = "center"
-  button.style.width = "36px"
+  button.style.display = "block"
+  button.style.position = "relative"
+  button.style.width = "42px"
+  button.style.height = "42px"
   button.style.padding = "0"
   button.style.border = "0"
   button.style.background = "transparent"
   button.style.cursor = "pointer"
-  button.style.transform = active ? "scale(1.25)" : "scale(1)"
   button.style.transformOrigin = "50% 100%"
   button.style.zIndex = active ? "20" : "1"
 
-  const indicator = document.createElement("span")
-  indicator.style.display = "flex"
-  indicator.style.flexDirection = "column"
-  indicator.style.alignItems = "center"
-  indicator.style.pointerEvents = "none"
+  // Bounce animates this wrapper so it does not fight the active scale transform.
+  const body = document.createElement("span")
+  body.className = "quest-event-marker__body"
+  body.style.display = "block"
+  body.style.position = "relative"
+  body.style.width = "42px"
+  body.style.height = "42px"
+  body.style.pointerEvents = "none"
 
-  const bar = document.createElement("span")
-  bar.style.width = "6px"
-  bar.style.height = "12px"
-  bar.style.background = "#ffe66d"
-  bar.style.border = "2px solid #342414"
-  bar.style.boxSizing = "border-box"
+  const image = document.createElement("img")
+  image.src = "/map-assets/quest-marker.png"
+  image.alt = ""
+  image.draggable = false
+  image.style.display = "block"
+  image.style.width = "42px"
+  image.style.height = "42px"
 
-  const gap = document.createElement("span")
-  gap.style.height = "2px"
+  const count = document.createElement("span")
+  count.textContent = String(city.events.length)
+  count.style.position = "absolute"
+  // Parchment sits in the middle ~50% of the art, slightly below vertical center.
+  count.style.top = "56%"
+  count.style.left = "50%"
+  count.style.transform = "translate(-50%, -50%)"
+  count.style.color = "#5a3d1e"
+  count.style.fontFamily = "var(--font-pixel)"
+  count.style.fontSize = "10px"
+  count.style.lineHeight = "1"
+  count.style.pointerEvents = "none"
 
-  const dot = document.createElement("span")
-  dot.style.width = "6px"
-  dot.style.height = "6px"
-  dot.style.background = "#ffe66d"
-  dot.style.border = "2px solid #342414"
-  dot.style.boxSizing = "border-box"
-
-  const plaque = document.createElement("span")
-  plaque.textContent = String(city.events.length)
-  plaque.style.marginTop = "3px"
-  plaque.style.background = active ? "#4ecdc4" : "#95602f"
-  plaque.style.border = "2px solid #342414"
-  plaque.style.boxShadow = "2px 2px 0 #342414"
-  plaque.style.color = active ? "#1a1a2e" : "#fff4ce"
-  plaque.style.fontFamily = "var(--font-pixel)"
-  plaque.style.fontSize = "8px"
-  plaque.style.lineHeight = "1"
-  plaque.style.padding = "1px 4px"
-  plaque.style.boxSizing = "border-box"
-  plaque.style.pointerEvents = "none"
-
-  indicator.append(bar, gap, dot)
-  button.append(indicator, plaque)
+  body.append(image, count)
+  button.append(body)
   button.addEventListener("click", () => onSelectCity(city))
 
   return button
@@ -618,6 +613,27 @@ export function HomeEventsMap() {
       <div className="pointer-events-none absolute right-3 bottom-3 z-30 border border-[#1a1a2e] bg-white/85 px-1.5 text-[10px] leading-4 text-[#1a1a2e] sm:right-6 sm:bottom-6">
         (c) CARTO (c) OpenStreetMap
       </div>
+
+      <style jsx global>{`
+        @keyframes quest-marker-bounce {
+          0%,
+          100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-4px);
+          }
+        }
+
+        .quest-event-marker.is-active {
+          transform: scale(1.2);
+        }
+
+        .quest-event-marker:hover .quest-event-marker__body,
+        .quest-event-marker.is-active .quest-event-marker__body {
+          animation: quest-marker-bounce 0.5s steps(2) infinite;
+        }
+      `}</style>
     </main>
   )
 }
