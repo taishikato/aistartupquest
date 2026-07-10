@@ -1,13 +1,13 @@
 import type { Metadata } from "next"
 
-import { WorldGlobeSelect } from "@/components/world-globe-select"
+import { HomeEventsMap } from "@/components/home-events-map"
 
 export const metadata: Metadata = {
-  title: "AI Startup Quest: Choose a City Startup Map",
+  title: "AI Startup Quest: AI Events & Startup World Map",
   description:
-    "Choose a city stage and jump into an AI startup map for San Francisco, Toronto, New York, London, Vancouver, or Tokyo.",
+    "Explore Cursor community events worldwide, then jump into city AI startup maps for San Francisco, Toronto, New York, London, Vancouver, and Tokyo.",
 }
 
 export default function Page() {
-  return <WorldGlobeSelect />
+  return <HomeEventsMap />
 }
