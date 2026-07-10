@@ -88,7 +88,6 @@ function createEventCityMarker({
     : "quest-event-marker"
   button.setAttribute("aria-label", `Show Cursor events in ${city.name}`)
   button.style.display = "block"
-  button.style.position = "relative"
   button.style.width = "42px"
   button.style.height = "42px"
   button.style.padding = "0"
