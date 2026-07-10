@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "test": "vitest run",
+    "fetch:cursor": "pnpm dlx tsx scripts/fetch-cursor-events.ts",
     "import:cursor": "pnpm dlx tsx scripts/import-cursor-events.ts",
     "lint": "eslint",
     "format:write": "prettier --write \"**/*.{ts,tsx}\" --cache",
