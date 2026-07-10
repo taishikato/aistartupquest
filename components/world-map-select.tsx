@@ -64,7 +64,7 @@ export function WorldMapSelect() {
         onActiveCityChange={setActiveCityId}
       />
 
-      <header className="pointer-events-none absolute top-0 right-0 left-0 z-30 flex items-start gap-3 p-4 sm:p-6">
+      <header className="pointer-events-none absolute top-0 right-0 left-0 z-30 flex items-stretch gap-3 p-4 sm:p-6">
         <div className="pointer-events-auto flex min-w-0 items-center gap-3 border-2 border-[#1a1a2e] bg-white px-3 py-2 shadow-[4px_4px_0_#1a1a2e]">
           <Link
             href="/"
@@ -107,6 +107,14 @@ export function WorldMapSelect() {
               />
             )}
           </button>
+        </div>
+        <div className="pointer-events-auto flex">
+          <Link
+            href="/events"
+            className="flex h-full items-center justify-center border-2 border-[#1a1a2e] bg-[#ffe66d] px-3 py-2 font-(family-name:--font-pixel) text-[11px] leading-5 text-[#1a1a2e] shadow-[4px_4px_0_#1a1a2e] transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffe66d] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+          >
+            Events
+          </Link>
         </div>
       </header>
 
