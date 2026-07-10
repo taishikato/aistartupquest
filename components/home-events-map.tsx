@@ -405,15 +405,14 @@ export function HomeEventsMap() {
     }
 
     cityMarkersRef.current.forEach((marker) => marker.remove())
-    cityMarkersRef.current = WORLD_STAGE_CITIES.map(
-      (city) =>
-        new maplibregl.Marker({
-          element: createCityMarker(city),
-          anchor: "bottom",
-          opacityWhenCovered: "0",
-        })
-          .setLngLat([city.lon, city.lat])
-          .addTo(mapReady)
+    cityMarkersRef.current = WORLD_STAGE_CITIES.map((city) =>
+      new maplibregl.Marker({
+        element: createCityMarker(city),
+        anchor: "bottom",
+        opacityWhenCovered: "0",
+      })
+        .setLngLat([city.lon, city.lat])
+        .addTo(mapReady)
     )
 
     return () => {
@@ -428,19 +427,18 @@ export function HomeEventsMap() {
     }
 
     eventMarkersRef.current.forEach((marker) => marker.remove())
-    eventMarkersRef.current = filteredCities.map(
-      (city) =>
-        new maplibregl.Marker({
-          element: createEventCityMarker({
-            city,
-            active: city.name === selectedCity,
-            onSelectCity: selectCity,
-          }),
-          anchor: "bottom",
-          opacityWhenCovered: "0",
-        })
-          .setLngLat([city.lon, city.lat])
-          .addTo(mapReady)
+    eventMarkersRef.current = filteredCities.map((city) =>
+      new maplibregl.Marker({
+        element: createEventCityMarker({
+          city,
+          active: city.name === selectedCity,
+          onSelectCity: selectCity,
+        }),
+        anchor: "bottom",
+        opacityWhenCovered: "0",
+      })
+        .setLngLat([city.lon, city.lat])
+        .addTo(mapReady)
     )
 
     return () => {
@@ -525,7 +523,7 @@ export function HomeEventsMap() {
       </div>
 
       {/* MAP / GLOBE toggle */}
-      <div className="pointer-events-none absolute top-4 left-0 right-0 z-30 flex justify-center px-4 md:left-[min(380px,calc(100vw-24px))] md:top-6">
+      <div className="pointer-events-none absolute top-4 right-0 left-0 z-30 flex justify-center px-4 md:top-6 md:left-[min(380px,calc(100vw-24px))]">
         <div className="pointer-events-auto flex shadow-[3px_3px_0_#1a1a2e]">
           <button
             type="button"
@@ -554,7 +552,7 @@ export function HomeEventsMap() {
 
       {/* Selected city panel (desktop map area) */}
       {selectedCity ? (
-        <section className="pointer-events-none absolute right-4 bottom-12 z-30 hidden max-w-[min(360px,calc(100vw-32px))] md:bottom-6 md:left-[calc(min(380px,calc(100vw-24px))+1.5rem)] md:block md:right-auto">
+        <section className="pointer-events-none absolute right-4 bottom-12 z-30 hidden max-w-[min(360px,calc(100vw-32px))] md:right-auto md:bottom-6 md:left-[calc(min(380px,calc(100vw-24px))+1.5rem)] md:block">
           <div className="pointer-events-auto max-h-[40vh] overflow-y-auto border-2 border-[#1a1a2e] bg-white p-4 shadow-[4px_4px_0_#1a1a2e]">
             <div className="flex items-start justify-between gap-4">
               <h2 className="font-(family-name:--font-pixel) text-[13px] leading-5 text-[#1a1a2e]">
@@ -620,13 +618,7 @@ function GuildBoardHeader({
   return (
     <header className="shrink-0 border-b-[3px] border-[#1a1a2e] bg-[#ead9ab] p-4">
       <div className="flex items-center gap-3">
-        <Image
-          src="/brand-mark.png"
-          alt=""
-          width={38}
-          height={38}
-          priority
-        />
+        <Image src="/brand-mark.png" alt="" width={38} height={38} priority />
         <h1 className="font-(family-name:--font-pixel) text-[11px] leading-5 text-[#1a1a2e]">
           AI Startup Quest
         </h1>
