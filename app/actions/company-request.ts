@@ -1,12 +1,19 @@
 "use server"
 
+import { headers } from "next/headers"
+
 import type { CityId } from "@/lib/city-config"
 import { COMPANY_CATEGORIES, type CompanyCategory } from "@/lib/company"
+import {
+  hashClientIp,
+  hashCompanyRequestPayload,
+} from "@/lib/meetup-submit"
 import { createAdminClient } from "@/lib/supabase/admin"
 
 type City = CityId
 
 export type CompanyRequestPayload = {
+  turnstileToken: string
   category: CompanyCategory
   city: City
   companyName: string
@@ -31,6 +38,50 @@ const VALID_CITIES = new Set<City>([
   "tokyo",
 ])
 const VALID_CATEGORIES = new Set<string>(COMPANY_CATEGORIES)
+
+const RATE_WINDOW_MS = 24 * 60 * 60 * 1000
+const RATE_MAX = 5
+const DUPLICATE_WINDOW_MS = 15 * 60 * 1000
+
+async function getRequestIp(): Promise<string> {
+  const h = await headers()
+  const xff = h.get("x-forwarded-for")
+  if (xff) {
+    return xff.split(",")[0]?.trim() ?? "127.0.0.1"
+  }
+  return h.get("x-real-ip") ?? "127.0.0.1"
+}
+
+async function verifyTurnstile(
+  token: string,
+  remoteIp: string
+): Promise<{ ok: boolean; message?: string }> {
+  const secret = process.env.TURNSTILE_SECRET_KEY
+  if (!secret) {
+    return { ok: false, message: "Turnstile is not configured on the server." }
+  }
+
+  const body = new URLSearchParams()
+  body.set("secret", secret)
+  body.set("response", token)
+  body.set("remoteip", remoteIp)
+
+  const res = await fetch(
+    "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body,
+    }
+  )
+
+  const data = (await res.json()) as { success?: boolean }
+  if (!data.success) {
+    return { ok: false, message: "Bot verification failed. Please try again." }
+  }
+
+  return { ok: true }
+}
 
 export async function submitCompanyRequest(
   payload: CompanyRequestPayload
@@ -85,7 +136,96 @@ export async function submitCompanyRequest(
     return { status: "error", message: "Notes are too long." }
   }
 
+  if (!payload.turnstileToken.trim()) {
+    return {
+      status: "error",
+      message: "Complete the verification challenge.",
+    }
+  }
+
+  const ip = await getRequestIp()
+  const ipHash = hashClientIp(ip)
+
+  const turnstile = await verifyTurnstile(payload.turnstileToken, ip)
+  if (!turnstile.ok) {
+    return {
+      status: "error",
+      message: turnstile.message ?? "Verification failed.",
+    }
+  }
+
+  const payloadHash = hashCompanyRequestPayload({
+    city: payload.city,
+    companyName,
+    category: payload.category,
+    founded: String(founded),
+    locationLabel,
+    shortDescription,
+    website,
+  })
+
   const supabase = createAdminClient()
+
+  const duplicateCutoff = new Date(
+    Date.now() - DUPLICATE_WINDOW_MS
+  ).toISOString()
+  const { data: duplicateAttempts, error: duplicateError } = await supabase
+    .from("company_submission_attempts")
+    .select("id")
+    .match({ payload_hash: payloadHash })
+    .gte("created_at", duplicateCutoff)
+    .limit(1)
+
+  if (duplicateError) {
+    console.error("company request duplicate check failed", duplicateError)
+    return {
+      status: "error",
+      message: "Could not verify duplicate cooldown. Try later.",
+    }
+  }
+
+  if (duplicateAttempts && duplicateAttempts.length > 0) {
+    return {
+      status: "error",
+      message:
+        "You already submitted this company request recently. Try again later.",
+    }
+  }
+
+  const rateCutoff = new Date(Date.now() - RATE_WINDOW_MS).toISOString()
+  const { count: rateCount, error: rateError } = await supabase
+    .from("company_submission_attempts")
+    .select("id", { count: "exact", head: true })
+    .match({ ip_hash: ipHash })
+    .gte("created_at", rateCutoff)
+
+  if (rateError) {
+    console.error("company request rate limit check failed", rateError)
+    return {
+      status: "error",
+      message: "Could not verify rate limit. Try later.",
+    }
+  }
+
+  if ((rateCount ?? 0) >= RATE_MAX) {
+    return {
+      status: "error",
+      message: "Too many submissions from this network. Try again tomorrow.",
+    }
+  }
+
+  const { error: attemptError } = await supabase
+    .from("company_submission_attempts")
+    .insert({ ip_hash: ipHash, payload_hash: payloadHash })
+
+  if (attemptError) {
+    console.error("company request attempt insert failed", attemptError)
+    return {
+      status: "error",
+      message: "Could not record submission. Try again.",
+    }
+  }
+
   const { error } = await supabase.from("company_submission_requests").insert({
     category: payload.category,
     city: payload.city,
@@ -99,6 +239,7 @@ export async function submitCompanyRequest(
   })
 
   if (error) {
+    console.error("company request insert failed", error)
     return {
       status: "error",
       message: "Could not send the request. Please try again.",
