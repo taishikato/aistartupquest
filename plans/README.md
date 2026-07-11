@@ -24,7 +24,7 @@ Each executor: read the plan fully before starting, honor its STOP conditions, a
 | 011 | Design spike: resolve the world-map experiments (narrowed to `/map-libre`) | P3 | S | - | DONE (verified `37e60c2`: decision doc + `/map-libre` deleted) |
 | 017 | Lay the SEO groundwork: sitemap, robots, per-city OpenGraph, structured data | P2 | M | - | BLOCKED (`NEXT_PUBLIC_SITE_URL` missing from `.env.local`) |
 | 018 | Design spike: company detail pages | P2 | M | 017 (soft) | DONE (verified `dcf8e21`: `docs/design/company-pages.md`; URL scheme blocked on `(city, slug)` uniqueness — maintainer pick) |
-| 019 | Make the top-page events map shareable (URL-synced selection) | P2 | M | 015, 016 (soft) | TODO |
+| 019 | Make the top-page events map shareable (URL-synced selection) | P2 | M | 015, 016 (soft) | DONE (verified `af91afe5`: `?city=` / `?view=globe` on `/`) |
 | 012 | Events-first top page | - | - | - | DONE (implemented by maintainer, `0e7beeb`) |
 | 013 | Event company tag design | - | - | - | DONE (implemented by maintainer, `40d8fab`, `16f120d`) |
 

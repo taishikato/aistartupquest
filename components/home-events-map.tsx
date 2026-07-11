@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Image from "next/image"
+import { usePathname, useSearchParams } from "next/navigation"
 import { format } from "date-fns"
 import maplibregl, { type Map as MapLibreMap, type Marker } from "maplibre-gl"
 
@@ -11,6 +12,12 @@ import {
   type CursorCommunityCity,
   type CursorCommunityEvent,
 } from "@/lib/cursor-community-events"
+import {
+  buildHomeMapQuery,
+  parseHomeMapCity,
+  parseHomeMapView,
+  type HomeMapView,
+} from "@/lib/home-map-url"
 import { cn } from "@/lib/utils"
 import { GLOBE_CAMERA } from "@/lib/world-art-map"
 import {
@@ -22,7 +29,7 @@ import {
   type WorldStageCity,
 } from "@/lib/world-stage-cities"
 
-type WorldView = "mercator" | "globe"
+type WorldView = HomeMapView
 
 const FLAT_CAMERA = {
   center: [5, 14] as [number, number],
@@ -142,18 +149,24 @@ function createCityMarker(city: WorldStageCity) {
 }
 
 export function HomeEventsMap() {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const containerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<MapLibreMap | null>(null)
   const eventMarkersRef = useRef<Marker[]>([])
   const cityMarkersRef = useRef<Marker[]>([])
   const rotationFrameRef = useRef<number | null>(null)
   const rotationStoppedByUserRef = useRef(false)
-  const viewRef = useRef<WorldView>("mercator")
+  const viewRef = useRef<WorldView>(parseHomeMapView(searchParams.get("view")))
   const [mapReady, setMapReady] = useState<MapLibreMap | null>(null)
-  const [view, setView] = useState<WorldView>("mercator")
+  const [view, setView] = useState<WorldView>(() =>
+    parseHomeMapView(searchParams.get("view"))
+  )
   const [query, setQuery] = useState("")
   const [selectedCity, setSelectedCity] = useState<string | null>(null)
   const [boardOpen, setBoardOpen] = useState(false)
+  const urlHydratedRef = useRef(false)
+  const [hasHydratedUrl, setHasHydratedUrl] = useState(false)
 
   const upcomingCities = useMemo(() => getUpcomingCities(), [])
   const allEvents = useMemo(
@@ -265,6 +278,70 @@ export function HomeEventsMap() {
       startIdleRotation()
     }
   }
+
+  useEffect(() => {
+    if (!mapReady || urlHydratedRef.current) {
+      return
+    }
+
+    urlHydratedRef.current = true
+
+    const urlView = parseHomeMapView(searchParams.get("view"))
+    if (urlView === "globe") {
+      // Map always boots mercator; force projection even when React state is already globe.
+      const map = mapRef.current
+      if (map) {
+        stopIdleRotation()
+        viewRef.current = "globe"
+        setView("globe")
+        map.setProjection({ type: "globe" })
+        map.setRenderWorldCopies(false)
+        map.dragRotate.disable()
+        map.setMinZoom(GLOBE_CAMERA.minZoom)
+        // Do NOT easeTo default globe camera when a city will flyTo next.
+        startIdleRotation()
+      }
+    }
+
+    const cityName = parseHomeMapCity(searchParams.get("city"), upcomingCities)
+    if (cityName) {
+      const matched = upcomingCities.find((city) => city.name === cityName)
+      if (matched) {
+        selectCity(matched)
+      }
+    }
+
+    // Mark after applying URL selection so the write effect cannot strip
+    // ?city= before selectedCity state catches up.
+    setHasHydratedUrl(true)
+  }, [
+    mapReady,
+    searchParams,
+    selectCity,
+    upcomingCities,
+    stopIdleRotation,
+    startIdleRotation,
+  ])
+
+  useEffect(() => {
+    if (!hasHydratedUrl) {
+      return
+    }
+
+    const nextQuery = buildHomeMapQuery({
+      selectedCity,
+      view,
+      currentSearch: searchParams.toString(),
+    })
+    const currentQuery = searchParams.toString()
+
+    if (nextQuery === currentQuery) {
+      return
+    }
+
+    const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname
+    window.history.replaceState(null, "", nextUrl)
+  }, [hasHydratedUrl, pathname, searchParams, selectedCity, view])
 
   useEffect(() => {
     viewRef.current = view

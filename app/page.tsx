@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { Suspense } from "react"
 
 import { HomeEventsMap } from "@/components/home-events-map"
 
@@ -9,5 +10,9 @@ export const metadata: Metadata = {
 }
 
 export default function Page() {
-  return <HomeEventsMap />
+  return (
+    <Suspense fallback={null}>
+      <HomeEventsMap />
+    </Suspense>
+  )
 }
