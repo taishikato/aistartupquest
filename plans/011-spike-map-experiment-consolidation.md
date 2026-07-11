@@ -6,59 +6,64 @@
 > If anything in the "STOP conditions" section occurs, stop and report.
 > When done, update the status row for this plan in `plans/README.md`.
 >
-> **Drift check (run first)**: `git diff --stat ba0778c..HEAD -- app/map-libre app/page.tsx app/events components/world-globe-select.tsx components/world-map-select.tsx components/map-libre-world-select.tsx components/events-world-map.tsx`
+> **Drift check (run first)**: `git diff --stat ab0a47e..HEAD -- app/map-libre app/page.tsx app/events components/map-libre-world-select.tsx components/home-events-map.tsx`
+> If any in-scope file changed since this plan was written, compare the
+> "Current state" excerpts against the live code before proceeding; on a
+> mismatch, treat it as a STOP condition.
 > On drift, re-read the changed files before writing the decision doc.
 
 ## Status
 
 - **Priority**: P3
-- **Effort**: S-M
+- **Effort**: S
 - **Risk**: LOW (doc) / MED (if the deletion step is executed)
 - **Depends on**: none
 - **Category**: direction
 - **Planned at**: commit `ba0778c`, 2026-07-06
+- **Reconciled at**: commit `ab0a47e`, 2026-07-11 (narrowed to `/map-libre` only)
+- **Status**: DONE at `37e60c2` (executed 2026-07-11; decision doc + deletion)
 
-> **Premise update (2026-07-11, commit `16f120d`)**: the maintainer resolved most of this spike's question directly.
-> Three of the four components below were DELETED between `ba0778c` and `16f120d`: `world-globe-select.tsx`, `world-map-select.tsx`, and `events-world-map.tsx` are gone, replaced by `components/home-events-map.tsx` (the new events-first top page; `/events` now permanent-redirects to `/`).
-> What remains undecided is only the original default hypothesis: `app/map-libre/page.tsx` + `components/map-libre-world-select.tsx` (still present, still unlinked).
-> New evidence strengthening the delete verdict: the 2026-07-11 audit found `map-libre-world-select.tsx` duplicates `home-events-map.tsx` near-verbatim in its `createCityMarker` factory (`map-libre-world-select.tsx:27-85` vs `home-events-map.tsx:139-184`) and its map bootstrap (`:100-157` vs `:310-414`) — as long as it lives, every restyle of the city-sign marker must be made twice.
-> Execution guidance: skip deliverable sections whose subject components no longer exist; the doc shrinks to (a) the `/map-libre` keep/delete verdict — hypothesis unchanged: delete, (b) if KEPT, a shared marker-factory/bootstrap extraction sketch with `home-events-map.tsx`, and (c) the consolidation question relative to `map-shell.tsx`/`city-map.tsx` (plans 006/007).
-> Section 3 (exposure of `/events`) is answered: `/` is the events map. Update the drift-check base to `16f120d`.
+> **Premise update (2026-07-11, commit `16f120d`, refreshed `ab0a47e`)**: the maintainer resolved most of this spike's question directly.
+> Three of the four components were DELETED: `world-globe-select.tsx`, `world-map-select.tsx`, and `events-world-map.tsx` are gone, replaced by `components/home-events-map.tsx` (the events-first top page; `/events` permanent-redirects to `/`).
+> What remains undecided is only `app/map-libre/page.tsx` + `components/map-libre-world-select.tsx` (still present, still unlinked).
+> New evidence strengthening the delete verdict: `map-libre-world-select.tsx` (245 lines) duplicates `home-events-map.tsx` near-verbatim in its city-sign marker factory and map bootstrap — as long as it lives, every restyle of the city-sign marker must be made twice.
+> Execution guidance: the doc shrinks to (a) the `/map-libre` keep/delete verdict — hypothesis unchanged: delete, (b) if KEPT, a shared marker-factory/bootstrap extraction sketch with `home-events-map.tsx`, and (c) the consolidation question relative to `map-shell.tsx`/`city-map.tsx` (plans 006/007).
+> Section 3 (exposure of `/events`) is answered: `/` is the events map.
 
 ## Why this matters
 
-The repo carries four world-map selector components and an unlisted comparison page, which together confuse every audit, refactor, and new contributor:
+The repo still carries one concluded comparison experiment as an unlisted route:
 
-- `components/world-globe-select.tsx` (478 lines) — the LIVE landing page globe (`app/page.tsx` imports it).
-- `components/world-map-select.tsx` (280 lines) — the flat fallback, rendered when WebGL fails (`world-globe-select.tsx:401-402`: `if (shouldUseFallback) return <WorldMapSelect />`). Live, but only on fallback.
-- `components/map-libre-world-select.tsx` (245 lines) — used ONLY by `app/map-libre/page.tsx`, a page whose own metadata says "Compare the RPG world map with a MapLibre-powered world map city selector". Not linked from any navigation (verify: `grep -rn '"/map-libre"' app components` — only the page itself).
-- `components/events-world-map.tsx` (697 lines) — the LIVE `/events` world map (globe + flat, ART/ATLAS styles). Recent git history (last ~15 commits, `957d57c`..`ba0778c`) is almost entirely this component — it is the active experiment that appears to have WON the comparison.
+- `components/map-libre-world-select.tsx` (245 lines) — used ONLY by `app/map-libre/page.tsx`, a page whose own metadata says "Compare the RPG world map with a MapLibre-powered world map city selector". Not linked from any navigation (verify: `rg -n '"/map-libre"' app components` — only the page itself).
+- The live product surface is `components/home-events-map.tsx` on `/` (events-first atlas). The comparison the `/map-libre` page exists for looks concluded.
 
-The comparison the `/map-libre` page exists for looks concluded: the events map went maplibre-with-art-style and shipped.
-Keeping the losing branch of an experiment as an unlisted route costs maintenance (it was audited for bugs today, again) without informing any future decision.
+Keeping the losing branch of an experiment as an unlisted route costs maintenance without informing any future decision.
 
 ## Current state (facts for the decision)
 
+Verified at commit `ab0a47e`:
+
 - `app/map-libre/page.tsx` (13 lines) — full contents render `<MapLibreWorldSelect />` with compare-page metadata.
-- `/events` is likewise not linked from the main navigation at `ba0778c` (verify: `grep -rn '"/events"' app components` and check `components/discovery-panel.tsx` / the landing page for links) — decide its exposure too.
-- `lib/world-art-map.ts`, `lib/world-atlas-style.ts`, `lib/world-stage-cities.ts` — style/data deps of the events map; `lib/data/cursor-community-events.json` feeds it.
-- The duplication pattern across all four components: map bootstrap + marker creation + fallback handling, each hand-rolled (see also plan 007's out-of-scope note deferring consolidation to this spike).
+- Deleted (do not resurrect): `world-globe-select.tsx`, `world-map-select.tsx`, `events-world-map.tsx`.
+- `/events` permanent-redirects to `/`; exposure decision is settled.
+- `lib/world-art-map.ts`, `lib/world-atlas-style.ts`, `lib/world-stage-cities.ts` — style/data deps shared with the top-page map; `lib/data/cursor-community-events.json` feeds `home-events-map.tsx`.
+- Duplication: city-sign marker factory and map bootstrap are hand-rolled in both `map-libre-world-select.tsx` and `home-events-map.tsx` (see also plans 006/007/016).
 
 ## Deliverable
 
 Write `docs/design/world-map-consolidation.md` containing:
 
-1. **Inventory table** — the four components + two pages: route, purpose, live/experimental, lines, unique capabilities (globe rotation, ART/ATLAS toggle, WebGL fallback, meetup counts...).
-2. **Decision per artifact** — keep / delete / merge, with one-line justification each. The default hypothesis to confirm or refute: delete `/map-libre` + `map-libre-world-select.tsx` (experiment concluded), keep the rest.
-3. **Exposure decision** — should `/events` be linked from the landing globe or sidebar; if yes, where (one sentence, honoring the guild/quest brand language from `CLAUDE.md`).
-4. **Consolidation sketch** — IF two or more survivors share enough (marker creation, fallback), sketch the shared hook/module and estimate effort; if the sharing is superficial, say "not worth it" explicitly (a valid verdict).
+1. **Inventory table** — survivors only: `home-events-map.tsx` (live `/`), `map-libre-world-select.tsx` + `/map-libre` (experiment), plus pointers to `map-shell.tsx`/`city-map.tsx` for the consolidation question. Do not invent rows for deleted components.
+2. **Decision per artifact** — keep / delete / merge for `/map-libre` + `map-libre-world-select.tsx`, with one-line justification. Default hypothesis: delete.
+3. **Exposure decision** — already answered (`/` is the events map); one sentence confirming that in the doc.
+4. **Consolidation sketch** — IF `/map-libre` is KEPT, sketch a shared marker-factory/bootstrap module with `home-events-map.tsx` and estimate effort; if deleted, say whether extracting shared pieces from `home-events-map.tsx` vs `map-shell.tsx` is worth a follow-up (or "not worth it").
 5. **Open questions for the maintainer.**
 
 ### Optional Step (execute ONLY if the doc's own conclusion is "delete" and no STOP condition fired)
 
 Delete `app/map-libre/page.tsx` and `components/map-libre-world-select.tsx`.
 
-**Pre-check**: `grep -rn "map-libre-world-select\|MapLibreWorldSelect" app components lib --include='*.ts*'` → only the two files being deleted.
+**Pre-check**: `rg -n "map-libre-world-select|MapLibreWorldSelect" app components lib --glob '*.ts*'` → only the two files being deleted.
 
 **Verify**: `pnpm typecheck` → exit 0; `pnpm build` → exit 0; `curl -s -o /dev/null -w "%{http_code}" localhost:3000/map-libre` against `pnpm dev` → 404.
 
@@ -66,7 +71,7 @@ Delete `app/map-libre/page.tsx` and `components/map-libre-world-select.tsx`.
 
 **In scope**: `docs/design/world-map-consolidation.md` (create); optionally delete `app/map-libre/page.tsx` + `components/map-libre-world-select.tsx`.
 
-**Out of scope**: modifying the surviving components (consolidation is a FUTURE plan the doc proposes); `components/world-map-select.tsx` (live fallback — never delete here); any navigation/link changes (the doc recommends, a follow-up implements).
+**Out of scope**: modifying `home-events-map.tsx` / `map-shell.tsx` / `city-map.tsx` (consolidation is a FUTURE plan the doc proposes); recreating deleted world-map components; any navigation/link changes (the doc recommends, a follow-up implements).
 
 ## Git workflow
 
@@ -84,7 +89,7 @@ Delete `app/map-libre/page.tsx` and `components/map-libre-world-select.tsx`.
 ## STOP conditions
 
 - Analytics or an external link (`grep -rn "map-libre" ..` beyond the two files, README, or the maintainer's marketing posts if discoverable in the repo) shows the page has real traffic or inbound links — keep it, note it in the doc.
-- Evidence that the comparison is NOT concluded (e.g. recent commits still touching `map-libre-world-select.tsx` after `ba0778c`) — doc only, no deletion.
+- Evidence that the comparison is NOT concluded (e.g. recent commits still touching `map-libre-world-select.tsx` after `ab0a47e`) — doc only, no deletion.
 
 ## Maintenance notes
 
