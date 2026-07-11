@@ -10,7 +10,6 @@ import "./globals.css"
 import { ogImage, pageDescription, pageTitle, siteUrl } from "@/lib/config"
 import { cn } from "@/lib/utils"
 import { QueryProvider } from "@/components/query-provider"
-import { ThemeProvider } from "@/components/theme-provider"
 
 export const metadata: Metadata = {
   metadataBase: siteUrl ? new URL(siteUrl) : undefined,
@@ -60,7 +59,6 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      suppressHydrationWarning
       className={cn(
         "antialiased",
         fontMono.variable,
@@ -71,13 +69,7 @@ export default function RootLayout({
     >
       <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
       <body>
-        <ThemeProvider
-          attribute="class"
-          forcedTheme="light"
-          disableTransitionOnChange
-        >
-          <QueryProvider>{children}</QueryProvider>
-        </ThemeProvider>
+        <QueryProvider>{children}</QueryProvider>
         <Analytics />
       </body>
     </html>
