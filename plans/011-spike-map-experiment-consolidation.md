@@ -18,6 +18,13 @@
 - **Category**: direction
 - **Planned at**: commit `ba0778c`, 2026-07-06
 
+> **Premise update (2026-07-11, commit `16f120d`)**: the maintainer resolved most of this spike's question directly.
+> Three of the four components below were DELETED between `ba0778c` and `16f120d`: `world-globe-select.tsx`, `world-map-select.tsx`, and `events-world-map.tsx` are gone, replaced by `components/home-events-map.tsx` (the new events-first top page; `/events` now permanent-redirects to `/`).
+> What remains undecided is only the original default hypothesis: `app/map-libre/page.tsx` + `components/map-libre-world-select.tsx` (still present, still unlinked).
+> New evidence strengthening the delete verdict: the 2026-07-11 audit found `map-libre-world-select.tsx` duplicates `home-events-map.tsx` near-verbatim in its `createCityMarker` factory (`map-libre-world-select.tsx:27-85` vs `home-events-map.tsx:139-184`) and its map bootstrap (`:100-157` vs `:310-414`) — as long as it lives, every restyle of the city-sign marker must be made twice.
+> Execution guidance: skip deliverable sections whose subject components no longer exist; the doc shrinks to (a) the `/map-libre` keep/delete verdict — hypothesis unchanged: delete, (b) if KEPT, a shared marker-factory/bootstrap extraction sketch with `home-events-map.tsx`, and (c) the consolidation question relative to `map-shell.tsx`/`city-map.tsx` (plans 006/007).
+> Section 3 (exposure of `/events`) is answered: `/` is the events map. Update the drift-check base to `16f120d`.
+
 ## Why this matters
 
 The repo carries four world-map selector components and an unlisted comparison page, which together confuse every audit, refactor, and new contributor:

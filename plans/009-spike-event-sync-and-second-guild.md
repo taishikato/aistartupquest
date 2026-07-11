@@ -18,9 +18,16 @@
 - **Category**: direction
 - **Planned at**: commit `ba0778c`, 2026-07-06
 
+> **Premise update (2026-07-11, commit `16f120d`)**: the pipeline is no longer fully manual.
+> `scripts/fetch-cursor-events.ts` (`pnpm fetch:cursor`) now scrapes cursor.com/community's flight payload via `lib/cursor-events-fetch.ts` into `scripts/data/cursor-events.json`, replacing the hand-edit half of the loop; plan 014 hardens it.
+> This narrows the spike: deliverable section 1 becomes "how to SCHEDULE the existing fetch+import scripts" (the fetch mechanism is proven), and section 3 already has a working Luma-via-HTML precedent.
+> It also sharpens section 5: `/` (not `/events`, which now permanent-redirects to `/`) IS the events map, and it reads a SEPARATE hand-maintained file, `lib/data/cursor-community-events.json`, that the fetch script cannot produce — the parser emits no `company` field and no city coordinates.
+> The gap between the automated city-map feed and the fully manual top-page feed is now the single most consequential question in this spike; treat section 5 as a first-class deliverable, not a footnote.
+> Update the drift-check base to `16f120d` and include `lib/cursor-events-fetch.ts scripts/fetch-cursor-events.ts lib/data/cursor-community-events.json components/home-events-map.tsx` in its path list.
+
 ## Why this matters
 
-The product's brand language says event sources are "guilds" and Cursor is the first one, but the pipeline is one-source and fully manual: someone hand-edits `scripts/data/cursor-events.json` (23 lines today) and runs `pnpm import:cursor`.
+The product's brand language says event sources are "guilds" and Cursor is the first one, but the pipeline is one-source and only half automated: `pnpm fetch:cursor` scrapes the source, then someone reviews the JSON and runs `pnpm import:cursor` — and the top page's own dataset is maintained entirely by hand.
 Manual sync means events go stale silently — the worst failure mode for a product whose pitch is "upcoming events".
 The schema is already multi-source ready (`meetups.source` column, upsert on `(source, source_event_id)`, `MeetupSource` union type), so the marginal design cost is low and the decision now is HOW to automate and WHICH second guild proves the pattern.
 

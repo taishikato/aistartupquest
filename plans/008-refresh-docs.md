@@ -20,9 +20,15 @@
 - **Category**: docs
 - **Planned at**: commit `ba0778c`, 2026-07-06
 
+> **Premise update (2026-07-11, commit `16f120d`)**: the route inventory below drifted.
+> `/` is now the events-first world atlas (`components/home-events-map.tsx`), and `app/events/page.tsx` is a `permanentRedirect("/")`.
+> Describe the events map as the top page, not as `/events`.
+> Additionally, Step 3 below was added: the delta introduced a second event-data pipeline that must be documented in `AGENTS.md`.
+> The original drift check only covers the doc files; also run `git ls-files app` to confirm the live route list before writing.
+
 ## Why this matters
 
-`README.md` says startup data "is maintained in `lib/companies.ts`" — a file that does not exist (data comes from the Supabase `companies` table) — and describes the app as SF-only, while the product now covers six cities (SF, Toronto, NY, London, Vancouver, Tokyo) plus a world events map at `/events`.
+`README.md` says startup data "is maintained in `lib/companies.ts`" — a file that does not exist (data comes from the Supabase `companies` table) — and describes the app as SF-only, while the product now covers six cities (SF, Toronto, NY, London, Vancouver, Tokyo) plus an events-first world map on the top page.
 A wrong README is worse than a missing one: it actively misdirects new contributors and coding agents.
 Separately, `CLAUDE.md`/`AGENTS.md` line 70 tells agents to run `nr genType`; `nr` (the antfu/ni runner) is a personal global tool not guaranteed in any environment, and the repo's real command is `pnpm genType`.
 
@@ -34,7 +40,10 @@ Separately, `CLAUDE.md`/`AGENTS.md` line 70 tells agents to run `nr genType`; `n
   - Lines 14-19: Development section with `pnpm install` / `pnpm dev` — correct, keep.
 - `CLAUDE.md:70` and `AGENTS.md:70` (both files contain the identical line — check `ls -la CLAUDE.md AGENTS.md` to see whether one is a symlink; at `ba0778c` they are separate files with identical content):
   - `- After changing Supabase schema or views, run \`nr genType\` and commit the updated \`types/supabase.ts\`.`
-- Real product surface (verify by listing `app/`): routes `/` (world select), `/sf`, `/toronto`, `/ny`, `/london`, `/vancouver`, `/tokyo`, `/events`, `/map-libre`.
+- Real product surface (verify by listing `app/`): routes `/` (events-first world atlas), `/sf`, `/toronto`, `/ny`, `/london`, `/vancouver`, `/tokyo`, `/events` (permanent redirect to `/`), `/map-libre`.
+- Event data pipelines (for Step 3; verified at `16f120d`):
+  - City maps: `scripts/fetch-cursor-events.ts` (`pnpm fetch:cursor`) scrapes cursor.com/community into `scripts/data/cursor-events.json`; `scripts/import-cursor-events.ts` (`pnpm import:cursor`) validates and upserts it into the Supabase `meetups` table, which the six city pages read.
+  - Top page: `components/home-events-map.tsx` reads the hand-maintained `lib/data/cursor-community-events.json` (different shape: per-city coordinates plus per-event `company`). `fetch:cursor` does NOT refresh this file.
 - Brand language to honor (from `CLAUDE.md` Brand Language section): cities are game worlds, startups are sprites/bosses, meetups are quests, event sources are guilds; action words stay plain.
 - Writing conventions for this repo's Markdown (user rule): each full sentence on its own line; plain dash `-`, never the em dash.
 
@@ -71,7 +80,7 @@ Keep it short (25-40 lines). Structure:
 
 1. Title: rename to reflect the product (e.g. `# AI Startup Quest`) with the one-line pitch: a pixel-art RPG map for exploring AI startups and community events across six cities.
 2. Keep the existing screenshot image line.
-3. "What's this" bullets: city maps for SF, Toronto, NY, London, Vancouver, Tokyo; startups as sprites on a game-style map; community meetups as quests; a world events view at `/events`.
+3. "What's this" bullets: an events-first world map on the top page; city maps for SF, Toronto, NY, London, Vancouver, Tokyo; startups as sprites on a game-style map; community meetups as quests.
 4. Data section (replaces the false line): startup data lives in the Supabase `companies` table, loaded per city page via `lib/city-page-data.ts`; meetups come from the `published_upcoming_meetups` view; community submissions go through server actions in `app/actions/`.
 5. Development section: keep `pnpm install` / `pnpm dev`; add `pnpm lint`, `pnpm typecheck`, `pnpm test`.
 6. Note that agent/contributor rules live in `AGENTS.md`.
@@ -87,6 +96,17 @@ If `ls -la` shows one is a symlink to the other, edit the real file once.
 
 **Verify**: `grep -rn "nr genType" CLAUDE.md AGENTS.md` → no matches; `grep -rn "pnpm genType" CLAUDE.md AGENTS.md` → 2 matches (or 1 if symlinked).
 
+### Step 3: Document the two event-data pipelines in AGENTS.md (added 2026-07-11)
+
+Add a short "Event data pipelines" subsection under Implementation Notes in `AGENTS.md` (and `CLAUDE.md` if they are still identical copies), stating in 3-4 lines:
+
+- `pnpm fetch:cursor` scrapes cursor.com/community into `scripts/data/cursor-events.json`; `pnpm import:cursor` upserts it into Supabase `meetups` for the six city pages.
+- The top page reads `lib/data/cursor-community-events.json`, a separate hand-maintained file with a different shape (city coordinates + per-event `company`); `fetch:cursor` does not touch it.
+
+Write each full sentence on its own line; plain `-` dashes only.
+
+**Verify**: `grep -n "fetch:cursor" AGENTS.md` → at least 1 match; `grep -n "cursor-community-events.json" AGENTS.md` → at least 1 match.
+
 ## Test plan
 
 Docs-only change; no tests.
@@ -98,7 +118,8 @@ Machine-checkable. ALL must hold:
 
 - [ ] `grep -n "lib/companies.ts" README.md` → no matches
 - [ ] `grep -rn "nr genType" CLAUDE.md AGENTS.md` → no matches
-- [ ] README mentions all six cities and the `/events` page
+- [ ] README mentions all six cities and the events-first top page
+- [ ] `AGENTS.md` documents both event-data pipelines (Step 3 verifies)
 - [ ] `git status` shows only README.md, CLAUDE.md, AGENTS.md modified
 - [ ] `plans/README.md` status row updated
 
