@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest"
 
+import type { CityId } from "@/lib/city-config"
 import {
   filterAndSortUpcomingMeetups,
   isMeetupUpcoming,
   type Meetup,
 } from "@/lib/meetup"
-import type { CityId } from "@/lib/city-config"
 
 function makeMeetup(overrides: Partial<Meetup> = {}): Meetup {
   return {
@@ -43,10 +43,16 @@ describe("isMeetupUpcoming timezone edges", () => {
     const nowMs = Date.UTC(2026, 7, 1, 20, 0, 0)
 
     expect(
-      isMeetupUpcoming(makeMeetup({ city: "tokyo", eventDate: "2026-08-01" }), nowMs)
+      isMeetupUpcoming(
+        makeMeetup({ city: "tokyo", eventDate: "2026-08-01" }),
+        nowMs
+      )
     ).toBe(false)
     expect(
-      isMeetupUpcoming(makeMeetup({ city: "sf", eventDate: "2026-08-01" }), nowMs)
+      isMeetupUpcoming(
+        makeMeetup({ city: "sf", eventDate: "2026-08-01" }),
+        nowMs
+      )
     ).toBe(true)
   })
 
@@ -55,7 +61,10 @@ describe("isMeetupUpcoming timezone edges", () => {
     const nowMs = Date.UTC(2026, 7, 2, 6, 59, 0)
 
     expect(
-      isMeetupUpcoming(makeMeetup({ city: "sf", eventDate: "2026-08-01" }), nowMs)
+      isMeetupUpcoming(
+        makeMeetup({ city: "sf", eventDate: "2026-08-01" }),
+        nowMs
+      )
     ).toBe(true)
   })
 

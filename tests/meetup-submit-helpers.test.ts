@@ -9,9 +9,9 @@ import {
 
 describe("slugifyMeetupBase", () => {
   it("lowercases, strips unsafe characters, and appends city/date", () => {
-    expect(slugifyMeetupBase("Hello World!!! AI Meetup", "sf", "2026-08-01")).toBe(
-      "hello-world-ai-meetup-sf-20260801"
-    )
+    expect(
+      slugifyMeetupBase("Hello World!!! AI Meetup", "sf", "2026-08-01")
+    ).toBe("hello-world-ai-meetup-sf-20260801")
   })
 
   it("is deterministic for the same inputs", () => {

@@ -5,7 +5,12 @@ import Image from "next/image"
 import { format } from "date-fns"
 import maplibregl, { type Map as MapLibreMap, type Marker } from "maplibre-gl"
 
-import cursorCommunityEvents from "@/lib/data/cursor-community-events.json"
+import {
+  getUpcomingCities,
+  type CityWithEvents,
+  type CursorCommunityCity,
+  type CursorCommunityEvent,
+} from "@/lib/cursor-community-events"
 import { cn } from "@/lib/utils"
 import { GLOBE_CAMERA } from "@/lib/world-art-map"
 import {
@@ -19,25 +24,6 @@ import {
 
 type WorldView = "mercator" | "globe"
 
-type CursorCommunityCity = {
-  name: string
-  lat: number
-  lon: number
-}
-
-type CursorCommunityEvent = {
-  id: string
-  title: string
-  city: string
-  date: string
-  url: string
-  company: string
-}
-
-type CityWithEvents = CursorCommunityCity & {
-  events: CursorCommunityEvent[]
-}
-
 const FLAT_CAMERA = {
   center: [5, 14] as [number, number],
   zoom: 1.34,
@@ -45,34 +31,6 @@ const FLAT_CAMERA = {
 }
 
 const IDLE_ROTATION_DEGREES_PER_FRAME = 0.015
-
-function getUpcomingCities(): CityWithEvents[] {
-  // Compute per call so a long-lived server module does not keep a stale UTC day
-  // and mismatch the client's fresh evaluation during hydration.
-  const today = new Date().toISOString().slice(0, 10)
-  const eventsByCity = new Map<string, CursorCommunityEvent[]>()
-
-  ;(cursorCommunityEvents.events as CursorCommunityEvent[]).forEach((event) => {
-    if (event.date < today) {
-      return
-    }
-
-    const cityEvents = eventsByCity.get(event.city) ?? []
-    cityEvents.push(event)
-    eventsByCity.set(event.city, cityEvents)
-  })
-
-  eventsByCity.forEach((events) => {
-    events.sort((a, b) => a.date.localeCompare(b.date))
-  })
-
-  return (cursorCommunityEvents.cities as CursorCommunityCity[])
-    .map((city) => ({
-      ...city,
-      events: eventsByCity.get(city.name) ?? [],
-    }))
-    .filter((city) => city.events.length >= 1)
-}
 
 function createEventCityMarker({
   city,
@@ -227,9 +185,14 @@ export function HomeEventsMap() {
       .filter((city) => city.events.length > 0)
   }, [filteredEvents, upcomingCities])
 
-  const selectedCityEvents = selectedCity
-    ? (upcomingCities.find((city) => city.name === selectedCity)?.events ?? [])
-    : []
+  const selectedCityEvents = useMemo(
+    () =>
+      selectedCity
+        ? (upcomingCities.find((city) => city.name === selectedCity)?.events ??
+          [])
+        : [],
+    [selectedCity, upcomingCities]
+  )
 
   const stopIdleRotation = useCallback(() => {
     if (rotationFrameRef.current !== null) {

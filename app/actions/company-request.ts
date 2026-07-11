@@ -4,10 +4,7 @@ import { headers } from "next/headers"
 
 import type { CityId } from "@/lib/city-config"
 import { COMPANY_CATEGORIES, type CompanyCategory } from "@/lib/company"
-import {
-  hashClientIp,
-  hashCompanyRequestPayload,
-} from "@/lib/meetup-submit"
+import { hashClientIp, hashCompanyRequestPayload } from "@/lib/meetup-submit"
 import { createAdminClient } from "@/lib/supabase/admin"
 
 type City = CityId

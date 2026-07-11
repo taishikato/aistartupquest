@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 
-import { submitCompanyRequest } from "@/app/actions/company-request"
 import { hashCompanyRequestPayload } from "@/lib/meetup-submit"
+import { submitCompanyRequest } from "@/app/actions/company-request"
 
 function makePayload(
   overrides: Partial<Parameters<typeof submitCompanyRequest>[0]> = {}
