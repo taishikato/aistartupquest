@@ -77,13 +77,20 @@ export function parseCursorCommunityEvents(html: string): CursorEventInput[] {
       continue
     }
     if (!parsed.name || !parsed.start_at || !parsed.url) continue
+    if (!parsed.url.startsWith("https://")) continue
     const slug = parsed.url.split("/").pop()
     if (!slug) continue
+    let date: string
+    try {
+      date = localDateForTimezone(parsed.start_at, parsed.timezone ?? "UTC")
+    } catch {
+      continue
+    }
     events.push({
       id: slug,
       title: parsed.name,
       city: parsed.geo_address_json?.city ?? "",
-      date: localDateForTimezone(parsed.start_at, parsed.timezone ?? "UTC"),
+      date,
       url: parsed.url,
     })
   }
