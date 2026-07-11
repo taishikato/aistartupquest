@@ -298,7 +298,8 @@ export async function submitMeetup(
   let coords: { lat: number; lng: number } | null
   try {
     coords = await geocodeWithGoogle(query)
-  } catch {
+  } catch (error) {
+    console.error("geocodeWithGoogle failed", { query, error })
     return {
       status: "error",
       message: "Location lookup is temporarily unavailable. Try again later.",
