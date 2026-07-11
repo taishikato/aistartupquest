@@ -10,7 +10,7 @@ Each executor: read the plan fully before starting, honor its STOP conditions, a
 |------|-------|----------|--------|------------|--------|
 | 001 | Upgrade Next.js past the current security advisories | P1 | S | - | DONE |
 | 002 | Add anti-abuse protection to company submission requests | P1 | M | - | DONE |
-| 003 | Verification baseline: CI, server-action tests, zero lint warnings | P1 | M | - | TODO |
+| 003 | Verification baseline: CI, server-action tests, zero lint warnings | P1 | M | - | DONE |
 | 014 | Make the cursor.com event fetch resilient to malformed and drifted upstream data | P1 | S | - | DONE |
 | 004 | Remove dead code and misplaced dependencies | P2 | S | 001 (soft) | TODO |
 | 005 | Small correctness and observability fixes (bundle) | P2 | S | - | TODO |
@@ -32,6 +32,7 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (with one-line reason) | REJE
 
 ## Reconciliation log
 
+- 2026-07-11 at `643a83b` (`/improve execute 003`): plan refreshed before dispatch (Step 1 lint fix dropped — `events-world-map.tsx` deleted; lint already clean). Executor landed timezone edge tests, submit-helper tests, and `.github/workflows/ci.yml` on `advisor/003-verification-baseline`. Reviewer re-ran lint/typecheck/test/YAML parse; scope clean; APPROVED. Merged into main.
 - 2026-07-10 at `ba0778c`: all 11 plans remained TODO; no source drift from the planning commit; plan 001 refreshed for newer Next.js advisories (minimum safe version `16.2.6`).
 - 2026-07-11 at `16f120d`: delta audit of everything changed since `ba0778c` (the events-first top page rewrite, the cursor.com fetch pipeline, quest markers, company tags).
   - Verification: `pnpm typecheck`, `pnpm test` (18 tests), and `pnpm lint` (now zero warnings) all pass; `pnpm audit --prod` still reports 54 production vulnerabilities (15 high) driven by Next.js `16.1.7` — plan 001 remains the top P1.

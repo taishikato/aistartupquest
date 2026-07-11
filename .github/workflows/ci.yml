@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: corepack enable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint --max-warnings 0
+      - run: pnpm typecheck
+      - run: pnpm test
+      # pnpm build deliberately excluded: needs Supabase env secrets.
+      # Add later once repo secrets (NEXT_PUBLIC_SUPABASE_URL, etc.) are configured.
