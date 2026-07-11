@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Image from "next/image"
-import Link from "next/link"
 import { format } from "date-fns"
 import maplibregl, { type Map as MapLibreMap, type Marker } from "maplibre-gl"
 
@@ -517,24 +516,6 @@ export function HomeEventsMap() {
             />
           </div>
         ) : null}
-      </div>
-
-      {/* Compact city nav */}
-      <div className="pointer-events-none absolute top-4 right-4 z-30 flex flex-col items-end gap-3 md:top-6 md:right-6">
-        <nav
-          className="pointer-events-auto flex flex-wrap justify-end gap-1 border-2 border-[#1a1a2e] bg-white p-1 shadow-[3px_3px_0_#1a1a2e]"
-          aria-label="City maps"
-        >
-          {WORLD_STAGE_CITIES.map((city) => (
-            <Link
-              key={city.id}
-              href={city.href}
-              className="border-2 border-[#1a1a2e] bg-[#ffe66d] px-2 py-1 font-(family-name:--font-pixel) text-[8px] leading-4 text-[#1a1a2e]"
-            >
-              {city.code}
-            </Link>
-          ))}
-        </nav>
       </div>
 
       {/* MAP / GLOBE toggle */}
