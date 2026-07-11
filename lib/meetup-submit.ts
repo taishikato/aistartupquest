@@ -25,6 +25,19 @@ export function hashMeetupPayload(parts: {
   return createHash("sha256").update(payload).digest("hex")
 }
 
+export function hashCompanyRequestPayload(parts: {
+  city: string
+  companyName: string
+  category: string
+  founded: string
+  locationLabel: string
+  shortDescription: string
+  website: string
+}) {
+  const payload = JSON.stringify(parts)
+  return createHash("sha256").update(payload).digest("hex")
+}
+
 export function hashClientIp(ip: string) {
   return createHash("sha256").update(ip).digest("hex")
 }
