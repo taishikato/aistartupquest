@@ -1,12 +1,16 @@
 "use client"
 
-import { useState, useTransition, type FormEvent } from "react"
+import { useRef, useState, useTransition, type FormEvent } from "react"
 import { LoaderCircle, Plus, X } from "lucide-react"
 
 import type { CityId } from "@/lib/city-config"
 import { COMPANY_CATEGORIES, type CompanyCategory } from "@/lib/company"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import {
+  TurnstileWidget,
+  type TurnstileWidgetHandle,
+} from "@/components/turnstile-widget"
 import { submitCompanyRequest } from "@/app/actions/company-request"
 
 type CompanyRequestPanelProps = {
@@ -31,6 +35,7 @@ const FIELD_LABEL_CLASS = cn(
 )
 
 export function CompanyRequestPanel({ initialCity }: CompanyRequestPanelProps) {
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ""
   const [isOpen, setIsOpen] = useState(false)
   const [city, setCity] = useState<CityId>(initialCity)
   const [companyName, setCompanyName] = useState("")
@@ -41,11 +46,13 @@ export function CompanyRequestPanel({ initialCity }: CompanyRequestPanelProps) {
   const [website, setWebsite] = useState("")
   const [contactEmail, setContactEmail] = useState("")
   const [notes, setNotes] = useState("")
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const [status, setStatus] = useState<"idle" | "submitting" | "success">(
     "idle"
   )
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const turnstileRef = useRef<TurnstileWidgetHandle | null>(null)
 
   const resetForm = () => {
     setCity(initialCity)
@@ -57,6 +64,8 @@ export function CompanyRequestPanel({ initialCity }: CompanyRequestPanelProps) {
     setWebsite("")
     setContactEmail("")
     setNotes("")
+    setTurnstileToken(null)
+    turnstileRef.current?.reset()
     setErrorMessage(null)
     setStatus("idle")
   }
@@ -108,11 +117,17 @@ export function CompanyRequestPanel({ initialCity }: CompanyRequestPanelProps) {
       return
     }
 
+    if (!turnstileToken) {
+      setErrorMessage("Complete the verification challenge.")
+      return
+    }
+
     setStatus("submitting")
     setErrorMessage(null)
 
     startTransition(async () => {
       const result = await submitCompanyRequest({
+        turnstileToken,
         category,
         city,
         companyName: trimmedCompanyName,
@@ -127,6 +142,7 @@ export function CompanyRequestPanel({ initialCity }: CompanyRequestPanelProps) {
       if (result.status === "error") {
         setStatus("idle")
         setErrorMessage(result.message)
+        turnstileRef.current?.reset()
         return
       }
 
@@ -337,6 +353,24 @@ export function CompanyRequestPanel({ initialCity }: CompanyRequestPanelProps) {
                     />
                   </label>
 
+                  {siteKey ? (
+                    <div className="space-y-2">
+                      <span className={cn(FIELD_LABEL_CLASS, "mb-0")}>
+                        Verification
+                      </span>
+                      <TurnstileWidget
+                        ref={turnstileRef}
+                        siteKey={siteKey}
+                        onToken={setTurnstileToken}
+                      />
+                    </div>
+                  ) : (
+                    <div className="border border-[#efc7c7] bg-[#fff7f7] px-3 py-3 text-sm text-[#b42318]">
+                      Company submissions are disabled because the site key is
+                      not configured.
+                    </div>
+                  )}
+
                   {errorMessage ? (
                     <div className="border border-[#efc7c7] bg-[#fff7f7] px-3 py-3 text-sm text-[#b42318]">
                       {errorMessage}
@@ -349,7 +383,12 @@ export function CompanyRequestPanel({ initialCity }: CompanyRequestPanelProps) {
                     </p>
                     <Button
                       type="submit"
-                      disabled={status === "submitting" || isPending}
+                      disabled={
+                        status === "submitting" ||
+                        isPending ||
+                        !siteKey ||
+                        !turnstileToken
+                      }
                       className="h-11 min-w-[148px] border-2 border-[#111827] bg-white px-4 text-[12px] font-semibold tracking-[0.08em] text-[#111827] uppercase shadow-[3px_3px_0_#111827] hover:bg-[#f8fafc]"
                     >
                       {status === "submitting" || isPending ? (
