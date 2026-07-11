@@ -6,14 +6,14 @@
       "name": "Lusaka",
       "lat": -15.39,
       "lon": 28.32,
-      "artLon": 27.0,
+      "artLon": 27,
       "artLat": -34.4
     },
     {
       "name": "Kigali",
       "lat": -1.95,
       "lon": 30.06,
-      "artLon": 31.0,
+      "artLon": 31,
       "artLat": -21.6
     },
     {
@@ -90,7 +90,7 @@
       "name": "Canela",
       "lat": -29.36,
       "lon": -50.81,
-      "artLon": -62.0,
+      "artLon": -62,
       "artLat": -49.8
     },
     {
@@ -98,20 +98,20 @@
       "lat": 0.35,
       "lon": 32.58,
       "artLon": 32.4,
-      "artLat": -19.0
+      "artLat": -19
     },
     {
       "name": "London",
       "lat": 51.51,
       "lon": -0.13,
       "artLon": -15.6,
-      "artLat": 45.0
+      "artLat": 45
     },
     {
       "name": "Toulouse",
       "lat": 43.6,
       "lon": 1.44,
-      "artLon": -12.0,
+      "artLon": -12,
       "artLat": 33.6
     },
     {
@@ -154,7 +154,7 @@
       "lat": 35.47,
       "lon": -97.52,
       "artLon": -109.6,
-      "artLat": 21.0
+      "artLat": 21
     },
     {
       "name": "Helsinki",
@@ -216,8 +216,8 @@
       "name": "Ahmedabad",
       "lat": 23.03,
       "lon": 72.58,
-      "artLon": 64.0,
-      "artLat": 7.0
+      "artLon": 64,
+      "artLat": 7
     },
     {
       "name": "Colombo",
@@ -280,7 +280,7 @@
       "lat": 37.54,
       "lon": -77.44,
       "artLon": -90.1,
-      "artLat": 23.0
+      "artLat": 23
     },
     {
       "name": "Medellín",
@@ -307,7 +307,7 @@
       "name": "Houston",
       "lat": 29.76,
       "lon": -95.37,
-      "artLon": -107.0,
+      "artLon": -107,
       "artLat": 14.9
     },
     {
@@ -335,28 +335,28 @@
       "name": "Santa Cruz de la Sierra",
       "lat": -17.78,
       "lon": -63.18,
-      "artLon": -71.0,
+      "artLon": -71,
       "artLat": -40.5
     },
     {
       "name": "Christchurch",
       "lat": -43.53,
       "lon": 172.64,
-      "artLon": 170.0,
+      "artLon": 170,
       "artLat": -67.3
     },
     {
       "name": "Dallas",
       "lat": 32.78,
       "lon": -96.8,
-      "artLon": -109.0,
+      "artLon": -109,
       "artLat": 18.4
     },
     {
       "name": "Cali",
       "lat": 3.45,
       "lon": -76.53,
-      "artLon": -86.0,
+      "artLon": -86,
       "artLat": -9.4
     },
     {
@@ -412,8 +412,8 @@
       "name": "Da Nang",
       "lat": 16.05,
       "lon": 108.21,
-      "artLon": 99.0,
-      "artLat": 1.0
+      "artLon": 99,
+      "artLat": 1
     },
     {
       "name": "Bangkok",
@@ -434,7 +434,7 @@
       "lat": 27.72,
       "lon": 85.32,
       "artLon": 81.8,
-      "artLat": 20.0
+      "artLat": 20
     },
     {
       "name": "Accra",
@@ -480,9 +480,9 @@
     },
     {
       "name": "Mar del Plata",
-      "lat": -38.0,
+      "lat": -38,
       "lon": -57.56,
-      "artLon": -67.0,
+      "artLon": -67,
       "artLat": -58.7
     },
     {
@@ -506,6 +506,7 @@
       "title": "Cursor Mobilethon Zambia",
       "city": "Lusaka",
       "date": "2026-07-05",
+      "company": "Cursor",
       "url": "https://luma.com/ts6mt9v8"
     },
     {
@@ -513,6 +514,7 @@
       "title": "Cursor Kigali Hackthon",
       "city": "Kigali",
       "date": "2026-07-05",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-udu8"
     },
     {
@@ -520,6 +522,7 @@
       "title": "Cursor Hackathon Dublin",
       "city": "Dublin",
       "date": "2026-07-05",
+      "company": "Cursor",
       "url": "https://luma.com/cursordublin"
     },
     {
@@ -527,6 +530,7 @@
       "title": "Cursor Santo Domingo Meetup",
       "city": "Santo Domingo",
       "date": "2026-07-05",
+      "company": "Cursor",
       "url": "https://luma.com/meetupsantodomingo"
     },
     {
@@ -534,6 +538,7 @@
       "title": "Cursor Meetup Andorra",
       "city": "Andorra la Vella",
       "date": "2026-07-06",
+      "company": "Cursor",
       "url": "https://luma.com/mcvompr1"
     },
     {
@@ -541,6 +546,7 @@
       "title": "Cursor Meetup Prague: Vibe & Build - July",
       "city": "Prague",
       "date": "2026-07-07",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-oc4y"
     },
     {
@@ -548,6 +554,7 @@
       "title": "Cursor Meetup - AI Agent 101",
       "city": "Bali",
       "date": "2026-07-08",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-jo24"
     },
     {
@@ -555,6 +562,7 @@
       "title": "Cursor Robotics Hackathon Almaty",
       "city": "Astana",
       "date": "2026-07-08",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-s3t1"
     },
     {
@@ -562,6 +570,7 @@
       "title": "Cursor Student Workshop Hong Kong with RevisionDojo (YC F24)",
       "city": "Hong Kong",
       "date": "2026-07-08",
+      "company": "Cursor",
       "url": "https://luma.com/ugobl880"
     },
     {
@@ -569,6 +578,7 @@
       "title": "Cursor Meetup Mendoza",
       "city": "Mendoza",
       "date": "2026-07-08",
+      "company": "Cursor",
       "url": "https://luma.com/bwst0qek"
     },
     {
@@ -576,6 +586,7 @@
       "title": "Cafe Cursor Barranquilla",
       "city": "Barranquilla",
       "date": "2026-07-09",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-2um8"
     },
     {
@@ -583,6 +594,7 @@
       "title": "Frankfurt Build Day X Cursor",
       "city": "Frankfurt am Main",
       "date": "2026-07-10",
+      "company": "Cursor",
       "url": "https://luma.com/9rq3fpqr"
     },
     {
@@ -590,6 +602,7 @@
       "title": "Cursor Workshop - Canela",
       "city": "Canela",
       "date": "2026-07-10",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-vipo"
     },
     {
@@ -597,6 +610,7 @@
       "title": "Cafe Cursor Kampala",
       "city": "Kampala",
       "date": "2026-07-11",
+      "company": "Cursor",
       "url": "https://luma.com/CursorCafeKampala"
     },
     {
@@ -604,6 +618,7 @@
       "title": "Cafe Cursor London",
       "city": "London",
       "date": "2026-07-11",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-1yyu"
     },
     {
@@ -611,6 +626,7 @@
       "title": "Cursor Toulouse Meetup #1",
       "city": "Toulouse",
       "date": "2026-07-11",
+      "company": "Cursor",
       "url": "https://luma.com/o20wgedd"
     },
     {
@@ -618,6 +634,7 @@
       "title": "Cursor Cairo Build-a-thon",
       "city": "Cairo",
       "date": "2026-07-11",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-x9yx"
     },
     {
@@ -625,6 +642,7 @@
       "title": "Cursor Meetup Rio de Janeiro",
       "city": "Rio de Janeiro",
       "date": "2026-07-11",
+      "company": "Cursor",
       "url": "https://luma.com/45jawdhf"
     },
     {
@@ -632,6 +650,7 @@
       "title": "Cursor Aracaju",
       "city": "Aracaju",
       "date": "2026-07-11",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-kviw"
     },
     {
@@ -639,6 +658,7 @@
       "title": "Cafe Cursor Tandil",
       "city": "Tandil",
       "date": "2026-07-11",
+      "company": "Cursor",
       "url": "https://luma.com/jnihlrhh"
     },
     {
@@ -646,6 +666,7 @@
       "title": "Cursor Miami Build Day",
       "city": "Miami",
       "date": "2026-07-12",
+      "company": "Cursor",
       "url": "https://luma.com/5nwptx5q"
     },
     {
@@ -653,6 +674,7 @@
       "title": "Cafe Cursor OKC",
       "city": "Oklahoma City",
       "date": "2026-07-13",
+      "company": "Cursor",
       "url": "https://luma.com/cafe-cursor-okc"
     },
     {
@@ -660,6 +682,7 @@
       "title": "Cursor Mini Summer Hackathon Helsinki",
       "city": "Helsinki",
       "date": "2026-07-15",
+      "company": "Cursor",
       "url": "https://luma.com/rvqgc8me"
     },
     {
@@ -667,6 +690,7 @@
       "title": "Cafe Cursor Los Angeles",
       "city": "Los Angeles",
       "date": "2026-07-15",
+      "company": "Cursor",
       "url": "https://luma.com/g581r6a7"
     },
     {
@@ -674,6 +698,7 @@
       "title": "Cursor Code Night Yaoundé",
       "city": "Yaoundé",
       "date": "2026-07-15",
+      "company": "Cursor",
       "url": "https://luma.com/vtf4mmhg"
     },
     {
@@ -681,6 +706,7 @@
       "title": "Cafe Cursor Philadelphia",
       "city": "Philadelphia",
       "date": "2026-07-16",
+      "company": "Cursor",
       "url": "https://luma.com/tkx269iu"
     },
     {
@@ -688,6 +714,7 @@
       "title": "Cursor Hackathon @Bliq | July 16th, Thursday",
       "city": "Berlin",
       "date": "2026-07-16",
+      "company": "Cursor",
       "url": "https://luma.com/0jyksnjv"
     },
     {
@@ -695,6 +722,7 @@
       "title": "Cursor x Tec Hackaton",
       "city": "Guatemala City",
       "date": "2026-07-16",
+      "company": "Cursor",
       "url": "https://luma.com/pc9qvm82"
     },
     {
@@ -702,6 +730,7 @@
       "title": "Cursor Meetup São Paulo - Edição Sorocaba",
       "city": "São Paulo",
       "date": "2026-07-16",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-zh83"
     },
     {
@@ -709,6 +738,7 @@
       "title": "Cafe Cursor Lisbon #2",
       "city": "Lisbon",
       "date": "2026-07-17",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-whcv"
     },
     {
@@ -716,6 +746,7 @@
       "title": "Cursor Hackathon Ahmedabad",
       "city": "Ahmedabad",
       "date": "2026-07-18",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-ajvc"
     },
     {
@@ -723,6 +754,7 @@
       "title": "Cursor Meetup Colombo: The Builder Series",
       "city": "Colombo",
       "date": "2026-07-18",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-meetup-cmb-jun"
     },
     {
@@ -730,6 +762,7 @@
       "title": "Cafe Cursor Zambia",
       "city": "Lusaka",
       "date": "2026-07-18",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-k00u"
     },
     {
@@ -737,6 +770,7 @@
       "title": "Café Cursor Abidjan",
       "city": "Abidjan",
       "date": "2026-07-18",
+      "company": "Cursor",
       "url": "https://luma.com/60kf1a8p"
     },
     {
@@ -744,6 +778,7 @@
       "title": "Cursor Meetup Yaoundé",
       "city": "Yaoundé",
       "date": "2026-07-18",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-65wa"
     },
     {
@@ -751,6 +786,7 @@
       "title": "Cursor Meetup San José",
       "city": "San José",
       "date": "2026-07-18",
+      "company": "Cursor",
       "url": "https://luma.com/5gubuqjk"
     },
     {
@@ -758,6 +794,7 @@
       "title": "Cafe Cursor Shanghai",
       "city": "Shanghai",
       "date": "2026-07-19",
+      "company": "Cursor",
       "url": "https://luma.com/nthhqbbg"
     },
     {
@@ -765,6 +802,7 @@
       "title": "Café Cursor - Salvador",
       "city": "Salvador do Sul",
       "date": "2026-07-20",
+      "company": "Cursor",
       "url": "https://luma.com/loqhkf1a"
     },
     {
@@ -772,6 +810,7 @@
       "title": "Cursor Recife Meetup",
       "city": "Recife",
       "date": "2026-07-20",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-bxpw"
     },
     {
@@ -779,6 +818,7 @@
       "title": "Cursor Workshop Shenzhen",
       "city": "Shenzhen",
       "date": "2026-07-22",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-roo0"
     },
     {
@@ -786,6 +826,7 @@
       "title": "Cursor Tbilisi Meetup #1",
       "city": "Tbilisi",
       "date": "2026-07-22",
+      "company": "Cursor",
       "url": "https://luma.com/fv4imtwi"
     },
     {
@@ -793,6 +834,7 @@
       "title": "Cursor Richmond - Build a Personal Website in 90 Minutes",
       "city": "Virginia City",
       "date": "2026-07-22",
+      "company": "Cursor",
       "url": "https://luma.com/r78qish8"
     },
     {
@@ -800,6 +842,7 @@
       "title": "Cafe Cursor Medellin",
       "city": "Medellín",
       "date": "2026-07-22",
+      "company": "Cursor",
       "url": "https://luma.com/12och43q"
     },
     {
@@ -807,6 +850,7 @@
       "title": "Cursor Meetup Johannesburg",
       "city": "Johannesburg",
       "date": "2026-07-23",
+      "company": "Cursor",
       "url": "https://luma.com/wfr5v6dg"
     },
     {
@@ -814,6 +858,7 @@
       "title": "Cursor Build Night Málaga",
       "city": "Málaga",
       "date": "2026-07-23",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-mlg-4"
     },
     {
@@ -821,6 +866,7 @@
       "title": "Cursor Meetup Houston",
       "city": "Houston",
       "date": "2026-07-23",
+      "company": "Cursor",
       "url": "https://luma.com/q59a0s4f"
     },
     {
@@ -828,6 +874,7 @@
       "title": "Cafe Cursor Rosario",
       "city": "Rosario",
       "date": "2026-07-24",
+      "company": "Cursor",
       "url": "https://luma.com/vot320b3"
     },
     {
@@ -835,6 +882,7 @@
       "title": "Cursor AI Hackathon Ethiopia",
       "city": "Addis Ababa",
       "date": "2026-07-25",
+      "company": "Cursor",
       "url": "https://luma.com/qr9ljv2c"
     },
     {
@@ -842,6 +890,7 @@
       "title": "Cursor Hackathon Stuttgart | Social Media Hack",
       "city": "Stuttgart",
       "date": "2026-07-25",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-ho2x"
     },
     {
@@ -849,6 +898,7 @@
       "title": "Cursor Coworking Day Guatemala",
       "city": "Guatemala City",
       "date": "2026-07-25",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-xxan"
     },
     {
@@ -856,6 +906,7 @@
       "title": "Cursor Buildathon Bolivia",
       "city": "Santa Cruz de la Sierra",
       "date": "2026-07-25",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-buildathon"
     },
     {
@@ -863,6 +914,7 @@
       "title": "Cursor Christchurch Meetup #1",
       "city": "Christchurch",
       "date": "2026-07-26",
+      "company": "Cursor",
       "url": "https://luma.com/ydfbgrle"
     },
     {
@@ -870,6 +922,7 @@
       "title": "Cafe Cursor Dallas",
       "city": "Dallas",
       "date": "2026-07-26",
+      "company": "Cursor",
       "url": "https://luma.com/eikql20a"
     },
     {
@@ -877,6 +930,7 @@
       "title": "Cursor Meetup Philadelphia - July",
       "city": "Philadelphia",
       "date": "2026-07-28",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-7gs6"
     },
     {
@@ -884,6 +938,7 @@
       "title": "Cursor Meetup, Prompt Battle with Composer 2.5",
       "city": "Cali",
       "date": "2026-07-28",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-cali"
     },
     {
@@ -891,6 +946,7 @@
       "title": "Cursor Calgary Meetup - July",
       "city": "Calgary",
       "date": "2026-07-29",
+      "company": "Cursor",
       "url": "https://luma.com/y6o5mr37"
     },
     {
@@ -898,6 +954,7 @@
       "title": "Cursor Meetup Barranquilla",
       "city": "Barranquilla",
       "date": "2026-07-30",
+      "company": "Cursor",
       "url": "https://luma.com/db5yay6f"
     },
     {
@@ -905,6 +962,7 @@
       "title": "Cursor Tokyo AI Meetup",
       "city": "Tokyo",
       "date": "2026-07-31",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-tokyoai-0731"
     },
     {
@@ -912,6 +970,7 @@
       "title": "Cursor Northampton Meetup",
       "city": "Northampton",
       "date": "2026-07-31",
+      "company": "Cursor",
       "url": "https://luma.com/655mo00p"
     },
     {
@@ -919,6 +978,7 @@
       "title": "Cursor Meetup Jakarta",
       "city": "Jakarta",
       "date": "2026-08-01",
+      "company": "Cursor",
       "url": "https://luma.com/4qe99i6e"
     },
     {
@@ -926,6 +986,7 @@
       "title": "Cursor Meetup Sapporo",
       "city": "Sapporo",
       "date": "2026-08-01",
+      "company": "Cursor",
       "url": "https://luma.com/y45znb44"
     },
     {
@@ -933,6 +994,7 @@
       "title": "Cursor Meetup Brussels",
       "city": "Brussels",
       "date": "2026-08-01",
+      "company": "Cursor",
       "url": "https://luma.com/crsr-wat"
     },
     {
@@ -940,6 +1002,7 @@
       "title": "Cursor For Designers Yangon",
       "city": "Yangon",
       "date": "2026-08-02",
+      "company": "Cursor",
       "url": "https://luma.com/uecfvilk"
     },
     {
@@ -947,6 +1010,7 @@
       "title": "Cafe Cursor Calgary",
       "city": "Calgary",
       "date": "2026-08-02",
+      "company": "Cursor",
       "url": "https://luma.com/6z1eyz1l"
     },
     {
@@ -954,6 +1018,7 @@
       "title": "Cafe Cursor Bali",
       "city": "Bali",
       "date": "2026-08-03",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-3oa8"
     },
     {
@@ -961,6 +1026,7 @@
       "title": "Cursor Da Nang Meetup: With Nick Miller From Cursor",
       "city": "Da Nang",
       "date": "2026-08-05",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-fr4s"
     },
     {
@@ -968,6 +1034,7 @@
       "title": "Café Cursor Bangkok",
       "city": "Bangkok",
       "date": "2026-08-09",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-bkk-090826"
     },
     {
@@ -975,6 +1042,7 @@
       "title": "Cafe Cursor Casablanca",
       "city": "Casablanca",
       "date": "2026-08-09",
+      "company": "Cursor",
       "url": "https://luma.com/hkn8y90u"
     },
     {
@@ -982,6 +1050,7 @@
       "title": "Cursor Kathmandu: Vibe & Build with Nick Miller from Cursor",
       "city": "Kathmandu",
       "date": "2026-08-10",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-tkvx"
     },
     {
@@ -989,6 +1058,7 @@
       "title": "Cursor Meetup Accra",
       "city": "Accra",
       "date": "2026-08-12",
+      "company": "Cursor",
       "url": "https://luma.com/CursorMeetupAccra02"
     },
     {
@@ -996,6 +1066,7 @@
       "title": "Cursor além do Código - Curitiba",
       "city": "Curitiba",
       "date": "2026-08-12",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-umd5"
     },
     {
@@ -1003,6 +1074,7 @@
       "title": "Cursor Kenya Meetup: With Yash Gaitonde From Cursor",
       "city": "Nairobi",
       "date": "2026-08-14",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-mzjz"
     },
     {
@@ -1010,6 +1082,7 @@
       "title": "Cursor Meetup Split - Technical Deep Dive & Q&A",
       "city": "Zagreb",
       "date": "2026-08-18",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-sayd"
     },
     {
@@ -1017,6 +1090,7 @@
       "title": "Networking, Café e Conversa sobre IA",
       "city": "Recife",
       "date": "2026-08-19",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-n2so"
     },
     {
@@ -1024,6 +1098,7 @@
       "title": "Cursor for PMs Toronto - August",
       "city": "Toronto",
       "date": "2026-08-19",
+      "company": "Cursor",
       "url": "https://luma.com/hlx6e9er"
     },
     {
@@ -1031,6 +1106,7 @@
       "title": "Cursor Hackathon Seoul 4th",
       "city": "Seoul",
       "date": "2026-08-22",
+      "company": "Cursor",
       "url": "https://luma.com/06x2etd7"
     },
     {
@@ -1038,6 +1114,7 @@
       "title": "Cursor Hackathon Mar del Plata",
       "city": "Mar del Plata",
       "date": "2026-08-22",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-myvz"
     },
     {
@@ -1045,6 +1122,7 @@
       "title": "Cursor Codechella @ Victoria, BC",
       "city": "Victoria",
       "date": "2026-08-22",
+      "company": "Cursor",
       "url": "https://luma.com/cursorvictoria"
     },
     {
@@ -1052,6 +1130,7 @@
       "title": "Cursor Meetup Philadelphia - August",
       "city": "Philadelphia",
       "date": "2026-08-25",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-1z5g"
     },
     {
@@ -1059,6 +1138,7 @@
       "title": "Cursor Kenya: Build Night",
       "city": "Nairobi",
       "date": "2026-08-28",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-ps5b"
     },
     {
@@ -1066,6 +1146,7 @@
       "title": "Cursor Hackathon Myanmar",
       "city": "Yangon",
       "date": "2026-08-29",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-9t4c"
     },
     {
@@ -1073,6 +1154,7 @@
       "title": "Build with Cursor: Nijmegen",
       "city": "Nijmegen",
       "date": "2026-09-02",
+      "company": "Cursor",
       "url": "https://luma.com/fw7ovtge"
     },
     {
@@ -1080,6 +1162,7 @@
       "title": "Cursor Hackathon Barranquilla",
       "city": "Barranquilla",
       "date": "2026-09-03",
+      "company": "Cursor",
       "url": "https://luma.com/lgttu49h"
     },
     {
@@ -1087,6 +1170,7 @@
       "title": "Cursor Hackathon Indonesia",
       "city": "Jakarta",
       "date": "2026-09-10",
+      "company": "Cursor",
       "url": "https://luma.com/d4b0eg4v"
     },
     {
@@ -1094,6 +1178,7 @@
       "title": "Café Cursor Douala",
       "city": "Yaoundé",
       "date": "2026-09-19",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-nm86"
     },
     {
@@ -1101,6 +1186,7 @@
       "title": "Cursor Meetup Philadelphia - September",
       "city": "Philadelphia",
       "date": "2026-09-29",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-hdle"
     },
     {
@@ -1108,6 +1194,7 @@
       "title": "Cursor Meetup Philadelphia - October",
       "city": "Philadelphia",
       "date": "2026-10-27",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-c2mq"
     },
     {
@@ -1115,6 +1202,7 @@
       "title": "Cursor Meetup Philadelphia - November",
       "city": "Philadelphia",
       "date": "2026-11-17",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-acqy"
     },
     {
@@ -1122,6 +1210,7 @@
       "title": "Cursor Meetup Philadelphia - December",
       "city": "Philadelphia",
       "date": "2026-12-17",
+      "company": "Cursor",
       "url": "https://luma.com/cursor-8wr8"
     }
   ]

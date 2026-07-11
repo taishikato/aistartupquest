@@ -32,6 +32,7 @@ type CursorCommunityEvent = {
   city: string
   date: string
   url: string
+  company: string
 }
 
 type CityWithEvents = CursorCommunityCity & {
@@ -706,12 +707,17 @@ function GuildBoardList({
                 onClick={() => city && onSelectCity(city)}
                 className="block w-full text-left"
               >
-                <time
-                  dateTime={event.date}
-                  className="font-(family-name:--font-pixel) text-[8px] leading-4 text-[#95602f]"
-                >
-                  {format(new Date(`${event.date}T00:00:00`), "MMM d")}
-                </time>
+                <div className="flex items-start justify-between gap-2">
+                  <time
+                    dateTime={event.date}
+                    className="font-(family-name:--font-pixel) text-[8px] leading-4 text-[#95602f]"
+                  >
+                    {format(new Date(`${event.date}T00:00:00`), "MMM d")}
+                  </time>
+                  <span className="border-2 border-[#1a1a2e] bg-[#ead9ab] px-1.5 py-0.5 font-(family-name:--font-pixel) text-[8px] leading-3 text-[#95602f]">
+                    {event.company}
+                  </span>
+                </div>
                 <h2 className="mt-1 text-sm leading-5 font-bold text-[#1a1a2e]">
                   {event.title}
                 </h2>
