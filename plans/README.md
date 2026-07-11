@@ -9,7 +9,7 @@ Each executor: read the plan fully before starting, honor its STOP conditions, a
 | Plan | Title | Priority | Effort | Depends on | Status |
 |------|-------|----------|--------|------------|--------|
 | 001 | Upgrade Next.js past the current security advisories | P1 | S | - | DONE |
-| 002 | Add anti-abuse protection to company submission requests | P1 | M | - | TODO |
+| 002 | Add anti-abuse protection to company submission requests | P1 | M | - | DONE |
 | 003 | Verification baseline: CI, server-action tests, zero lint warnings | P1 | M | - | TODO |
 | 014 | Make the cursor.com event fetch resilient to malformed and drifted upstream data | P1 | S | - | DONE |
 | 004 | Remove dead code and misplaced dependencies | P2 | S | 001 (soft) | TODO |
