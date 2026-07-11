@@ -166,6 +166,7 @@ export function HomeEventsMap() {
   const [selectedCity, setSelectedCity] = useState<string | null>(null)
   const [boardOpen, setBoardOpen] = useState(false)
   const urlHydratedRef = useRef(false)
+  const [hasHydratedUrl, setHasHydratedUrl] = useState(false)
 
   const upcomingCities = useMemo(() => getUpcomingCities(), [])
   const allEvents = useMemo(
@@ -309,6 +310,10 @@ export function HomeEventsMap() {
         selectCity(matched)
       }
     }
+
+    // Mark after applying URL selection so the write effect cannot strip
+    // ?city= before selectedCity state catches up.
+    setHasHydratedUrl(true)
   }, [
     mapReady,
     searchParams,
@@ -319,6 +324,10 @@ export function HomeEventsMap() {
   ])
 
   useEffect(() => {
+    if (!hasHydratedUrl) {
+      return
+    }
+
     const nextQuery = buildHomeMapQuery({
       selectedCity,
       view,
@@ -332,7 +341,7 @@ export function HomeEventsMap() {
 
     const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname
     window.history.replaceState(null, "", nextUrl)
-  }, [pathname, searchParams, selectedCity, view])
+  }, [hasHydratedUrl, pathname, searchParams, selectedCity, view])
 
   useEffect(() => {
     viewRef.current = view
