@@ -14,9 +14,10 @@
 - **Priority**: P3
 - **Effort**: M (spike; implementation estimated in the deliverable)
 - **Risk**: LOW (no production changes)
-- **Depends on**: none (plan 002 sharpens the same surface; read its plan file for context)
+- **Depends on**: none (plan 002 DONE — write this spike against post-002 company-request code)
 - **Category**: direction
 - **Planned at**: commit `ba0778c`, 2026-07-06
+- **Status**: DONE — executed 2026-07-11; commit `bc93afc`; merged to main as `6c3adbb`
 
 ## Why this matters
 

@@ -20,7 +20,7 @@ Each executor: read the plan fully before starting, honor its STOP conditions, a
 | 007 | Decompose the 1383-line map-shell.tsx | P3 | L | 003, 006 | TODO |
 | 008 | Refresh README and fix the stale genType command (amended 2026-07-11) | P2 | S | - | TODO |
 | 009 | Design spike: automated event sync and the second guild (amended 2026-07-11) | P3 | M | - | TODO |
-| 010 | Design spike: submission lifecycle (moderation, edit, withdrawal) | P3 | M | - | TODO |
+| 010 | Design spike: submission lifecycle (moderation, edit, withdrawal) | P3 | M | - | DONE (`bc93afc`; merged `6c3adbb`) |
 | 011 | Design spike: resolve the world-map experiments (largely superseded; amended 2026-07-11) | P3 | S | - | TODO |
 | 017 | Lay the SEO groundwork: sitemap, robots, per-city OpenGraph, structured data | P2 | M | - | TODO |
 | 018 | Design spike: company detail pages | P2 | M | 017 (soft) | TODO |
@@ -32,6 +32,7 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (with one-line reason) | REJE
 
 ## Reconciliation log
 
+- 2026-07-11 at `bc93afc` (`/improve execute 010`, grok 4.5): design spike APPROVED. Deliverable `docs/design/submission-lifecycle.md` (force-added because `.gitignore` ignores `docs/`). Recommendations: signed edit-link tokens for meetup self-service; CLI review script for company requests (no admin UI / no accounts). Also surfaced a DB city-check gap (`company_submission_requests` still `sf`/`toronto` only). Scope clean (docs only). Merged to main (`6c3adbb`); feature branch deleted.
 - 2026-07-11 at `9533c4a` (`/improve execute 005`, grok 4.5 high): drift check clean for in-scope sources (`events-world-map.tsx` deleted, out of scope). Executor landed four commits on `advisor/005-small-correctness-fixes` (nullable `meetupFromPublicRow` + caller filter, geocode/Turnstile `console.error` logging, cloud rAF reschedule). Reviewer re-ran greps, typecheck, test (43), lint; scope clean (`lib/use-city-meetups.ts` required by Step 1); APPROVED. Merged via PR #26; feature branch deleted.
 - 2026-07-11 at `c5c9021` (`/improve execute 004`): plan refreshed before dispatch. Original Step 4 (remove `shadcn` from dependencies) dropped — `app/globals.css` imports `shadcn/tailwind.css`, so the package is a build-time CSS dependency, not CLI-only. `dark:` utilities in `components/ui/button.tsx` noted as inert under `forcedTheme="light"` / `@custom-variant dark (&:is(.dark *))`; not a STOP. Scope narrowed to dead-file deletions + `next-themes` removal. Executor (Grok 4.5 high) landed three commits on `advisor/004-remove-dead-code`. Reviewer re-ran typecheck/test/lint/build; scope clean; APPROVED. Merged via PR #25 (`ab0a47e`); feature branch deleted.
 - 2026-07-11 at `643a83b` (`/improve execute 003`): plan refreshed before dispatch (Step 1 lint fix dropped — `events-world-map.tsx` deleted; lint already clean). Executor landed timezone edge tests, submit-helper tests, and `.github/workflows/ci.yml` on `advisor/003-verification-baseline`. Reviewer re-ran lint/typecheck/test/YAML parse; scope clean; APPROVED. Merged into main.
