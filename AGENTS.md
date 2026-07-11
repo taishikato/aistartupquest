@@ -70,7 +70,14 @@
 - Map rendering lives in `components/map-shell.tsx`.
 - Company logos are shown in both cards and map markers. Keep those in sync.
 - In Supabase client queries, prefer `.match()` over `.eq()`.
-- After changing Supabase schema or views, run `nr genType` and commit the updated `types/supabase.ts`.
+- After changing Supabase schema or views, run `pnpm genType` and commit the updated `types/supabase.ts`.
+
+### Event data pipelines
+
+- `pnpm fetch:cursor` scrapes cursor.com/community into `scripts/data/cursor-events.json`.
+- `pnpm import:cursor` upserts that file into the Supabase `meetups` table, which the six city pages read.
+- The top page reads `lib/data/cursor-community-events.json`, a separate hand-maintained file with a different shape (city coordinates plus per-event `company`).
+- `fetch:cursor` does not touch `lib/data/cursor-community-events.json`.
 
 
 
