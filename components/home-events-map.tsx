@@ -45,13 +45,15 @@ const FLAT_CAMERA = {
 }
 
 const IDLE_ROTATION_DEGREES_PER_FRAME = 0.015
-const TODAY = new Date().toISOString().slice(0, 10)
 
 function getUpcomingCities(): CityWithEvents[] {
+  // Compute per call so a long-lived server module does not keep a stale UTC day
+  // and mismatch the client's fresh evaluation during hydration.
+  const today = new Date().toISOString().slice(0, 10)
   const eventsByCity = new Map<string, CursorCommunityEvent[]>()
 
   ;(cursorCommunityEvents.events as CursorCommunityEvent[]).forEach((event) => {
-    if (event.date < TODAY) {
+    if (event.date < today) {
       return
     }
 
