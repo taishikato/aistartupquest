@@ -22,6 +22,9 @@ Each executor: read the plan fully before starting, honor its STOP conditions, a
 | 009 | Design spike: automated event sync and the second guild (amended 2026-07-11) | P3 | M | - | TODO |
 | 010 | Design spike: submission lifecycle (moderation, edit, withdrawal) | P3 | M | - | TODO |
 | 011 | Design spike: resolve the world-map experiments (largely superseded; amended 2026-07-11) | P3 | S | - | TODO |
+| 017 | Lay the SEO groundwork: sitemap, robots, per-city OpenGraph, structured data | P2 | M | - | TODO |
+| 018 | Design spike: company detail pages | P2 | M | 017 (soft) | TODO |
+| 019 | Make the top-page events map shareable (URL-synced selection) | P2 | M | 015, 016 (soft) | TODO |
 | 012 | Events-first top page | - | - | - | DONE (implemented by maintainer, `0e7beeb`) |
 | 013 | Event company tag design | - | - | - | DONE (implemented by maintainer, `40d8fab`, `16f120d`) |
 
@@ -37,7 +40,9 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (with one-line reason) | REJE
   - Plans 008 and 009 received premise updates for route changes (`/` is the events map; `/events` permanent-redirects) and for the new fetch pipeline.
   - New plans 014-016 cover the delta findings.
   - During the audit the maintainer committed `0adafe4` (removes the compact city-nav from `home-events-map.tsx`); plans 015/016 document it as expected drift from their `16f120d` line references.
-- Executable immediately: 001, 002, 003, 005, 008, 009, 010, 011, 014, 015.
+- Executable immediately: 001, 002, 003, 005, 008, 009, 010, 011, 014, 015, 017, 018.
+- 2026-07-11 at `d1a8440` (`/improve next`, direction-only audit): five grounded direction findings; the maintainer selected three for planning (017 SEO groundwork, 018 company-pages spike, 019 top-page deep links).
+  - Not selected, recorded for a future run: **surface the collected X handle with a proper column** (currently stored into `contact_email` at `app/actions/meetup-submit.ts:335` and shown only as an unlinked organizer-name fallback; S-M effort, needs a migration) and **city-follow + weekly digest spike** (stated Phase 2 retention priority; no code exists; L design spike).
 
 ## Dependency notes
 
@@ -49,6 +54,9 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (with one-line reason) | REJE
 - 002 and 010 touch the same submission surface: implement 002 (security fix) first; 010 is a design doc and should be written against post-002 code if 002 has landed.
 - 009 and 010 interact: guild imports publish immediately (trusted source); any moderation design from 010 must state that explicitly.
 - 014 hardens the script that 009's automation design will schedule; 014 first is preferred but not required.
+- 015, 016, and 019 all edit `components/home-events-map.tsx`; execute in that order (019's drift check anticipates the other two).
+- 018 designs against 017's `buildPageMetadata` helper and `app/sitemap.ts` when they exist; 017 first is preferred but not required.
+- 017 and plan 008 both touch product naming ("AI Startup Quest"); whichever lands second should keep the wording consistent.
 
 ## Audit coverage note
 
@@ -77,3 +85,6 @@ Recorded so nobody re-audits them:
 - **2026-07-11: city-sign markers effect rebuilds on `mapReady` change** (`home-events-map.tsx:416-436`): fires once per map instance for a static six-entry list; no churn in practice. Not worth changing.
 - **2026-07-11: `GuildBoardHeader`/`GuildBoardList` duplicated between desktop aside and mobile sheet**: intentional responsive composition of shared components, not duplication; the components ARE the extraction. Not a finding.
 - **2026-07-11: local event/city types re-declared in `home-events-map.tsx`** (vs `lib/cursor-events.ts` shapes): the shapes genuinely differ (`company`, coordinates); plan 015 moves them to `lib/cursor-community-events.ts` as the single source for the top-page dataset. Folded into 015, not a separate finding.
+- **2026-07-11 (direction audit): audio easter egg missing from the new top page** (theme player lives only in `city-map.tsx:193-243`): atmosphere polish, marginal product value; not planned.
+- **2026-07-11 (direction audit): `forcedTheme="light"` at `app/layout.tsx:76`** while the product is dark-pixel-only: a theming oddity, but proposing theme work contradicts the no-toggle rule and nothing visibly breaks; left alone deliberately.
+- **2026-07-11 (direction audit): "Built with Cursor" company layer**: explicitly rejected by the maintainer's strategy notes; never propose.
