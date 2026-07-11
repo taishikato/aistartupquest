@@ -1,11 +1,4 @@
-# AGENTS.md
-
-## Agent Roles
-
-- Claude (Fable 5) is the planner, reviewer, and manager of the main loop.
-- Codex is the IC (executor) for code changes.
-- Delegate code changes to Codex through the codex-plugin-cc plugin (https://github.com/openai/codex-plugin-cc/blob/main/README.md).
-- Claude reviews Codex's output before committing.
+# [AGENTS.md](http://AGENTS.md)
 
 ## Communication
 
@@ -18,12 +11,16 @@
 - The brand is a pixel-art RPG: users explore each city's AI ecosystem like a game world.
 - The map is powered by `maplibre-gl`.
 
+
+
 ## Brand Language
 
 - Core metaphor: cities are game worlds, startups are sprites/bosses on the map, meetups and events are quests on the guild notice board, event sources (e.g. Cursor) are guilds.
 - Use the game metaphor for atmosphere only: markers, frames, icons, pixel type, microcopy accents.
 - Action words stay plain and product-like (Register, RSVP, Search, Add meetup). Never make users decode game vocabulary to act.
 - City-level events hide the venue by design; frame it as part of the experience ("Venue shared after registration"), never as a limitation.
+
+
 
 ## Commands
 
@@ -32,6 +29,8 @@
 - Build: `pnpm build`
 - Lint: `pnpm lint`
 - Typecheck: `pnpm typecheck`
+
+
 
 ## UI Rules
 
@@ -45,12 +44,16 @@
 - When composing conditional `className` values in JavaScript or TypeScript, use the `cn` helper from `lib/utils.ts`.
 - In forms, label optional fields with `(optional)` next to the field name.
 
+
+
 ## Layout Rules
 
 - Do not allow the whole page to scroll.
 - The sidebar should scroll internally.
 - On first load, the map should show San Francisco as a whole, not jump to a single startup.
 - Map markers should remain visible in the initial viewport.
+
+
 
 ## Implementation Notes
 
@@ -69,8 +72,11 @@
 - In Supabase client queries, prefer `.match()` over `.eq()`.
 - After changing Supabase schema or views, run `nr genType` and commit the updated `types/supabase.ts`.
 
+
+
 ## Change Discipline
 
 - Prefer small, direct edits over broad redesigns.
 - Before changing shared styles, confirm whether the user wants that scope.
 - Do not edit `app/globals.css` unless the user explicitly asks for it.
+
