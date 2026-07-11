@@ -16,6 +16,7 @@
 - **Depends on**: none strictly; if plan 017 (SEO groundwork) has landed, design against its `buildPageMetadata` helper and `app/sitemap.ts`
 - **Category**: direction
 - **Planned at**: commit `d1a8440`, 2026-07-11
+- **Status**: DONE (STOP path) at commit `dcf8e21`, 2026-07-11 — deliverable `docs/design/company-pages.md`; URL scheme left to maintainer because slugs are `(city, slug)` unique only
 
 ## Why this matters
 

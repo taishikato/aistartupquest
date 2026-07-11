@@ -18,12 +18,12 @@ Each executor: read the plan fully before starting, honor its STOP conditions, a
 | 016 | Stop rebuilding every top-page event marker on each selection and keystroke | P2 | M | 015 (soft), 003 (soft) | TODO |
 | 006 | Stop rebuilding every map marker on each selection change (map-shell) | P2 | M | 003 | TODO |
 | 007 | Decompose the 1383-line map-shell.tsx | P3 | L | 003, 006 | TODO |
-| 008 | Refresh README and fix the stale genType command (amended 2026-07-11) | P2 | S | - | TODO |
-| 009 | Design spike: automated event sync and the second guild (amended 2026-07-11) | P3 | M | - | TODO |
+| 008 | Refresh README and fix the stale genType command (amended 2026-07-11) | P2 | S | - | DONE (merged PR #27) |
+| 009 | Design spike: automated event sync and the second guild (amended 2026-07-11) | P3 | M | - | DONE (merged PR #28; `docs/design/event-sync.md`) |
 | 010 | Design spike: submission lifecycle (moderation, edit, withdrawal) | P3 | M | - | DONE (`bc93afc`; merged `6c3adbb`) |
 | 011 | Design spike: resolve the world-map experiments (narrowed to `/map-libre`) | P3 | S | - | DONE (verified `37e60c2`: decision doc + `/map-libre` deleted) |
-| 017 | Lay the SEO groundwork: sitemap, robots, per-city OpenGraph, structured data | P2 | M | - | TODO |
-| 018 | Design spike: company detail pages | P2 | M | 017 (soft) | TODO |
+| 017 | Lay the SEO groundwork: sitemap, robots, per-city OpenGraph, structured data | P2 | M | - | BLOCKED (`NEXT_PUBLIC_SITE_URL` missing from `.env.local`) |
+| 018 | Design spike: company detail pages | P2 | M | 017 (soft) | DONE (verified `dcf8e21`: `docs/design/company-pages.md`; URL scheme blocked on `(city, slug)` uniqueness — maintainer pick) |
 | 019 | Make the top-page events map shareable (URL-synced selection) | P2 | M | 015, 016 (soft) | TODO |
 | 012 | Events-first top page | - | - | - | DONE (implemented by maintainer, `0e7beeb`) |
 | 013 | Event company tag design | - | - | - | DONE (implemented by maintainer, `40d8fab`, `16f120d`) |
@@ -32,6 +32,7 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (with one-line reason) | REJE
 
 ## Reconciliation log
 
+- 2026-07-11 (stash cleanup): dropped 5 obsolete `plans/` WIP stashes from prior merge/delete flows. They were older than main and would have regressed DONE rows (005/010/011/015). Recovered only missing index status: 008/009/018 → DONE, 017 → BLOCKED (missing `NEXT_PUBLIC_SITE_URL`).
 - 2026-07-11 (`/improve execute 015`, grok 4.5 review): extracted `getUpcomingCities` to `lib/cursor-community-events.ts` with 6 vitest cases; memoized `selectedCityEvents`; slimmed `cursor-community-events.json` (drop artLon/artLat, prune past events). Reviewer re-ran typecheck/test/lint/format:check/build; APPROVED. Merged to main; feature branch deleted.
 - 2026-07-11 at `37e60c2` (`/improve execute 011`, grok 4.5): decision doc `docs/design/world-map-consolidation.md` (DELETE verdict) + removed `app/map-libre/` and `components/map-libre-world-select.tsx`. Reviewer re-ran typecheck/test/lint/build; route list has no `/map-libre`; scope clean; APPROVED. Note: `docs/` is gitignored — executor force-added the decision doc so it is tracked.
 - 2026-07-11 at `bc93afc` (`/improve execute 010`, grok 4.5): design spike APPROVED. Deliverable `docs/design/submission-lifecycle.md` (force-added because `.gitignore` ignores `docs/`). Recommendations: signed edit-link tokens for meetup self-service; CLI review script for company requests (no admin UI / no accounts). Also surfaced a DB city-check gap (`company_submission_requests` still `sf`/`toronto` only). Scope clean (docs only). Merged to main (`6c3adbb`); feature branch deleted.
