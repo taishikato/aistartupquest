@@ -13,7 +13,7 @@ Each executor: read the plan fully before starting, honor its STOP conditions, a
 | 003 | Verification baseline: CI, server-action tests, zero lint warnings | P1 | M | - | DONE |
 | 014 | Make the cursor.com event fetch resilient to malformed and drifted upstream data | P1 | S | - | DONE |
 | 004 | Remove dead code and misplaced dependencies | P2 | S | 001 (soft) | DONE |
-| 005 | Small correctness and observability fixes (bundle) | P2 | S | - | TODO |
+| 005 | Small correctness and observability fixes (bundle) | P2 | S | - | DONE |
 | 015 | Extract and unit-test the top page's upcoming-events logic; slim its client payload | P2 | S | - | TODO |
 | 016 | Stop rebuilding every top-page event marker on each selection and keystroke | P2 | M | 015 (soft), 003 (soft) | TODO |
 | 006 | Stop rebuilding every map marker on each selection change (map-shell) | P2 | M | 003 | TODO |
@@ -32,6 +32,7 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (with one-line reason) | REJE
 
 ## Reconciliation log
 
+- 2026-07-11 at `9533c4a` (`/improve execute 005`, grok 4.5 high): drift check clean for in-scope sources (`events-world-map.tsx` deleted, out of scope). Executor landed four commits on `advisor/005-small-correctness-fixes` (nullable `meetupFromPublicRow` + caller filter, geocode/Turnstile `console.error` logging, cloud rAF reschedule). Reviewer re-ran greps, typecheck, test (43), lint; scope clean (`lib/use-city-meetups.ts` required by Step 1); APPROVED. Merged via PR #26; feature branch deleted.
 - 2026-07-11 at `c5c9021` (`/improve execute 004`): plan refreshed before dispatch. Original Step 4 (remove `shadcn` from dependencies) dropped — `app/globals.css` imports `shadcn/tailwind.css`, so the package is a build-time CSS dependency, not CLI-only. `dark:` utilities in `components/ui/button.tsx` noted as inert under `forcedTheme="light"` / `@custom-variant dark (&:is(.dark *))`; not a STOP. Scope narrowed to dead-file deletions + `next-themes` removal. Executor (Grok 4.5 high) landed three commits on `advisor/004-remove-dead-code`. Reviewer re-ran typecheck/test/lint/build; scope clean; APPROVED. Merged via PR #25 (`ab0a47e`); feature branch deleted.
 - 2026-07-11 at `643a83b` (`/improve execute 003`): plan refreshed before dispatch (Step 1 lint fix dropped — `events-world-map.tsx` deleted; lint already clean). Executor landed timezone edge tests, submit-helper tests, and `.github/workflows/ci.yml` on `advisor/003-verification-baseline`. Reviewer re-ran lint/typecheck/test/YAML parse; scope clean; APPROVED. Merged into main.
 - 2026-07-10 at `ba0778c`: all 11 plans remained TODO; no source drift from the planning commit; plan 001 refreshed for newer Next.js advisories (minimum safe version `16.2.6`).

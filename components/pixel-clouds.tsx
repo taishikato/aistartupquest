@@ -211,6 +211,7 @@ export function PixelClouds({ map }: PixelCloudsProps) {
       try {
         bounds = map.getBounds()
       } catch {
+        frameRef.current = requestAnimationFrame(animate)
         return
       }
 

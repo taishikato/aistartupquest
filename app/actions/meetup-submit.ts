@@ -100,8 +100,12 @@ async function verifyTurnstile(
     }
   )
 
-  const data = (await res.json()) as { success?: boolean }
+  const data = (await res.json()) as {
+    success?: boolean
+    "error-codes"?: string[]
+  }
   if (!data.success) {
+    console.error("turnstile verification failed", data["error-codes"])
     return { ok: false, message: "Bot verification failed. Please try again." }
   }
 
@@ -298,7 +302,8 @@ export async function submitMeetup(
   let coords: { lat: number; lng: number } | null
   try {
     coords = await geocodeWithGoogle(query)
-  } catch {
+  } catch (error) {
+    console.error("geocodeWithGoogle failed", { query, error })
     return {
       status: "error",
       message: "Location lookup is temporarily unavailable. Try again later.",

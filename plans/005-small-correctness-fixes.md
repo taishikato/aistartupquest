@@ -18,6 +18,7 @@
 - **Depends on**: none
 - **Category**: bug
 - **Planned at**: commit `ba0778c`, 2026-07-06
+- **Status**: DONE (executed 2026-07-11 on `advisor/005-small-correctness-fixes`, tip `9533c4a`)
 
 ## Why this matters
 

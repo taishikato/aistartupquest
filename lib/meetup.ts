@@ -81,18 +81,37 @@ export function meetupFromRow(row: MeetupRow): Meetup {
   }
 }
 
-export function meetupFromPublicRow(row: PublicMeetupRow): Meetup {
+export function meetupFromPublicRow(row: PublicMeetupRow): Meetup | null {
+  if (
+    row.slug == null ||
+    row.city == null ||
+    row.title == null ||
+    row.description == null ||
+    row.venue_name == null ||
+    row.location_label == null ||
+    row.longitude == null ||
+    row.latitude == null ||
+    row.event_date == null ||
+    row.event_url == null ||
+    row.status == null
+  ) {
+    console.error("published_upcoming_meetups row missing required field", {
+      slug: row.slug,
+    })
+    return null
+  }
+
   return {
-    slug: row.slug as string,
+    slug: row.slug,
     city: row.city as CityId,
-    title: row.title as string,
-    description: row.description as string,
-    venueName: row.venue_name as string,
-    locationLabel: row.location_label as string,
-    coordinates: [row.longitude as number, row.latitude as number],
-    eventDate: row.event_date as string,
+    title: row.title,
+    description: row.description,
+    venueName: row.venue_name,
+    locationLabel: row.location_label,
+    coordinates: [row.longitude, row.latitude],
+    eventDate: row.event_date,
     organizerName: row.organizer_name,
-    eventUrl: row.event_url as string,
+    eventUrl: row.event_url,
     contactEmail: null,
     status: row.status as MeetupStatus,
     source: (row.source ?? "community") as MeetupSource,

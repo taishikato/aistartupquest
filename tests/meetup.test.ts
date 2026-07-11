@@ -45,8 +45,29 @@ describe("meetupFromPublicRow", () => {
       source: null,
       location_precision: null,
     })
-    expect(meetup.source).toBe("community")
-    expect(meetup.locationPrecision).toBe("exact")
+    expect(meetup).not.toBeNull()
+    expect(meetup!.source).toBe("community")
+    expect(meetup!.locationPrecision).toBe("exact")
+  })
+
+  it("returns null when a required field is null", () => {
+    const meetup = meetupFromPublicRow({
+      slug: "s",
+      city: "sf",
+      title: null,
+      description: "d",
+      venue_name: "v",
+      location_label: "l",
+      latitude: 1,
+      longitude: 2,
+      event_date: "2026-08-01",
+      organizer_name: null,
+      event_url: "https://example.com",
+      status: "published",
+      source: null,
+      location_precision: null,
+    })
+    expect(meetup).toBeNull()
   })
 })
 
