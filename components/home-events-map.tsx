@@ -714,7 +714,16 @@ function GuildBoardList({
                   >
                     {format(new Date(`${event.date}T00:00:00`), "MMM d")}
                   </time>
-                  <span className="border-2 border-[#1a1a2e] bg-[#ead9ab] px-1.5 py-0.5 font-(family-name:--font-pixel) text-[8px] leading-3 text-[#95602f]">
+                  <span className="inline-flex items-center gap-1 border-2 border-[#1a1a2e] bg-[#ead9ab] px-1.5 py-0.5 font-(family-name:--font-pixel) text-[8px] leading-3 text-[#95602f]">
+                    {event.company === "Cursor" ? (
+                      <Image
+                        src="/cursor-icon.png"
+                        alt=""
+                        width={14}
+                        height={16}
+                        className="h-4 w-3.5"
+                      />
+                    ) : null}
                     {event.company}
                   </span>
                 </div>
