@@ -71,6 +71,27 @@ export type Database = {
         }
         Relationships: []
       }
+      company_submission_attempts: {
+        Row: {
+          created_at: string
+          id: string
+          ip_hash: string
+          payload_hash: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_hash: string
+          payload_hash: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_hash?: string
+          payload_hash?: string
+        }
+        Relationships: []
+      }
       company_submission_requests: {
         Row: {
           category: string
