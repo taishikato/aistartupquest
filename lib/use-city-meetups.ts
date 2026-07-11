@@ -3,7 +3,11 @@
 import { useQuery } from "@tanstack/react-query"
 
 import type { CityId } from "@/lib/city-config"
-import { filterAndSortUpcomingMeetups, meetupFromPublicRow } from "@/lib/meetup"
+import {
+  filterAndSortUpcomingMeetups,
+  meetupFromPublicRow,
+  type Meetup,
+} from "@/lib/meetup"
 import { createClient } from "@/lib/supabase/client"
 
 const PUBLIC_MEETUP_COLUMNS =
@@ -26,7 +30,11 @@ export function useCityMeetups(city: CityId, enabled: boolean) {
         throw error
       }
 
-      return filterAndSortUpcomingMeetups((data ?? []).map(meetupFromPublicRow))
+      return filterAndSortUpcomingMeetups(
+        (data ?? [])
+          .map(meetupFromPublicRow)
+          .filter((m): m is Meetup => m !== null)
+      )
     },
   })
 }
