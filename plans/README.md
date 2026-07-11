@@ -14,7 +14,7 @@ Each executor: read the plan fully before starting, honor its STOP conditions, a
 | 014 | Make the cursor.com event fetch resilient to malformed and drifted upstream data | P1 | S | - | DONE |
 | 004 | Remove dead code and misplaced dependencies | P2 | S | 001 (soft) | DONE |
 | 005 | Small correctness and observability fixes (bundle) | P2 | S | - | DONE |
-| 015 | Extract and unit-test the top page's upcoming-events logic; slim its client payload | P2 | S | - | TODO |
+| 015 | Extract and unit-test the top page's upcoming-events logic; slim its client payload | P2 | S | - | DONE (verified: lib extract + 6 tests + JSON slim) |
 | 016 | Stop rebuilding every top-page event marker on each selection and keystroke | P2 | M | 015 (soft), 003 (soft) | TODO |
 | 006 | Stop rebuilding every map marker on each selection change (map-shell) | P2 | M | 003 | TODO |
 | 007 | Decompose the 1383-line map-shell.tsx | P3 | L | 003, 006 | TODO |
@@ -32,6 +32,7 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (with one-line reason) | REJE
 
 ## Reconciliation log
 
+- 2026-07-11 (`/improve execute 015`, grok 4.5 review): extracted `getUpcomingCities` to `lib/cursor-community-events.ts` with 6 vitest cases; memoized `selectedCityEvents`; slimmed `cursor-community-events.json` (drop artLon/artLat, prune past events). Reviewer re-ran typecheck/test/lint/format:check/build; APPROVED. Merged to main; feature branch deleted.
 - 2026-07-11 at `37e60c2` (`/improve execute 011`, grok 4.5): decision doc `docs/design/world-map-consolidation.md` (DELETE verdict) + removed `app/map-libre/` and `components/map-libre-world-select.tsx`. Reviewer re-ran typecheck/test/lint/build; route list has no `/map-libre`; scope clean; APPROVED. Note: `docs/` is gitignored — executor force-added the decision doc so it is tracked.
 - 2026-07-11 at `bc93afc` (`/improve execute 010`, grok 4.5): design spike APPROVED. Deliverable `docs/design/submission-lifecycle.md` (force-added because `.gitignore` ignores `docs/`). Recommendations: signed edit-link tokens for meetup self-service; CLI review script for company requests (no admin UI / no accounts). Also surfaced a DB city-check gap (`company_submission_requests` still `sf`/`toronto` only). Scope clean (docs only). Merged to main (`6c3adbb`); feature branch deleted.
 - 2026-07-11 at `9533c4a` (`/improve execute 005`, grok 4.5 high): drift check clean for in-scope sources (`events-world-map.tsx` deleted, out of scope). Executor landed four commits on `advisor/005-small-correctness-fixes` (nullable `meetupFromPublicRow` + caller filter, geocode/Turnstile `console.error` logging, cloud rAF reschedule). Reviewer re-ran greps, typecheck, test (43), lint; scope clean (`lib/use-city-meetups.ts` required by Step 1); APPROVED. Merged via PR #26; feature branch deleted.

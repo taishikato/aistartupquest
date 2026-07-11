@@ -22,6 +22,7 @@
 - **Depends on**: none (plan 016 touches the same file — do not run both concurrently; 015 first)
 - **Category**: tests + perf
 - **Planned at**: commit `16f120d`, 2026-07-11
+- **Status**: DONE (merged to main; feature branch deleted)
 
 ## Why this matters
 
