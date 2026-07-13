@@ -22,7 +22,7 @@ Each executor: read the plan fully before starting, honor its STOP conditions, a
 | 009 | Design spike: automated event sync and the second guild (amended 2026-07-11) | P3 | M | - | DONE (merged PR #28; `docs/design/event-sync.md`) |
 | 010 | Design spike: submission lifecycle (moderation, edit, withdrawal) | P3 | M | - | DONE (`bc93afc`; merged `6c3adbb`) |
 | 011 | Design spike: resolve the world-map experiments (narrowed to `/map-libre`) | P3 | S | - | DONE (verified `37e60c2`: decision doc + `/map-libre` deleted) |
-| 017 | Lay the SEO groundwork: sitemap, robots, per-city OpenGraph, structured data | P2 | M | - | BLOCKED (`NEXT_PUBLIC_SITE_URL` missing from `.env.local`) |
+| 017 | Lay the SEO groundwork: sitemap, robots, per-city OpenGraph, structured data | P2 | M | - | DONE (verified on `advisor/017-seo-groundwork` @ `50785d4b`; 4 commits) |
 | 018 | Design spike: company detail pages | P2 | M | 017 (soft) | DONE (verified `dcf8e21`: `docs/design/company-pages.md`; URL scheme blocked on `(city, slug)` uniqueness — maintainer pick) |
 | 019 | Make the top-page events map shareable (URL-synced selection) | P2 | M | 015, 016 (soft) | DONE (verified `af91afe5`: `?city=` / `?view=globe` on `/`) |
 | 012 | Events-first top page | - | - | - | DONE (implemented by maintainer, `0e7beeb`) |
@@ -32,6 +32,8 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (with one-line reason) | REJE
 
 ## Reconciliation log
 
+- 2026-07-13 (`/improve execute 017`, Grok 4.5): APPROVED. Worktree `/Users/taishikato/.cursor/worktrees/aistartupquest/017-seo-groundwork`, branch `advisor/017-seo-groundwork`, commits `94cd6b5f` → `25a7fe99` → `4096fe32` → `50785d4b`. Reviewer re-ran typecheck/test(58)/lint/build; curl: sitemap 7 urls, robots Sitemap 1, og:image on cities, JSON-LD on `/` + 6 cities. Scope clean (+ allowed `lib/structured-data.ts`). Pre-existing `lib/city-config.ts` emptyStateTitle still says "SF AI Startup Map" (out of scope). Merged via PR #30 (`e20d997e`); feature branch deleted.
+- 2026-07-13 (`/improve execute 017`): STOPPED before dispatch. STOP condition still holds — `NEXT_PUBLIC_SITE_URL` absent from `.env.local` (and no other `.env*`). In-scope drift since `d1a8440` is cosmetic to this plan (ThemeProvider removal, top-page Suspense); metadata excerpts still match. Status remains BLOCKED.
 - 2026-07-11 (stash cleanup): dropped 5 obsolete `plans/` WIP stashes from prior merge/delete flows. They were older than main and would have regressed DONE rows (005/010/011/015). Recovered only missing index status: 008/009/018 → DONE, 017 → BLOCKED (missing `NEXT_PUBLIC_SITE_URL`).
 - 2026-07-11 (`/improve execute 015`, grok 4.5 review): extracted `getUpcomingCities` to `lib/cursor-community-events.ts` with 6 vitest cases; memoized `selectedCityEvents`; slimmed `cursor-community-events.json` (drop artLon/artLat, prune past events). Reviewer re-ran typecheck/test/lint/format:check/build; APPROVED. Merged to main; feature branch deleted.
 - 2026-07-11 at `37e60c2` (`/improve execute 011`, grok 4.5): decision doc `docs/design/world-map-consolidation.md` (DELETE verdict) + removed `app/map-libre/` and `components/map-libre-world-select.tsx`. Reviewer re-ran typecheck/test/lint/build; route list has no `/map-libre`; scope clean; APPROVED. Note: `docs/` is gitignored — executor force-added the decision doc so it is tracked.

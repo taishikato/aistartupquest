@@ -19,7 +19,7 @@
 - **Depends on**: none (plan 018's company-page spike EXTENDS this later; do not wait for it)
 - **Category**: direction (SEO)
 - **Planned at**: commit `d1a8440`, 2026-07-11
-- **Execute attempt**: 2026-07-11 — STOPPED before dispatch. `NEXT_PUBLIC_SITE_URL` not present in `.env.local` (key count 0). Set the production site origin, then re-run `/improve execute 017`.
+- **Execute attempt**: 2026-07-13 — DONE / APPROVED. Branch `advisor/017-seo-groundwork` @ `50785d4b` (4 step commits). Reviewer re-verified typecheck/test/lint/build + curl done criteria.
 
 ## Why this matters
 
