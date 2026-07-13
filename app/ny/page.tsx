@@ -3,13 +3,15 @@ import type { Metadata } from "next"
 
 import { nyMapConfig } from "@/lib/city-config"
 import { loadCityMapPageData } from "@/lib/city-page-data"
+import { buildPageMetadata } from "@/lib/config"
 import { CityMap } from "@/components/city-map"
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "New York AI Startup Map: Explore AI Native Startups in New York",
   description:
     "Browse AI-native startups across New York on an interactive retro map, with category filters, source-backed locations, and direct company links.",
-}
+  path: "/ny",
+})
 
 export default async function Page() {
   const { companies } = await loadCityMapPageData("ny")
