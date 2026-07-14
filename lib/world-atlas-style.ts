@@ -1,5 +1,7 @@
 import type { Map as MapLibreMap, StyleSpecification } from "maplibre-gl"
 
+import { setPaintPropertyIfLayerExists } from "@/lib/map-paint"
+
 export const WORLD_ATLAS_STYLE_URL =
   "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
 
@@ -13,19 +15,6 @@ export async function loadWorldAtlasStyle(
   }
 
   return (await response.json()) as StyleSpecification
-}
-
-function setPaintPropertyIfLayerExists(
-  map: MapLibreMap,
-  layerId: string,
-  property: string,
-  value: unknown
-) {
-  if (!map.getLayer(layerId)) {
-    return
-  }
-
-  map.setPaintProperty(layerId, property, value)
 }
 
 export function applyRpgAtlasPaint(map: MapLibreMap) {
