@@ -44,7 +44,6 @@ export type CityMapConfig = {
   titleLines: [string, string]
   emptyStateTitle: string
   searchPlaceholder: string
-  meetupSearchPlaceholder: string
   initialSelectedSlug: string
   mapCenter: [number, number]
   sourceHref: string
@@ -57,7 +56,6 @@ export const sfMapConfig: CityMapConfig = {
   titleLines: ["SF AI", "Startup Map"],
   emptyStateTitle: "SF AI Startup Map",
   searchPlaceholder: "OpenAI, agents, voice...",
-  meetupSearchPlaceholder: "Meetup title, venue, topic...",
   initialSelectedSlug: "openai",
   mapCenter: [-122.4167, 37.7793],
   sourceHref: "https://github.com/taishikato/aistartupquest",
@@ -101,7 +99,6 @@ export const torontoMapConfig: CityMapConfig = {
   titleLines: ["Toronto AI", "Startup Map"],
   emptyStateTitle: "Toronto AI Startup Map",
   searchPlaceholder: "Cohere, agents, health...",
-  meetupSearchPlaceholder: "Meetup title, venue, topic...",
   initialSelectedSlug: "cohere",
   mapCenter: [-79.3832, 43.6532],
   sourceHref: "https://github.com/taishikato/aistartupquest",
@@ -145,7 +142,6 @@ export const nyMapConfig: CityMapConfig = {
   titleLines: ["NY AI", "Startup Map"],
   emptyStateTitle: "New York AI Startup Map",
   searchPlaceholder: "Runway, agents, fintech...",
-  meetupSearchPlaceholder: "Meetup title, venue, topic...",
   initialSelectedSlug: "runway",
   mapCenter: [-74.006, 40.7128],
   sourceHref: "https://github.com/taishikato/aistartupquest",
@@ -189,7 +185,6 @@ export const londonMapConfig: CityMapConfig = {
   titleLines: ["London AI", "Startup Map"],
   emptyStateTitle: "London AI Startup Map",
   searchPlaceholder: "PolyAI, legal, agents...",
-  meetupSearchPlaceholder: "Meetup title, venue, topic...",
   initialSelectedSlug: "polyai",
   mapCenter: [-0.1278, 51.5074],
   sourceHref: "https://github.com/taishikato/aistartupquest",
@@ -233,7 +228,6 @@ export const vancouverMapConfig: CityMapConfig = {
   titleLines: ["Vancouver AI", "Startup Map"],
   emptyStateTitle: "Vancouver AI Startup Map",
   searchPlaceholder: "robotics, mining, waste...",
-  meetupSearchPlaceholder: "Meetup title, venue, topic...",
   initialSelectedSlug: "sanctuary-ai",
   mapCenter: [-123.1207, 49.2827],
   sourceHref: "https://github.com/taishikato/aistartupquest",
@@ -277,7 +271,6 @@ export const tokyoMapConfig: CityMapConfig = {
   titleLines: ["Tokyo AI", "Startup Map"],
   emptyStateTitle: "Tokyo AI Startup Map",
   searchPlaceholder: "Sakana, legal, healthcare...",
-  meetupSearchPlaceholder: "Meetup title, venue, topic...",
   initialSelectedSlug: "sakana-ai",
   mapCenter: [139.767, 35.6804],
   sourceHref: "https://github.com/taishikato/aistartupquest",

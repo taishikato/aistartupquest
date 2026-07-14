@@ -1,11 +1,6 @@
 "use client"
 
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react"
+import { useEffect, useRef, useState } from "react"
 import { Github, Volume2, VolumeX } from "lucide-react"
 import maplibregl, {
   type Map as MapLibreMap,
@@ -15,39 +10,19 @@ import maplibregl, {
 import type { CityMapConfig } from "@/lib/city-config"
 import { type Company } from "@/lib/company"
 import { useMapMarkers } from "@/components/map-markers/use-map-markers"
-import {
-  addVoxelCityLayers,
-  applyMinecraftStyle,
-} from "@/lib/map-paint"
-import {
-  spreadOverlappingMeetups,
-  type DiscoveryMode,
-  type Meetup,
-} from "@/lib/meetup"
+import { addVoxelCityLayers, applyMinecraftStyle } from "@/lib/map-paint"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { CompanyAddInvite } from "@/components/company-add-invite"
-import { MeetupRequestPanel } from "@/components/meetup-request-panel"
 import { PixelClouds } from "@/components/pixel-clouds"
 
 type MapShellProps = {
-  mode: DiscoveryMode
   companies: Company[]
-  meetups: Meetup[]
   selectedCompany: Company
-  selectedMeetup: Meetup | null
   config: CityMapConfig
   onSelectCompany: (slug: string) => void
-  onSelectMeetup: (slug: string) => void
   isAudioMuted: boolean
   onToggleMute: () => void
-}
-
-function cityHrefWithMode(baseHref: string, mapMode: DiscoveryMode) {
-  if (mapMode === "meetups") {
-    return baseHref === "/" ? "/?mode=meetups" : `${baseHref}?mode=meetups`
-  }
-  return baseHref
 }
 
 const MAP_STYLE_URL =
@@ -72,14 +47,10 @@ async function loadMapStyle(signal: AbortSignal): Promise<StyleSpecification> {
 }
 
 export function MapShell({
-  mode,
   companies,
-  meetups,
   selectedCompany,
-  selectedMeetup,
   config,
   onSelectCompany,
-  onSelectMeetup,
   isAudioMuted,
   onToggleMute,
 }: MapShellProps) {
@@ -89,11 +60,6 @@ export function MapShell({
   const initialCenterRef = useRef(config.mapCenter)
   const [mapReady, setMapReady] = useState<MapLibreMap | null>(null)
   const denseStartups = companies.length >= 60
-  const denseMeetups = meetups.length >= 60
-  const spreadMeetups = useMemo(
-    () => spreadOverlappingMeetups(meetups),
-    [meetups]
-  )
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) {
@@ -162,15 +128,10 @@ export function MapShell({
 
   useMapMarkers({
     mapReady,
-    mode,
     companies,
-    spreadMeetups,
     denseStartups,
-    denseMeetups,
     selectedCompany,
-    selectedMeetup,
     onSelectCompany,
-    onSelectMeetup,
   })
 
   useEffect(() => {
@@ -184,17 +145,8 @@ export function MapShell({
       return
     }
 
-    const nextCenter =
-      mode === "startups"
-        ? selectedCompany.coordinates
-        : selectedMeetup?.coordinates
-
-    if (!nextCenter) {
-      return
-    }
-
     map.flyTo({
-      center: nextCenter,
+      center: selectedCompany.coordinates,
       zoom: map.getZoom(),
       pitch: MAP_PITCH,
       bearing: MAP_BEARING,
@@ -202,7 +154,7 @@ export function MapShell({
       curve: 1.2,
       essential: true,
     })
-  }, [mode, selectedCompany, selectedMeetup])
+  }, [selectedCompany])
 
   return (
     <div className="relative h-full min-h-0 overflow-hidden bg-[#cdb98b] lg:min-h-160">
@@ -222,11 +174,7 @@ export function MapShell({
         />
       </div>
       {mapReady && <PixelClouds map={mapReady} />}
-      {mode === "startups" ? (
-        <CompanyAddInvite />
-      ) : (
-        <MeetupRequestPanel initialCity={config.city} />
-      )}
+      <CompanyAddInvite />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#fff3cf]/35 to-transparent" />
       <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
         <Button
@@ -256,7 +204,7 @@ export function MapShell({
         {config.switchOptions.map((option) => (
           <a
             key={option.city}
-            href={cityHrefWithMode(option.href, mode)}
+            href={option.href}
             className="flex size-10 items-center justify-center border-[3px] border-[#342414] bg-[#f4ecd2] text-[#4c3926] shadow-[4px_4px_0px_#342414] transition-colors hover:bg-[#e7d8ae]"
             aria-label={option.ariaLabel}
           >
