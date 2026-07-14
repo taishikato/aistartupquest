@@ -26,7 +26,7 @@ import {
 } from "@/lib/meetup"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { CompanyRequestPanel } from "@/components/company-request-panel"
+import { CompanyAddInvite } from "@/components/company-add-invite"
 import { MeetupRequestPanel } from "@/components/meetup-request-panel"
 import { PixelClouds } from "@/components/pixel-clouds"
 
@@ -223,7 +223,7 @@ export function MapShell({
       </div>
       {mapReady && <PixelClouds map={mapReady} />}
       {mode === "startups" ? (
-        <CompanyRequestPanel initialCity={config.city} />
+        <CompanyAddInvite />
       ) : (
         <MeetupRequestPanel initialCity={config.city} />
       )}
