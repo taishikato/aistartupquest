@@ -39,6 +39,12 @@ const FLAT_CAMERA = {
 
 const IDLE_ROTATION_DEGREES_PER_FRAME = 0.015
 
+type EventMarkerEntry = {
+  marker: Marker
+  root: HTMLButtonElement
+  count: HTMLSpanElement
+}
+
 function createEventCityMarker({
   city,
   active,
@@ -47,7 +53,7 @@ function createEventCityMarker({
   city: CityWithEvents
   active: boolean
   onSelectCity: (city: CityWithEvents) => void
-}) {
+}): { root: HTMLButtonElement; count: HTMLSpanElement } {
   const button = document.createElement("button")
   button.type = "button"
   button.className = active
@@ -98,7 +104,12 @@ function createEventCityMarker({
   button.append(body)
   button.addEventListener("click", () => onSelectCity(city))
 
-  return button
+  return { root: button, count }
+}
+
+function setEventMarkerActive(root: HTMLButtonElement, active: boolean) {
+  root.classList.toggle("is-active", active)
+  root.style.zIndex = active ? "20" : "1"
 }
 
 function createCityMarker(city: WorldStageCity) {
@@ -153,11 +164,13 @@ export function HomeEventsMap() {
   const searchParams = useSearchParams()
   const containerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<MapLibreMap | null>(null)
-  const eventMarkersRef = useRef<Marker[]>([])
+  const eventMarkersRef = useRef<Map<string, EventMarkerEntry>>(new Map())
   const cityMarkersRef = useRef<Marker[]>([])
   const rotationFrameRef = useRef<number | null>(null)
   const rotationStoppedByUserRef = useRef(false)
   const viewRef = useRef<WorldView>(parseHomeMapView(searchParams.get("view")))
+  const selectedCityRef = useRef<string | null>(null)
+  const previousSelectedCityRef = useRef<string | null>(null)
   const [mapReady, setMapReady] = useState<MapLibreMap | null>(null)
   const [view, setView] = useState<WorldView>(() =>
     parseHomeMapView(searchParams.get("view"))
@@ -167,6 +180,8 @@ export function HomeEventsMap() {
   const [boardOpen, setBoardOpen] = useState(false)
   const urlHydratedRef = useRef(false)
   const [hasHydratedUrl, setHasHydratedUrl] = useState(false)
+
+  selectedCityRef.current = selectedCity
 
   const upcomingCities = useMemo(() => getUpcomingCities(), [])
   const allEvents = useMemo(
@@ -359,6 +374,7 @@ export function HomeEventsMap() {
       type: keyof HTMLElementEventMap
       listener: EventListener
     }> = []
+    const eventMarkers = eventMarkersRef.current
 
     const stopRotationPermanently = () => {
       rotationStoppedByUserRef.current = true
@@ -443,9 +459,9 @@ export function HomeEventsMap() {
       canvasListeners.forEach(({ type, listener }) => {
         mapRef.current?.getCanvas().removeEventListener(type, listener)
       })
-      eventMarkersRef.current.forEach((marker) => marker.remove())
+      eventMarkers.forEach((entry) => entry.marker.remove())
       cityMarkersRef.current.forEach((marker) => marker.remove())
-      eventMarkersRef.current = []
+      eventMarkers.clear()
       cityMarkersRef.current = []
       mapRef.current?.remove()
       mapRef.current = null
@@ -480,26 +496,69 @@ export function HomeEventsMap() {
       return
     }
 
-    eventMarkersRef.current.forEach((marker) => marker.remove())
-    eventMarkersRef.current = filteredCities.map((city) =>
-      new maplibregl.Marker({
-        element: createEventCityMarker({
-          city,
-          active: city.name === selectedCity,
-          onSelectCity: selectCity,
-        }),
+    const markers = eventMarkersRef.current
+    const nextNames = new Set(filteredCities.map((city) => city.name))
+
+    markers.forEach((entry, name) => {
+      if (!nextNames.has(name)) {
+        entry.marker.remove()
+        markers.delete(name)
+      }
+    })
+
+    filteredCities.forEach((city) => {
+      const existing = markers.get(city.name)
+
+      if (existing) {
+        existing.count.textContent = String(city.events.length)
+        return
+      }
+
+      const { root, count } = createEventCityMarker({
+        city,
+        active: city.name === selectedCityRef.current,
+        onSelectCity: selectCity,
+      })
+
+      const marker = new maplibregl.Marker({
+        element: root,
         anchor: "bottom",
         opacityWhenCovered: "0",
       })
         .setLngLat([city.lon, city.lat])
         .addTo(mapReady)
-    )
 
-    return () => {
-      eventMarkersRef.current.forEach((marker) => marker.remove())
-      eventMarkersRef.current = []
+      markers.set(city.name, { marker, root, count })
+    })
+
+    // Full marker teardown lives in the map-init effect so search/selection
+    // churn can keep DOM identity for surviving cities.
+  }, [filteredCities, mapReady, selectCity])
+
+  useEffect(() => {
+    if (!mapReady) {
+      return
     }
-  }, [filteredCities, mapReady, selectCity, selectedCity])
+
+    const markers = eventMarkersRef.current
+    const previous = previousSelectedCityRef.current
+
+    if (previous && previous !== selectedCity) {
+      const entry = markers.get(previous)
+      if (entry) {
+        setEventMarkerActive(entry.root, false)
+      }
+    }
+
+    if (selectedCity) {
+      const entry = markers.get(selectedCity)
+      if (entry) {
+        setEventMarkerActive(entry.root, true)
+      }
+    }
+
+    previousSelectedCityRef.current = selectedCity
+  }, [selectedCity, mapReady])
 
   return (
     <main className="relative h-dvh overflow-hidden bg-[#151527] text-[#1a1a2e]">
