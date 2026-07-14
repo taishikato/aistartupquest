@@ -9,7 +9,6 @@ import "./globals.css"
 
 import { ogImage, pageDescription, pageTitle, siteUrl } from "@/lib/config"
 import { cn } from "@/lib/utils"
-import { QueryProvider } from "@/components/query-provider"
 
 export const metadata: Metadata = {
   metadataBase: siteUrl ? new URL(siteUrl) : undefined,
@@ -69,7 +68,7 @@ export default function RootLayout({
     >
       <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
       <body>
-        <QueryProvider>{children}</QueryProvider>
+        {children}
         <Analytics />
       </body>
     </html>

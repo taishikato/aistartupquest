@@ -52,7 +52,6 @@ export type CityMapConfig = {
 
 export const sfMapConfig: CityMapConfig = {
   city: "sf",
-  timezone: "America/Los_Angeles",
   titleLines: ["SF AI", "Startup Map"],
   emptyStateTitle: "SF AI Startup Map",
   searchPlaceholder: "OpenAI, agents, voice...",
@@ -95,7 +94,6 @@ export const sfMapConfig: CityMapConfig = {
 
 export const torontoMapConfig: CityMapConfig = {
   city: "toronto",
-  timezone: "America/Toronto",
   titleLines: ["Toronto AI", "Startup Map"],
   emptyStateTitle: "Toronto AI Startup Map",
   searchPlaceholder: "Cohere, agents, health...",
@@ -138,7 +136,6 @@ export const torontoMapConfig: CityMapConfig = {
 
 export const nyMapConfig: CityMapConfig = {
   city: "ny",
-  timezone: "America/New_York",
   titleLines: ["NY AI", "Startup Map"],
   emptyStateTitle: "New York AI Startup Map",
   searchPlaceholder: "Runway, agents, fintech...",
@@ -181,7 +178,6 @@ export const nyMapConfig: CityMapConfig = {
 
 export const londonMapConfig: CityMapConfig = {
   city: "london",
-  timezone: "Europe/London",
   titleLines: ["London AI", "Startup Map"],
   emptyStateTitle: "London AI Startup Map",
   searchPlaceholder: "PolyAI, legal, agents...",
@@ -224,7 +220,6 @@ export const londonMapConfig: CityMapConfig = {
 
 export const vancouverMapConfig: CityMapConfig = {
   city: "vancouver",
-  timezone: "America/Vancouver",
   titleLines: ["Vancouver AI", "Startup Map"],
   emptyStateTitle: "Vancouver AI Startup Map",
   searchPlaceholder: "robotics, mining, waste...",
@@ -267,7 +262,6 @@ export const vancouverMapConfig: CityMapConfig = {
 
 export const tokyoMapConfig: CityMapConfig = {
   city: "tokyo",
-  timezone: "Asia/Tokyo",
   titleLines: ["Tokyo AI", "Startup Map"],
   emptyStateTitle: "Tokyo AI Startup Map",
   searchPlaceholder: "Sakana, legal, healthcare...",
