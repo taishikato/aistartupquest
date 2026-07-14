@@ -7,7 +7,7 @@
 
 ## Project Overview
 
-- This project is a Next.js 16 app for browsing AI startups and community events on city maps (SF, Toronto, NY, London, Vancouver, Tokyo).
+- This project is a Next.js 16 app for browsing AI startups on city maps (SF, Toronto, NY, London, Vancouver, Tokyo) and community events on the home page.
 - The brand is a pixel-art RPG: users explore each city's AI ecosystem like a game world.
 - The map is powered by `maplibre-gl`.
 
@@ -15,9 +15,9 @@
 
 ## Brand Language
 
-- Core metaphor: cities are game worlds, startups are sprites/bosses on the map, meetups and events are quests on the guild notice board, event sources (e.g. Cursor) are guilds.
+- Core metaphor: cities are game worlds, startups are sprites/bosses on the map, community events are quests on the guild notice board, event sources (e.g. Cursor) are guilds.
 - Use the game metaphor for atmosphere only: markers, frames, icons, pixel type, microcopy accents.
-- Action words stay plain and product-like (Register, RSVP, Search, Add meetup). Never make users decode game vocabulary to act.
+- Action words stay plain and product-like (Register, RSVP, Search). Never make users decode game vocabulary to act.
 - City-level events hide the venue by design; frame it as part of the experience ("Venue shared after registration"), never as a limitation.
 
 
@@ -57,14 +57,9 @@
 
 ## Implementation Notes
 
-- Startup data is loaded from the Supabase `companies` table in `app/page.tsx`.
-- Meetup data is loaded from the Supabase `published_upcoming_meetups` view.
-- Meetup submissions use the `submitMeetup` server action and are published immediately.
-- The meetup submission form should stay short: city, title, optional description, date only, address, link, and optional X account.
-- Meetup dates are stored as `event_date` (`date`) because the product does not collect meetup times.
-- Meetup `organizer_name` can be `null`; do not backfill a placeholder such as `Community`.
+- Startup data is loaded from the Supabase `companies` table for city pages.
+- City pages are startups-only. Community events live on `/` via `HomeEventsMap`.
 - Shared company types and helpers live in `lib/company.ts`.
-- Shared meetup types and helpers live in `lib/meetup.ts`.
 - Sidebar UI lives in `components/discovery-panel.tsx`.
 - Company cards live in `components/company-card.tsx`.
 - Map rendering lives in `components/map-shell.tsx`.
@@ -72,12 +67,9 @@
 - In Supabase client queries, prefer `.match()` over `.eq()`.
 - After changing Supabase schema or views, run `pnpm genType` and commit the updated `types/supabase.ts`.
 
-### Event data pipelines
+### Event data
 
-- `pnpm fetch:cursor` scrapes cursor.com/community into `scripts/data/cursor-events.json`.
-- `pnpm import:cursor` upserts that file into the Supabase `meetups` table, which the six city pages read.
-- The top page reads `lib/data/cursor-community-events.json`, a separate hand-maintained file with a different shape (city coordinates plus per-event `company`).
-- `fetch:cursor` does not touch `lib/data/cursor-community-events.json`.
+- The top page reads `lib/data/cursor-community-events.json`, a hand-maintained file with city coordinates plus per-event `company`.
 
 
 
@@ -86,4 +78,3 @@
 - Prefer small, direct edits over broad redesigns.
 - Before changing shared styles, confirm whether the user wants that scope.
 - Do not edit `app/globals.css` unless the user explicitly asks for it.
-

@@ -1,8 +1,5 @@
 export type CityId = "sf" | "toronto" | "ny" | "london" | "vancouver" | "tokyo"
 
-
-
-
 export type CitySwitchOption = {
   city: CityId
   href: string
@@ -12,8 +9,6 @@ export type CitySwitchOption = {
 
 export type CityMapConfig = {
   city: CityId
-  /** IANA timezone for meetup display and submission (city-local, not viewer). */
-  timezone: string
   titleLines: [string, string]
   emptyStateTitle: string
   searchPlaceholder: string
