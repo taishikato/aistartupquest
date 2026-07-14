@@ -19,7 +19,6 @@ import {
   type HomeMapView,
 } from "@/lib/home-map-url"
 import { cn } from "@/lib/utils"
-import { GLOBE_CAMERA } from "@/lib/world-art-map"
 import {
   applyRpgAtlasPaint,
   loadWorldAtlasStyle,
@@ -34,6 +33,12 @@ type WorldView = HomeMapView
 const FLAT_CAMERA = {
   center: [5, 14] as [number, number],
   zoom: 1.34,
+  minZoom: 1.2,
+}
+
+const GLOBE_CAMERA = {
+  center: [-40, 30] as [number, number],
+  zoom: 1.75,
   minZoom: 1.2,
 }
 
