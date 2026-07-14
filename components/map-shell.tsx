@@ -913,6 +913,7 @@ export function MapShell({
   const containerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<MapLibreMap | null>(null)
   const markersRef = useRef<Map<string, Marker>>(new Map())
+  const prevActiveSlugRef = useRef<string | null>(null)
   const hasInteractedRef = useRef(false)
   const hasRenderedMarkersRef = useRef(false)
   const mapMarkersSignatureRef = useRef("")
@@ -1140,6 +1141,7 @@ export function MapShell({
     }
 
     hasRenderedMarkersRef.current = true
+    prevActiveSlugRef.current = selectedSlugRef.current || null
     prevModeRef.current = mode
   }, [
     companies,
@@ -1153,24 +1155,54 @@ export function MapShell({
   ])
 
   useEffect(() => {
+    const activeSlug =
+      mode === "startups" ? selectedCompany.slug : (selectedMeetup?.slug ?? null)
+    const prevSlug = prevActiveSlugRef.current
+
+    if (prevSlug === activeSlug) {
+      return
+    }
+
     if (mode === "startups") {
       const dense = denseStartups
-      markersRef.current.forEach((marker, slug) => {
+      const companyBySlug = new Map(companies.map((c) => [c.slug, c]))
+
+      for (const slug of [prevSlug, activeSlug]) {
+        if (!slug) {
+          continue
+        }
+
+        const marker = markersRef.current.get(slug)
+        if (!marker) {
+          continue
+        }
+
         const button = marker.getElement() as HTMLButtonElement
-        const active = slug === selectedCompany.slug
-        const company = companies.find((item) => item.slug === slug)
+        const active = slug === activeSlug
+        const company = companyBySlug.get(slug)
 
         button.style.zIndex = active ? "10" : "1"
         if (company) {
           button.replaceChildren(createMarkerSprite(company, active, dense))
         }
-      })
+      }
     } else {
       const dense = denseMeetups
-      markersRef.current.forEach((marker, slug) => {
+      const meetupBySlug = new Map(spreadMeetups.map((m) => [m.slug, m]))
+
+      for (const slug of [prevSlug, activeSlug]) {
+        if (!slug) {
+          continue
+        }
+
+        const marker = markersRef.current.get(slug)
+        if (!marker) {
+          continue
+        }
+
         const button = marker.getElement() as HTMLButtonElement
-        const active = slug === selectedMeetup?.slug
-        const meetup = spreadMeetups.find((item) => item.slug === slug)
+        const active = slug === activeSlug
+        const meetup = meetupBySlug.get(slug)
 
         button.style.zIndex = active ? "10" : "1"
         if (meetup) {
@@ -1178,8 +1210,10 @@ export function MapShell({
             createMeetupSignboardMarker(meetup, active, dense)
           )
         }
-      })
+      }
     }
+
+    prevActiveSlugRef.current = activeSlug
   }, [
     companies,
     denseMeetups,
