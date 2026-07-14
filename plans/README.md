@@ -17,8 +17,8 @@ Executor model preference for this backlog: Grok 4.5 only.
 | 005 | Small correctness and observability fixes (bundle) | P2 | S | - | DONE |
 | 015 | Extract and unit-test the top page's upcoming-events logic; slim its client payload | P2 | S | - | DONE (verified: lib extract + 6 tests + JSON slim) |
 | 016 | Stop rebuilding every top-page event marker on each selection and keystroke | P2 | M | 015 DONE, 003 DONE, 019 DONE (soft) | DONE (merged PR #31 → `fc7fd5c0`) |
-| 006 | Stop rebuilding every map marker on each selection change (map-shell) | P2 | M | 003 DONE | TODO (verified no drift) |
-| 007 | Decompose the 1383-line map-shell.tsx | P3 | L | 003 DONE, 006 | TODO (blocked on 006) |
+| 006 | Stop rebuilding every map marker on each selection change (map-shell) | P2 | M | 003 DONE | DONE (verified on `advisor/006-map-marker-diffing` @ `0c26a803`; browser Step 3 SKIPPED) |
+| 007 | Decompose the 1383-line map-shell.tsx | P3 | L | 003 DONE, 006 DONE | TODO |
 | 008 | Refresh README and fix the stale genType command (amended 2026-07-11) | P2 | S | - | DONE (merged PR #27) |
 | 009 | Design spike: automated event sync and the second guild (amended 2026-07-11) | P3 | M | - | DONE (merged PR #28; `docs/design/event-sync.md`) |
 | 010 | Design spike: submission lifecycle (moderation, edit, withdrawal) | P3 | M | - | DONE (`bc93afc`; merged `6c3adbb`) |
@@ -33,6 +33,7 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (with one-line reason) | REJE
 
 ## Reconciliation log
 
+- 2026-07-13 (`/improve execute 006`, Grok 4.5): APPROVED. Worktree `/Users/taishikato/.cursor/worktrees/aistartupquest/006-map-marker-diffing`, branch `advisor/006-map-marker-diffing`, commit `0c26a803`. Effect B diffs prev/active slug only + Map lookup; Effect A syncs `prevActiveSlugRef`. Reviewer re-ran typecheck/test(58)/lint/build; scope clean (`components/map-shell.tsx` only). Manual browser Step 3 SKIPPED (HTTP 200 on `/sf` only). Not merged to main — left on advisor branch for maintainer. Next: 007 stacked on 006.
 - 2026-07-13 (`/improve execute 016`, Grok 4.5): APPROVED then merged. Worktree `/Users/taishikato/.cursor/worktrees/aistartupquest/016-home-events-marker-diffing`, branch `advisor/016-home-events-marker-diffing`, commits `309f77a1` → `6f747ae9`. Reviewer re-ran typecheck/test(58)/lint/build; scope clean. Merged via PR #31 (`fc7fd5c0`); feature branch deleted. Caveat at merge time: Step 2 browser checklist still unverified beyond HTTP 200.
 - 2026-07-13 (`/improve execute 017`): STOPPED before dispatch — plan already DONE (merged PR #30 @ `e20d997e` / `50785d4b`). Deliverables present on main: `app/sitemap.ts`, `app/robots.ts`, `lib/structured-data.ts`, `buildPageMetadata`. Next executable: 006 → 007.
 - 2026-07-13 (`/improve reconcile` at `f145ca21`, Grok 4.5 only):
@@ -65,7 +66,7 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (with one-line reason) | REJE
 ## Dependency notes
 
 - 004 is soft-ordered after 001 so `pnpm-lock.yaml` churn happens in two clean commits instead of conflicting ones. Both DONE.
-- 006 and 007 require 003 because no automated tests cover the map components; the CI gate (lint zero-warnings, typecheck, test) is the only regression net for those refactors. 003 is DONE — 006 is unblocked.
+- 006 and 007 require 003 because no automated tests cover the map components; the CI gate (lint zero-warnings, typecheck, test) is the only regression net for those refactors. 003 and 006 are DONE — 007 is unblocked (stack on `advisor/006-map-marker-diffing` until 006 merges).
 - 007 requires 006 to land first so the diffing logic moves into the new `useMapMarkers` hook wholesale; running them in the other order voids 006's line references.
 - 015 and 016 both edit `components/home-events-map.tsx`; run 015 first (016's drift check anticipates 015's extraction). 016 also soft-depends on 003 for the same no-test-net reason as 006.
 - 016 deliberately does NOT extract a marker module shared with `map-libre-world-select.tsx` or `map-shell.tsx`; that consolidation waits on 011's verdict and 006/007 landing.
