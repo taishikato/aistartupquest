@@ -19,6 +19,7 @@
 - **Depends on**: plans/003-verification-baseline.md (CI gate; no map tests exist, so lint/typecheck/build + manual verification are the net)
 - **Category**: perf
 - **Planned at**: commit `ba0778c`, 2026-07-06
+- **Reconciled at**: commit `f145ca21`, 2026-07-13 (`git diff --stat ba0778c..HEAD -- components/map-shell.tsx` empty; Effect A/B excerpts and line anchors still match live code; finding still present)
 
 ## Why this matters
 

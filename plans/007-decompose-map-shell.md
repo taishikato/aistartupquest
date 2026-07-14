@@ -18,6 +18,7 @@
 - **Depends on**: plans/003-verification-baseline.md (CI gate), plans/006-map-marker-diffing.md (land first so its logic moves wholesale)
 - **Category**: tech-debt
 - **Planned at**: commit `ba0778c`, 2026-07-06
+- **Reconciled at**: commit `f145ca21`, 2026-07-13 (`map-shell.tsx` still 1383 lines; no drift since `ba0778c`; still blocked on plan 006)
 
 ## Why this matters
 
