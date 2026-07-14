@@ -1,34 +1,7 @@
 export type CityId = "sf" | "toronto" | "ny" | "london" | "vancouver" | "tokyo"
 
-/** IANA timezone per city (meetup local wall time + display). */
-export const CITY_TIMEZONES: Record<CityId, string> = {
-  sf: "America/Los_Angeles",
-  toronto: "America/Toronto",
-  ny: "America/New_York",
-  london: "Europe/London",
-  vancouver: "America/Vancouver",
-  tokyo: "Asia/Tokyo",
-}
 
-/** Human-readable city label per city (geocoding + city-level venue display). */
-export const CITY_GEO_LABELS: Record<CityId, string> = {
-  sf: "San Francisco",
-  toronto: "Toronto",
-  ny: "New York",
-  london: "London",
-  vancouver: "Vancouver",
-  tokyo: "Tokyo",
-}
 
-/** Representative map coordinates per city (city-level event pins). */
-export const CITY_MAP_CENTERS: Record<CityId, [number, number]> = {
-  sf: [-122.4167, 37.7793],
-  toronto: [-79.3832, 43.6532],
-  ny: [-74.006, 40.7128],
-  london: [-0.1278, 51.5074],
-  vancouver: [-123.1207, 49.2827],
-  tokyo: [139.767, 35.6804],
-}
 
 export type CitySwitchOption = {
   city: CityId
