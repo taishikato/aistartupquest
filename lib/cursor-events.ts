@@ -201,13 +201,22 @@ function parseLumaEvent(value: LumaEvent): CursorEventInput | null {
   }
 }
 
-export function parseCursorCommunityEvents(html: string): CursorEventInput[] {
+export type CursorEventParseResult = {
+  candidateCount: number
+  events: CursorEventInput[]
+}
+
+export function parseCursorCommunityEventsWithStats(
+  html: string
+): CursorEventParseResult {
   const payload = extractFlightPayload(html)
   const events: CursorEventInput[] = []
   const eventPattern = /\{"platform":"luma"/g
   let match: RegExpExecArray | null
+  let candidateCount = 0
 
   while ((match = eventPattern.exec(payload))) {
+    candidateCount++
     const rawEvent = readJsonObject(payload, match.index)
     if (!rawEvent) {
       continue
@@ -223,7 +232,11 @@ export function parseCursorCommunityEvents(html: string): CursorEventInput[] {
     }
   }
 
-  return events
+  return { candidateCount, events }
+}
+
+export function parseCursorCommunityEvents(html: string): CursorEventInput[] {
+  return parseCursorCommunityEventsWithStats(html).events
 }
 
 export function buildCursorEventRow(

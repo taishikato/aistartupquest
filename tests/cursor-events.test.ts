@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest"
 import {
   buildCursorEventRow,
   parseCursorCommunityEvents,
+  parseCursorCommunityEventsWithStats,
 } from "@/lib/cursor-events"
 
 function communityHtml(events: unknown[]): string {
@@ -78,6 +79,19 @@ describe("parseCursorCommunityEvents", () => {
     ].join("")
 
     expect(parseCursorCommunityEvents(html)).toHaveLength(1)
+  })
+
+  it("reports extracted candidates separately from accepted events", () => {
+    const invalidEvent = { ...validEvent, geo_address_json: {} }
+
+    expect(
+      parseCursorCommunityEventsWithStats(
+        communityHtml([validEvent, invalidEvent])
+      )
+    ).toMatchObject({
+      candidateCount: 2,
+      events: [{ sourceEventId: "cursor-toronto" }],
+    })
   })
 })
 

@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "test": "vitest run",
+    "sync:cursor-events": "pnpm run _with-env pnpm dlx tsx scripts/sync-cursor-events.ts",
     "lint": "eslint",
     "format:write": "prettier --write \"**/*.{ts,tsx}\" --cache",
     "format:check": "prettier --check \"**/*.{ts,tsx}\" --cache",
