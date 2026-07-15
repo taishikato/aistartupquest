@@ -2,11 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
-import { format } from "date-fns"
-import maplibregl, { type Map as MapLibreMap, type Marker } from "maplibre-gl"
+import type { Map as MapLibreMap } from "maplibre-gl"
 
 import { applyHomeMapView } from "@/components/home-events/apply-home-map-view"
-import { FLAT_CAMERA } from "@/components/home-events/cameras"
 import {
   filterCitiesByEvents,
   filterEventsByQuery,
@@ -16,30 +14,16 @@ import {
   GuildBoardHeader,
   GuildBoardList,
 } from "@/components/home-events/guild-board"
-import {
-  createCityMarker,
-  createEventCityMarker,
-  setEventMarkerActive,
-  type EventMarkerEntry,
-} from "@/components/home-events/markers"
+import { SelectedCityPanel } from "@/components/home-events/selected-city-panel"
+import { useHomeMapUrlSync } from "@/components/home-events/use-home-map-url-sync"
+import { useHomeWorldMap } from "@/components/home-events/use-home-world-map"
 import { useIdleGlobeRotation } from "@/components/home-events/use-idle-globe-rotation"
 import {
   getUpcomingCities,
   type CursorCommunityCity,
 } from "@/lib/cursor-community-events"
-import {
-  buildHomeMapQuery,
-  parseHomeMapCity,
-  parseHomeMapView,
-  type HomeMapView,
-} from "@/lib/home-map-url"
-import { logNonAbortError } from "@/lib/is-abort-error"
+import { parseHomeMapView, type HomeMapView } from "@/lib/home-map-url"
 import { cn } from "@/lib/utils"
-import {
-  applyRpgAtlasPaint,
-  loadWorldAtlasStyle,
-} from "@/lib/world-atlas-style"
-import { WORLD_STAGE_CITIES } from "@/lib/world-stage-cities"
 
 type WorldView = HomeMapView
 
@@ -48,20 +32,14 @@ export function HomeEventsMap() {
   const searchParams = useSearchParams()
   const containerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<MapLibreMap | null>(null)
-  const eventMarkersRef = useRef<Map<string, EventMarkerEntry>>(new Map())
-  const cityMarkersRef = useRef<Marker[]>([])
   const viewRef = useRef<WorldView>(parseHomeMapView(searchParams.get("view")))
   const selectedCityRef = useRef<string | null>(null)
-  const previousSelectedCityRef = useRef<string | null>(null)
-  const [mapReady, setMapReady] = useState<MapLibreMap | null>(null)
   const [view, setView] = useState<WorldView>(() =>
     parseHomeMapView(searchParams.get("view"))
   )
   const [query, setQuery] = useState("")
   const [selectedCity, setSelectedCity] = useState<string | null>(null)
   const [boardOpen, setBoardOpen] = useState(false)
-  const urlHydratedRef = useRef(false)
-  const [hasHydratedUrl, setHasHydratedUrl] = useState(false)
   const { startIdleRotation, stopIdleRotation, rotationStoppedByUserRef } =
     useIdleGlobeRotation(mapRef, viewRef)
 
@@ -100,6 +78,32 @@ export function HomeEventsMap() {
     })
   }, [])
 
+  const mapReady = useHomeWorldMap({
+    containerRef,
+    mapRef,
+    selectedCityRef,
+    filteredCities,
+    selectedCity,
+    selectCity,
+    stopIdleRotation,
+    rotationStoppedByUserRef,
+  })
+
+  useHomeMapUrlSync({
+    mapReady,
+    mapRef,
+    viewRef,
+    pathname,
+    searchParams,
+    selectedCity,
+    view,
+    upcomingCities,
+    setView,
+    selectCity,
+    startIdleRotation,
+    stopIdleRotation,
+  })
+
   const switchView = (nextView: WorldView) => {
     const map = mapRef.current
 
@@ -118,261 +122,8 @@ export function HomeEventsMap() {
   }
 
   useEffect(() => {
-    if (!mapReady || urlHydratedRef.current) {
-      return
-    }
-
-    urlHydratedRef.current = true
-
-    const urlView = parseHomeMapView(searchParams.get("view"))
-    if (urlView === "globe") {
-      // Map always boots mercator; force projection even when React state is already globe.
-      const map = mapRef.current
-      if (map) {
-        stopIdleRotation()
-        viewRef.current = "globe"
-        setView("globe")
-        // Do NOT easeTo default globe camera when a city will flyTo next.
-        applyHomeMapView(map, "globe", { easeToDefaultCamera: false })
-        startIdleRotation()
-      }
-    }
-
-    const cityName = parseHomeMapCity(searchParams.get("city"), upcomingCities)
-    if (cityName) {
-      const matched = upcomingCities.find((city) => city.name === cityName)
-      if (matched) {
-        selectCity(matched)
-      }
-    }
-
-    // Mark after applying URL selection so the write effect cannot strip
-    // ?city= before selectedCity state catches up.
-    setHasHydratedUrl(true)
-  }, [
-    mapReady,
-    searchParams,
-    selectCity,
-    upcomingCities,
-    stopIdleRotation,
-    startIdleRotation,
-  ])
-
-  useEffect(() => {
-    if (!hasHydratedUrl) {
-      return
-    }
-
-    const nextQuery = buildHomeMapQuery({
-      selectedCity,
-      view,
-      currentSearch: searchParams.toString(),
-    })
-    const currentQuery = searchParams.toString()
-
-    if (nextQuery === currentQuery) {
-      return
-    }
-
-    const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname
-    window.history.replaceState(null, "", nextUrl)
-  }, [hasHydratedUrl, pathname, searchParams, selectedCity, view])
-
-  useEffect(() => {
     viewRef.current = view
   }, [view])
-
-  useEffect(() => {
-    if (!containerRef.current || mapRef.current) {
-      return
-    }
-
-    const controller = new AbortController()
-    let disposed = false
-    let sidebarPaddingCleanup: (() => void) | null = null
-    const canvasListeners: Array<{
-      type: keyof HTMLElementEventMap
-      listener: EventListener
-    }> = []
-    const eventMarkers = eventMarkersRef.current
-
-    const stopRotationPermanently = () => {
-      rotationStoppedByUserRef.current = true
-      stopIdleRotation()
-    }
-
-    loadWorldAtlasStyle(controller.signal)
-      .then((style) => {
-        if (disposed || !containerRef.current || mapRef.current) {
-          return
-        }
-
-        const map = new maplibregl.Map({
-          container: containerRef.current,
-          style: {
-            ...style,
-            projection: { type: "mercator" },
-          },
-          center: FLAT_CAMERA.center,
-          zoom: FLAT_CAMERA.zoom,
-          minZoom: FLAT_CAMERA.minZoom,
-          maxZoom: 5.5,
-          minPitch: 0,
-          maxPitch: 0,
-          attributionControl: false,
-          renderWorldCopies: true,
-          dragRotate: false,
-          touchPitch: false,
-        })
-
-        mapRef.current = map
-
-        // Keep camera center in the visible area beside the fixed sidebar.
-        const sidebarMediaQuery = window.matchMedia("(min-width: 768px)")
-        const syncSidebarPadding = () => {
-          map.setPadding({
-            left: sidebarMediaQuery.matches ? 380 : 0,
-            top: 0,
-            right: 0,
-            bottom: 0,
-          })
-        }
-        syncSidebarPadding()
-        sidebarMediaQuery.addEventListener("change", syncSidebarPadding)
-        sidebarPaddingCleanup = () => {
-          sidebarMediaQuery.removeEventListener("change", syncSidebarPadding)
-        }
-
-        const canvas = map.getCanvas()
-        ;(["pointerdown", "wheel", "touchstart"] as const).forEach((type) => {
-          canvas.addEventListener(type, stopRotationPermanently, { once: true })
-          canvasListeners.push({ type, listener: stopRotationPermanently })
-        })
-
-        map.once("load", () => {
-          if (disposed) {
-            return
-          }
-
-          applyRpgAtlasPaint(map)
-          map.resize()
-          setMapReady(map)
-        })
-
-        map.on("error", (error) => {
-          console.error(error)
-        })
-      })
-      .catch(logNonAbortError)
-
-    return () => {
-      disposed = true
-      controller.abort()
-      stopIdleRotation()
-      sidebarPaddingCleanup?.()
-      canvasListeners.forEach(({ type, listener }) => {
-        mapRef.current?.getCanvas().removeEventListener(type, listener)
-      })
-      eventMarkers.forEach((entry) => entry.marker.remove())
-      cityMarkersRef.current.forEach((marker) => marker.remove())
-      eventMarkers.clear()
-      cityMarkersRef.current = []
-      mapRef.current?.remove()
-      mapRef.current = null
-      setMapReady(null)
-    }
-  }, [stopIdleRotation])
-
-  useEffect(() => {
-    if (!mapReady) {
-      return
-    }
-
-    cityMarkersRef.current.forEach((marker) => marker.remove())
-    cityMarkersRef.current = WORLD_STAGE_CITIES.map((city) =>
-      new maplibregl.Marker({
-        element: createCityMarker(city),
-        anchor: "bottom",
-        opacityWhenCovered: "0",
-      })
-        .setLngLat([city.lon, city.lat])
-        .addTo(mapReady)
-    )
-
-    return () => {
-      cityMarkersRef.current.forEach((marker) => marker.remove())
-      cityMarkersRef.current = []
-    }
-  }, [mapReady])
-
-  useEffect(() => {
-    if (!mapReady) {
-      return
-    }
-
-    const markers = eventMarkersRef.current
-    const nextNames = new Set(filteredCities.map((city) => city.name))
-
-    markers.forEach((entry, name) => {
-      if (!nextNames.has(name)) {
-        entry.marker.remove()
-        markers.delete(name)
-      }
-    })
-
-    filteredCities.forEach((city) => {
-      const existing = markers.get(city.name)
-
-      if (existing) {
-        existing.count.textContent = String(city.events.length)
-        return
-      }
-
-      const { root, count } = createEventCityMarker({
-        city,
-        active: city.name === selectedCityRef.current,
-        onSelectCity: selectCity,
-      })
-
-      const marker = new maplibregl.Marker({
-        element: root,
-        anchor: "bottom",
-        opacityWhenCovered: "0",
-      })
-        .setLngLat([city.lon, city.lat])
-        .addTo(mapReady)
-
-      markers.set(city.name, { marker, root, count })
-    })
-
-    // Full marker teardown lives in the map-init effect so search/selection
-    // churn can keep DOM identity for surviving cities.
-  }, [filteredCities, mapReady, selectCity])
-
-  useEffect(() => {
-    if (!mapReady) {
-      return
-    }
-
-    const markers = eventMarkersRef.current
-    const previous = previousSelectedCityRef.current
-
-    if (previous && previous !== selectedCity) {
-      const entry = markers.get(previous)
-      if (entry) {
-        setEventMarkerActive(entry.root, false)
-      }
-    }
-
-    if (selectedCity) {
-      const entry = markers.get(selectedCity)
-      if (entry) {
-        setEventMarkerActive(entry.root, true)
-      }
-    }
-
-    previousSelectedCityRef.current = selectedCity
-  }, [selectedCity, mapReady])
 
   return (
     <main className="relative h-dvh overflow-hidden bg-[#151527] text-[#1a1a2e]">
@@ -459,51 +210,12 @@ export function HomeEventsMap() {
         </div>
       </div>
 
-      {/* Selected city panel (desktop map area) */}
       {selectedCity ? (
-        <section className="pointer-events-none absolute right-4 bottom-12 z-30 hidden max-w-[min(360px,calc(100vw-32px))] md:right-auto md:bottom-6 md:left-[calc(min(380px,calc(100vw-24px))+1.5rem)] md:block">
-          <div className="pointer-events-auto max-h-[40vh] overflow-y-auto border-2 border-[#1a1a2e] bg-white p-4 shadow-[4px_4px_0_#1a1a2e]">
-            <div className="flex items-start justify-between gap-4">
-              <h2 className="font-(family-name:--font-pixel) text-[13px] leading-5 text-[#1a1a2e]">
-                {selectedCity}
-              </h2>
-              <button
-                type="button"
-                onClick={() => setSelectedCity(null)}
-                className="flex size-7 shrink-0 items-center justify-center border-2 border-[#1a1a2e] bg-white font-(family-name:--font-pixel) text-[10px] text-[#1a1a2e] shadow-[2px_2px_0_#1a1a2e]"
-                aria-label="Close selected city"
-              >
-                X
-              </button>
-            </div>
-            <div className="mt-3 grid gap-3">
-              {selectedCityEvents.map((event) => (
-                <article
-                  key={event.id}
-                  className="grid gap-2 border-2 border-[#1a1a2e] bg-[#fff7dd] p-3"
-                >
-                  <time
-                    dateTime={event.date}
-                    className="font-(family-name:--font-pixel) text-[9px] leading-4 text-[#95602f]"
-                  >
-                    {format(new Date(`${event.date}T00:00:00`), "MMM d")}
-                  </time>
-                  <h3 className="text-sm leading-5 font-bold text-[#1a1a2e]">
-                    {event.title}
-                  </h3>
-                  <a
-                    href={event.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="justify-self-start border-2 border-[#1a1a2e] bg-[#4ecdc4] px-2 py-1 text-xs font-bold text-[#1a1a2e] shadow-[2px_2px_0_#1a1a2e]"
-                  >
-                    Register ↗
-                  </a>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
+        <SelectedCityPanel
+          selectedCity={selectedCity}
+          events={selectedCityEvents}
+          onClose={() => setSelectedCity(null)}
+        />
       ) : null}
 
       <div className="pointer-events-none absolute right-3 bottom-3 z-30 border border-[#1a1a2e] bg-white/85 px-1.5 text-[10px] leading-4 text-[#1a1a2e] sm:right-6 sm:bottom-6">
