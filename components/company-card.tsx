@@ -17,6 +17,18 @@ type CompanyCardProps = {
   onSelect?: (slug: string) => void
 }
 
+function trackCompanySiteClick(
+  company: Company,
+  source: "card" | "card_compact"
+) {
+  track("company_site_click", {
+    company_slug: company.slug,
+    company_name: company.name,
+    city: company.city,
+    source,
+  })
+}
+
 export function CompanyCard({
   company,
   active = false,
@@ -56,12 +68,7 @@ export function CompanyCard({
               aria-label={`Visit ${company.name}`}
               onClick={(event) => {
                 event.stopPropagation()
-                track("company_site_click", {
-                  company_slug: company.slug,
-                  company_name: company.name,
-                  city: company.city,
-                  source: "card_compact",
-                })
+                trackCompanySiteClick(company, "card_compact")
               }}
               className="inline-flex size-7 shrink-0 items-center justify-center border-2 border-[#3a3a5e] bg-[#2a2a4e] text-[#f0f7e6]/70 transition-colors hover:border-[#4ecdc4] hover:text-[#4ecdc4]"
             >
@@ -114,14 +121,7 @@ export function CompanyCard({
           target="_blank"
           rel="noreferrer"
           aria-label={`Visit ${company.name}`}
-          onClick={() =>
-            track("company_site_click", {
-              company_slug: company.slug,
-              company_name: company.name,
-              city: company.city,
-              source: "card",
-            })
-          }
+          onClick={() => trackCompanySiteClick(company, "card")}
           className="inline-flex size-9 shrink-0 items-center justify-center border-2 border-[#3a3a5e] bg-[#2a2a4e] text-[#4ecdc4] transition-colors hover:border-[#4ecdc4] hover:bg-[#4ecdc4] hover:text-[#1a1a2e]"
         >
           <ArrowUpRight className="size-4" />

@@ -45,6 +45,29 @@ const GLOBE_CAMERA = {
 
 const IDLE_ROTATION_DEGREES_PER_FRAME = 0.015
 
+function trackEventRegisterClick(
+  event: CursorCommunityEvent,
+  source: "board" | "city_panel"
+) {
+  track("event_register_click", {
+    event_id: event.id,
+    event_name: event.title,
+    city: event.city,
+    source_guild: event.company,
+    source,
+  })
+}
+
+function trackBoardEventView(event: CursorCommunityEvent) {
+  track("event_view", {
+    event_id: event.id,
+    event_name: event.title,
+    city: event.city,
+    source_guild: event.company,
+    source: "board",
+  })
+}
+
 type EventMarkerEntry = {
   marker: Marker
   root: HTMLButtonElement
@@ -718,13 +741,7 @@ export function HomeEventsMap() {
                     target="_blank"
                     rel="noreferrer"
                     onClick={() =>
-                      track("event_register_click", {
-                        event_id: event.id,
-                        event_name: event.title,
-                        city: event.city,
-                        source_guild: event.company,
-                        source: "city_panel",
-                      })
+                      trackEventRegisterClick(event, "city_panel")
                     }
                     className="justify-self-start border-2 border-[#1a1a2e] bg-[#4ecdc4] px-2 py-1 text-xs font-bold text-[#1a1a2e] shadow-[2px_2px_0_#1a1a2e]"
                   >
@@ -830,13 +847,7 @@ function GuildBoardList({
               <button
                 type="button"
                 onClick={() => {
-                  track("event_view", {
-                    event_id: event.id,
-                    event_name: event.title,
-                    city: event.city,
-                    source_guild: event.company,
-                    source: "board",
-                  })
+                  trackBoardEventView(event)
                   if (city) {
                     onSelectCity(city)
                   }
@@ -874,15 +885,7 @@ function GuildBoardList({
                 href={event.url}
                 target="_blank"
                 rel="noreferrer"
-                onClick={() =>
-                  track("event_register_click", {
-                    event_id: event.id,
-                    event_name: event.title,
-                    city: event.city,
-                    source_guild: event.company,
-                    source: "board",
-                  })
-                }
+                onClick={() => trackEventRegisterClick(event, "board")}
                 className="mt-3 inline-block border-2 border-[#1a1a2e] bg-[#4ecdc4] px-2 py-1 text-xs font-bold text-[#1a1a2e] shadow-[2px_2px_0_#1a1a2e]"
               >
                 Register ↗
