@@ -9,14 +9,14 @@ A pixel-art RPG map for exploring AI startups and community events across six ci
 - An events-first world map on the top page.
 - City maps for San Francisco, Toronto, New York, London, Vancouver, and Tokyo.
 - Startups shown as sprites on a game-style map.
-- Community meetups shown as quests on the map.
+- Community events shown as quests on the map.
 
 ## Data
 
 - Startup data lives in the Supabase `companies` table.
 - Each city page loads it via `lib/city-page-data.ts`.
-- Meetups come from the `published_upcoming_meetups` view.
-- Community submissions go through server actions in `app/actions/`.
+- Events live in the Supabase `events` table and the home page reads the `published_upcoming_events` view.
+- Cursor events are refreshed with `pnpm sync:cursor-events`.
 
 ## Development
 

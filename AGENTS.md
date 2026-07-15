@@ -69,7 +69,9 @@
 
 ### Event data
 
-- The top page reads `lib/data/cursor-community-events.json`, a hand-maintained file with city coordinates plus per-event `company`.
+- The top page reads published upcoming events from the Supabase `events` table through the `published_upcoming_events` view.
+- Refresh Cursor events with `pnpm sync:cursor-events`; the command fetches Cursor Community and upserts by `(source, source_event_id)`.
+- Event integrations store city-level coordinates only and never store private venue names, street addresses, or exact private venue coordinates.
 
 
 
