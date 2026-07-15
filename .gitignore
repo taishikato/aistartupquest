@@ -51,3 +51,5 @@ plans/
 
 # local task tracking
 /TODOS.md
+.vercel
+.env*
