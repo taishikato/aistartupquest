@@ -33,7 +33,6 @@ export function HomeEventsMap() {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<MapLibreMap | null>(null)
   const viewRef = useRef<WorldView>(parseHomeMapView(searchParams.get("view")))
-  const selectedCityRef = useRef<string | null>(null)
   const [view, setView] = useState<WorldView>(() =>
     parseHomeMapView(searchParams.get("view"))
   )
@@ -42,8 +41,6 @@ export function HomeEventsMap() {
   const [boardOpen, setBoardOpen] = useState(false)
   const { startIdleRotation, stopIdleRotation, rotationStoppedByUserRef } =
     useIdleGlobeRotation(mapRef, viewRef)
-
-  selectedCityRef.current = selectedCity
 
   const upcomingCities = useMemo(() => getUpcomingCities(), [])
   const allEvents = useMemo(
@@ -81,7 +78,6 @@ export function HomeEventsMap() {
   const mapReady = useHomeWorldMap({
     containerRef,
     mapRef,
-    selectedCityRef,
     filteredCities,
     selectedCity,
     selectCity,

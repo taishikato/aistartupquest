@@ -22,7 +22,6 @@ import { WORLD_STAGE_CITIES } from "@/lib/world-stage-cities"
 type UseHomeWorldMapArgs = {
   containerRef: RefObject<HTMLDivElement | null>
   mapRef: RefObject<MapLibreMap | null>
-  selectedCityRef: RefObject<string | null>
   filteredCities: CityWithEvents[]
   selectedCity: string | null
   selectCity: (city: CursorCommunityCity) => void
@@ -33,7 +32,6 @@ type UseHomeWorldMapArgs = {
 export function useHomeWorldMap({
   containerRef,
   mapRef,
-  selectedCityRef,
   filteredCities,
   selectedCity,
   selectCity,
@@ -193,7 +191,7 @@ export function useHomeWorldMap({
 
       const { root, count } = createEventCityMarker({
         city,
-        active: city.name === selectedCityRef.current,
+        active: city.name === selectedCity,
         onSelectCity: selectCity,
       })
 
@@ -210,7 +208,7 @@ export function useHomeWorldMap({
 
     // Full marker teardown lives in the map-init effect so search/selection
     // churn can keep DOM identity for surviving cities.
-  }, [filteredCities, mapReady, selectCity, selectedCityRef])
+  }, [filteredCities, mapReady, selectCity, selectedCity])
 
   useEffect(() => {
     if (!mapReady) {
