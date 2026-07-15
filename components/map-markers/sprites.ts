@@ -46,6 +46,28 @@ function createFloatingMarkerFrameFromSlug(slug: string) {
   })
 }
 
+function appendCompanyLogo(
+  parent: HTMLElement,
+  company: Company,
+  active: boolean,
+  dense: boolean,
+  logoSz: number
+) {
+  const img = document.createElement("img")
+  img.src = getCompanyLogoUrl(company)
+  img.alt = company.name
+  Object.assign(img.style, {
+    width: `${logoSz}px`,
+    height: `${logoSz}px`,
+    objectFit: "contain",
+  })
+  const monogram = getCompanyMonogram(company)
+  img.addEventListener("error", () => {
+    img.replaceWith(createFallback(monogram, active, dense))
+  })
+  parent.appendChild(img)
+}
+
 // Logo badge: category-colored frame + light inner pad so logos stay readable.
 function makeLogoBadge(
   company: Company,
@@ -86,19 +108,7 @@ function makeLogoBadge(
     justifyContent: "center",
     boxSizing: "border-box",
   })
-  const img = document.createElement("img")
-  img.src = getCompanyLogoUrl(company)
-  img.alt = company.name
-  Object.assign(img.style, {
-    width: `${logoSz}px`,
-    height: `${logoSz}px`,
-    objectFit: "contain",
-  })
-  const monogram = getCompanyMonogram(company)
-  img.addEventListener("error", () => {
-    img.replaceWith(createFallback(monogram, active, dense))
-  })
-  inner.appendChild(img)
+  appendCompanyLogo(inner, company, active, dense, logoSz)
   badge.appendChild(inner)
   return badge
 }
@@ -213,19 +223,7 @@ function makeBossLogoBadge(
     justifyContent: "center",
     boxSizing: "border-box",
   })
-  const img = document.createElement("img")
-  img.src = getCompanyLogoUrl(company)
-  img.alt = company.name
-  Object.assign(img.style, {
-    width: `${logoSz}px`,
-    height: `${logoSz}px`,
-    objectFit: "contain",
-  })
-  const monogram = getCompanyMonogram(company)
-  img.addEventListener("error", () => {
-    img.replaceWith(createFallback(monogram, active, dense))
-  })
-  inner.appendChild(img)
+  appendCompanyLogo(inner, company, active, dense, logoSz)
   badge.appendChild(inner)
   return badge
 }
