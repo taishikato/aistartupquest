@@ -3,10 +3,7 @@ import type { Map as MapLibreMap } from "maplibre-gl"
 import type { ReadonlyURLSearchParams } from "next/navigation"
 
 import { applyHomeMapView } from "@/components/home-events/apply-home-map-view"
-import type {
-  CityWithEvents,
-  CursorCommunityCity,
-} from "@/lib/cursor-community-events"
+import type { CityWithEvents, EventCity } from "@/lib/events"
 import {
   buildHomeMapQuery,
   parseHomeMapCity,
@@ -24,7 +21,7 @@ type UseHomeMapUrlSyncArgs = {
   view: HomeMapView
   upcomingCities: CityWithEvents[]
   setView: (view: HomeMapView) => void
-  selectCity: (city: CursorCommunityCity) => void
+  selectCity: (city: EventCity) => void
   startIdleRotation: () => void
   stopIdleRotation: () => void
 }

@@ -1,11 +1,11 @@
 import Image from "next/image"
 import { format } from "date-fns"
 
-import {
-  type CityWithEvents,
-  type CursorCommunityCity,
-  type CursorCommunityEvent,
-} from "@/lib/cursor-community-events"
+import type {
+  CityWithEvents,
+  CommunityEvent,
+  EventCity,
+} from "@/lib/events"
 import { cn } from "@/lib/utils"
 
 export function GuildBoardHeader({
@@ -55,10 +55,10 @@ export function GuildBoardList({
   selectedCity,
   onSelectCity,
 }: {
-  events: CursorCommunityEvent[]
+  events: CommunityEvent[]
   upcomingCities: CityWithEvents[]
   selectedCity: string | null
-  onSelectCity: (city: CursorCommunityCity) => void
+  onSelectCity: (city: EventCity) => void
 }) {
   return (
     <div className="min-h-0 flex-1 overflow-y-auto p-4">

@@ -1,6 +1,6 @@
 import { format } from "date-fns"
 
-import type { CursorCommunityEvent } from "@/lib/cursor-community-events"
+import type { CommunityEvent } from "@/lib/events"
 
 export function SelectedCityPanel({
   selectedCity,
@@ -8,7 +8,7 @@ export function SelectedCityPanel({
   onClose,
 }: {
   selectedCity: string
-  events: CursorCommunityEvent[]
+  events: CommunityEvent[]
   onClose: () => void
 }) {
   return (

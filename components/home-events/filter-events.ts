@@ -1,20 +1,17 @@
-import type {
-  CityWithEvents,
-  CursorCommunityEvent,
-} from "@/lib/cursor-community-events"
+import type { CityWithEvents, CommunityEvent } from "@/lib/events"
 
 export function flattenUpcomingEvents(
   cities: CityWithEvents[]
-): CursorCommunityEvent[] {
+): CommunityEvent[] {
   return cities
     .flatMap((city) => city.events)
     .sort((a, b) => a.date.localeCompare(b.date))
 }
 
 export function filterEventsByQuery(
-  events: CursorCommunityEvent[],
+  events: CommunityEvent[],
   query: string
-): CursorCommunityEvent[] {
+): CommunityEvent[] {
   const normalizedQuery = query.trim().toLocaleLowerCase()
 
   if (!normalizedQuery) {
@@ -30,7 +27,7 @@ export function filterEventsByQuery(
 
 export function filterCitiesByEvents(
   cities: CityWithEvents[],
-  events: CursorCommunityEvent[]
+  events: CommunityEvent[]
 ): CityWithEvents[] {
   const eventIds = new Set(events.map((event) => event.id))
 
