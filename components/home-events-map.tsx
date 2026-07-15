@@ -5,11 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation"
 import { format } from "date-fns"
 import maplibregl, { type Map as MapLibreMap, type Marker } from "maplibre-gl"
 
-import {
-  FLAT_CAMERA,
-  GLOBE_CAMERA,
-  IDLE_ROTATION_DEGREES_PER_FRAME,
-} from "@/components/home-events/cameras"
+import { FLAT_CAMERA, GLOBE_CAMERA } from "@/components/home-events/cameras"
 import {
   GuildBoardHeader,
   GuildBoardList,
@@ -20,6 +16,7 @@ import {
   setEventMarkerActive,
   type EventMarkerEntry,
 } from "@/components/home-events/markers"
+import { useIdleGlobeRotation } from "@/components/home-events/use-idle-globe-rotation"
 import {
   getUpcomingCities,
   type CursorCommunityCity,
@@ -47,8 +44,6 @@ export function HomeEventsMap() {
   const mapRef = useRef<MapLibreMap | null>(null)
   const eventMarkersRef = useRef<Map<string, EventMarkerEntry>>(new Map())
   const cityMarkersRef = useRef<Marker[]>([])
-  const rotationFrameRef = useRef<number | null>(null)
-  const rotationStoppedByUserRef = useRef(false)
   const viewRef = useRef<WorldView>(parseHomeMapView(searchParams.get("view")))
   const selectedCityRef = useRef<string | null>(null)
   const previousSelectedCityRef = useRef<string | null>(null)
@@ -61,6 +56,8 @@ export function HomeEventsMap() {
   const [boardOpen, setBoardOpen] = useState(false)
   const urlHydratedRef = useRef(false)
   const [hasHydratedUrl, setHasHydratedUrl] = useState(false)
+  const { startIdleRotation, stopIdleRotation, rotationStoppedByUserRef } =
+    useIdleGlobeRotation(mapRef, viewRef)
 
   selectedCityRef.current = selectedCity
 
@@ -102,40 +99,6 @@ export function HomeEventsMap() {
         : [],
     [selectedCity, upcomingCities]
   )
-
-  const stopIdleRotation = useCallback(() => {
-    if (rotationFrameRef.current !== null) {
-      window.cancelAnimationFrame(rotationFrameRef.current)
-      rotationFrameRef.current = null
-    }
-  }, [])
-
-  const startIdleRotation = useCallback(() => {
-    stopIdleRotation()
-
-    if (rotationStoppedByUserRef.current || viewRef.current !== "globe") {
-      return
-    }
-
-    rotationFrameRef.current = window.requestAnimationFrame(function rotate() {
-      const rotatingMap = mapRef.current
-
-      if (
-        !rotatingMap ||
-        viewRef.current !== "globe" ||
-        rotationStoppedByUserRef.current
-      ) {
-        rotationFrameRef.current = null
-        return
-      }
-
-      const center = rotatingMap.getCenter()
-      rotatingMap.jumpTo({
-        center: [center.lng + IDLE_ROTATION_DEGREES_PER_FRAME, center.lat],
-      })
-      rotationFrameRef.current = window.requestAnimationFrame(rotate)
-    })
-  }, [stopIdleRotation])
 
   const selectCity = useCallback((city: CursorCommunityCity) => {
     setSelectedCity(city.name)
