@@ -10,6 +10,7 @@ import maplibregl, {
 import type { CityMapConfig } from "@/lib/city-config"
 import { type Company } from "@/lib/company"
 import { useMapMarkers } from "@/components/map-markers/use-map-markers"
+import { logNonAbortError } from "@/lib/is-abort-error"
 import { addVoxelCityLayers, applyMinecraftStyle } from "@/lib/map-paint"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -109,13 +110,7 @@ export function MapShell({
 
         resizeObserver.observe(containerRef.current)
       })
-      .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return
-        }
-
-        console.error(error)
-      })
+      .catch(logNonAbortError)
 
     return () => {
       disposed = true
