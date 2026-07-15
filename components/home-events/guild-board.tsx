@@ -23,9 +23,14 @@ export function GuildBoardHeader({
     <header className="shrink-0 border-b-[3px] border-[#1a1a2e] bg-[#ead9ab] p-4">
       <div className="flex items-center gap-3">
         <Image src="/brand-mark.png" alt="" width={38} height={38} priority />
-        <h1 className="font-(family-name:--font-pixel) text-[11px] leading-5 text-[#1a1a2e]">
-          AI Startup Quest
-        </h1>
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <h1 className="font-(family-name:--font-pixel) text-[11px] leading-5 text-[#1a1a2e]">
+            AI Startup Quest
+          </h1>
+          <span className="border-2 border-[#1a1a2e] bg-[#4ecdc4] px-1.5 py-0.5 font-(family-name:--font-pixel) text-[8px] leading-3 text-[#1a1a2e] shadow-[2px_2px_0_#1a1a2e]">
+            Events
+          </span>
+        </div>
       </div>
       <p className="mt-3 font-(family-name:--font-pixel) text-[8px] leading-4 text-[#95602f]">
         {eventCount} upcoming events in {cityCount} cities
