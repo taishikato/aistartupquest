@@ -11,6 +11,7 @@ import maplibregl, {
 } from "maplibre-gl"
 
 import { createMarkerSprite } from "@/components/map-markers/sprites"
+import { track } from "@/lib/analytics"
 import { type Company } from "@/lib/company"
 
 // Keep in sync with MAP_PITCH / MAP_BEARING in map-shell.tsx (camera effect).
@@ -84,7 +85,14 @@ export function useMapMarkers({
       element.style.background = "none"
       element.style.border = "none"
       element.appendChild(createMarkerSprite(company, active, dense))
-      element.addEventListener("click", () => onSelectCompany(company.slug))
+      element.addEventListener("click", () => {
+        track("company_marker_click", {
+          company_slug: company.slug,
+          company_name: company.name,
+          city: company.city,
+        })
+        onSelectCompany(company.slug)
+      })
 
       const marker = new maplibregl.Marker({ element, anchor: "bottom" })
         .setLngLat(company.coordinates)

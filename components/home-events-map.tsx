@@ -6,6 +6,7 @@ import { usePathname, useSearchParams } from "next/navigation"
 import { format } from "date-fns"
 import maplibregl, { type Map as MapLibreMap, type Marker } from "maplibre-gl"
 
+import { track } from "@/lib/analytics"
 import {
   getUpcomingCities,
   type CityWithEvents,
@@ -107,7 +108,14 @@ function createEventCityMarker({
 
   body.append(image, count)
   button.append(body)
-  button.addEventListener("click", () => onSelectCity(city))
+  button.addEventListener("click", () => {
+    track("event_view", {
+      city: city.name,
+      source: "map_pin",
+      event_count: city.events.length,
+    })
+    onSelectCity(city)
+  })
 
   return { root: button, count }
 }
@@ -271,6 +279,22 @@ export function HomeEventsMap() {
     })
   }, [])
 
+  useEffect(() => {
+    const trimmed = query.trim()
+    if (trimmed.length < 2) {
+      return
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      track("event_search", {
+        query: trimmed,
+        result_count: filteredEvents.length,
+      })
+    }, 500)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [query, filteredEvents.length])
+
   const switchView = (nextView: WorldView) => {
     const map = mapRef.current
 
@@ -282,6 +306,7 @@ export function HomeEventsMap() {
 
     const camera = nextView === "globe" ? GLOBE_CAMERA : FLAT_CAMERA
 
+    track("map_view_toggle", { view: nextView })
     viewRef.current = nextView
     setView(nextView)
     map.setProjection({ type: nextView })
@@ -686,6 +711,15 @@ export function HomeEventsMap() {
                     href={event.url}
                     target="_blank"
                     rel="noreferrer"
+                    onClick={() =>
+                      track("event_register_click", {
+                        event_id: event.id,
+                        event_name: event.title,
+                        city: event.city,
+                        source_guild: event.company,
+                        source: "city_panel",
+                      })
+                    }
                     className="justify-self-start border-2 border-[#1a1a2e] bg-[#4ecdc4] px-2 py-1 text-xs font-bold text-[#1a1a2e] shadow-[2px_2px_0_#1a1a2e]"
                   >
                     Register ↗
@@ -789,7 +823,18 @@ function GuildBoardList({
             >
               <button
                 type="button"
-                onClick={() => city && onSelectCity(city)}
+                onClick={() => {
+                  track("event_view", {
+                    event_id: event.id,
+                    event_name: event.title,
+                    city: event.city,
+                    source_guild: event.company,
+                    source: "board",
+                  })
+                  if (city) {
+                    onSelectCity(city)
+                  }
+                }}
                 className="block w-full text-left"
               >
                 <div className="flex items-start justify-between gap-2">
@@ -823,6 +868,15 @@ function GuildBoardList({
                 href={event.url}
                 target="_blank"
                 rel="noreferrer"
+                onClick={() =>
+                  track("event_register_click", {
+                    event_id: event.id,
+                    event_name: event.title,
+                    city: event.city,
+                    source_guild: event.company,
+                    source: "board",
+                  })
+                }
                 className="mt-3 inline-block border-2 border-[#1a1a2e] bg-[#4ecdc4] px-2 py-1 text-xs font-bold text-[#1a1a2e] shadow-[2px_2px_0_#1a1a2e]"
               >
                 Register ↗
