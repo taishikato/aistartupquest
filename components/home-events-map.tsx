@@ -18,6 +18,7 @@ import {
   parseHomeMapView,
   type HomeMapView,
 } from "@/lib/home-map-url"
+import { logNonAbortError } from "@/lib/is-abort-error"
 import { cn } from "@/lib/utils"
 import {
   applyRpgAtlasPaint,
@@ -448,13 +449,7 @@ export function HomeEventsMap() {
           console.error(error)
         })
       })
-      .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return
-        }
-
-        console.error(error)
-      })
+      .catch(logNonAbortError)
 
     return () => {
       disposed = true
