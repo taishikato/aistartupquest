@@ -2,6 +2,7 @@
 /node_modules
 /.pnp
 .pnp.*
+.pnpm-store/
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
@@ -47,3 +48,6 @@ supabase/.temp/
 context/
 docs/
 plans/
+
+# local task tracking
+/TODOS.md
