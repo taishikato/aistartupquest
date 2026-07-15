@@ -5,7 +5,13 @@ import { usePathname, useSearchParams } from "next/navigation"
 import { format } from "date-fns"
 import maplibregl, { type Map as MapLibreMap, type Marker } from "maplibre-gl"
 
-import { FLAT_CAMERA, GLOBE_CAMERA } from "@/components/home-events/cameras"
+import { applyHomeMapView } from "@/components/home-events/apply-home-map-view"
+import { FLAT_CAMERA } from "@/components/home-events/cameras"
+import {
+  filterCitiesByEvents,
+  filterEventsByQuery,
+  flattenUpcomingEvents,
+} from "@/components/home-events/filter-events"
 import {
   GuildBoardHeader,
   GuildBoardList,
@@ -63,33 +69,17 @@ export function HomeEventsMap() {
 
   const upcomingCities = useMemo(() => getUpcomingCities(), [])
   const allEvents = useMemo(
-    () =>
-      upcomingCities
-        .flatMap((city) => city.events)
-        .sort((a, b) => a.date.localeCompare(b.date)),
+    () => flattenUpcomingEvents(upcomingCities),
     [upcomingCities]
   )
-  const normalizedQuery = query.trim().toLocaleLowerCase()
   const filteredEvents = useMemo(
-    () =>
-      allEvents.filter(
-        (event) =>
-          !normalizedQuery ||
-          event.title.toLocaleLowerCase().includes(normalizedQuery) ||
-          event.city.toLocaleLowerCase().includes(normalizedQuery)
-      ),
-    [allEvents, normalizedQuery]
+    () => filterEventsByQuery(allEvents, query),
+    [allEvents, query]
   )
-  const filteredCities = useMemo(() => {
-    const eventIds = new Set(filteredEvents.map((event) => event.id))
-
-    return upcomingCities
-      .map((city) => ({
-        ...city,
-        events: city.events.filter((event) => eventIds.has(event.id)),
-      }))
-      .filter((city) => city.events.length > 0)
-  }, [filteredEvents, upcomingCities])
+  const filteredCities = useMemo(
+    () => filterCitiesByEvents(upcomingCities, filteredEvents),
+    [filteredEvents, upcomingCities]
+  )
 
   const selectedCityEvents = useMemo(
     () =>
@@ -118,20 +108,9 @@ export function HomeEventsMap() {
     }
 
     stopIdleRotation()
-
-    const camera = nextView === "globe" ? GLOBE_CAMERA : FLAT_CAMERA
-
     viewRef.current = nextView
     setView(nextView)
-    map.setProjection({ type: nextView })
-    map.setRenderWorldCopies(nextView === "mercator")
-    map.dragRotate.disable()
-    map.setMinZoom(camera.minZoom)
-    map.easeTo({
-      center: camera.center,
-      zoom: camera.zoom,
-      duration: 700,
-    })
+    applyHomeMapView(map, nextView, { easeToDefaultCamera: true })
 
     if (nextView === "globe") {
       startIdleRotation()
@@ -153,11 +132,8 @@ export function HomeEventsMap() {
         stopIdleRotation()
         viewRef.current = "globe"
         setView("globe")
-        map.setProjection({ type: "globe" })
-        map.setRenderWorldCopies(false)
-        map.dragRotate.disable()
-        map.setMinZoom(GLOBE_CAMERA.minZoom)
         // Do NOT easeTo default globe camera when a city will flyTo next.
+        applyHomeMapView(map, "globe", { easeToDefaultCamera: false })
         startIdleRotation()
       }
     }

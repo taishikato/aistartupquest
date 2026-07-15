@@ -1,0 +1,43 @@
+import type {
+  CityWithEvents,
+  CursorCommunityEvent,
+} from "@/lib/cursor-community-events"
+
+export function flattenUpcomingEvents(
+  cities: CityWithEvents[]
+): CursorCommunityEvent[] {
+  return cities
+    .flatMap((city) => city.events)
+    .sort((a, b) => a.date.localeCompare(b.date))
+}
+
+export function filterEventsByQuery(
+  events: CursorCommunityEvent[],
+  query: string
+): CursorCommunityEvent[] {
+  const normalizedQuery = query.trim().toLocaleLowerCase()
+
+  if (!normalizedQuery) {
+    return events
+  }
+
+  return events.filter(
+    (event) =>
+      event.title.toLocaleLowerCase().includes(normalizedQuery) ||
+      event.city.toLocaleLowerCase().includes(normalizedQuery)
+  )
+}
+
+export function filterCitiesByEvents(
+  cities: CityWithEvents[],
+  events: CursorCommunityEvent[]
+): CityWithEvents[] {
+  const eventIds = new Set(events.map((event) => event.id))
+
+  return cities
+    .map((city) => ({
+      ...city,
+      events: city.events.filter((event) => eventIds.has(event.id)),
+    }))
+    .filter((city) => city.events.length > 0)
+}
