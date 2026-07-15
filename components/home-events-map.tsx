@@ -280,20 +280,19 @@ export function HomeEventsMap() {
   }, [])
 
   useEffect(() => {
-    const trimmed = query.trim()
-    if (trimmed.length < 2) {
+    if (normalizedQuery.length < 2) {
       return
     }
 
     const timeoutId = window.setTimeout(() => {
       track("event_search", {
-        query: trimmed,
+        query: normalizedQuery,
         result_count: filteredEvents.length,
       })
     }, 500)
 
     return () => window.clearTimeout(timeoutId)
-  }, [query, filteredEvents.length])
+  }, [normalizedQuery, filteredEvents.length])
 
   const switchView = (nextView: WorldView) => {
     const map = mapRef.current
