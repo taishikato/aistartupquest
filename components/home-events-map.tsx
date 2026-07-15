@@ -49,16 +49,20 @@ type EventMarkerEntry = {
   marker: Marker
   root: HTMLButtonElement
   count: HTMLSpanElement
+  /** Kept in sync with the pin badge when guild-board search filters change. */
+  eventCount: { value: number }
 }
 
 function createEventCityMarker({
   city,
   active,
   onSelectCity,
+  eventCount,
 }: {
   city: CityWithEvents
   active: boolean
   onSelectCity: (city: CityWithEvents) => void
+  eventCount: { value: number }
 }): { root: HTMLButtonElement; count: HTMLSpanElement } {
   const button = document.createElement("button")
   button.type = "button"
@@ -94,7 +98,7 @@ function createEventCityMarker({
   image.style.height = "42px"
 
   const count = document.createElement("span")
-  count.textContent = String(city.events.length)
+  count.textContent = String(eventCount.value)
   count.style.position = "absolute"
   // Parchment sits in the middle ~50% of the art, slightly below vertical center.
   count.style.top = "56%"
@@ -112,7 +116,7 @@ function createEventCityMarker({
     track("event_view", {
       city: city.name,
       source: "map_pin",
-      event_count: city.events.length,
+      event_count: eventCount.value,
     })
     onSelectCity(city)
   })
@@ -539,14 +543,17 @@ export function HomeEventsMap() {
       const existing = markers.get(city.name)
 
       if (existing) {
+        existing.eventCount.value = city.events.length
         existing.count.textContent = String(city.events.length)
         return
       }
 
+      const eventCount = { value: city.events.length }
       const { root, count } = createEventCityMarker({
         city,
         active: city.name === selectedCityRef.current,
         onSelectCity: selectCity,
+        eventCount,
       })
 
       const marker = new maplibregl.Marker({
@@ -557,7 +564,7 @@ export function HomeEventsMap() {
         .setLngLat([city.lon, city.lat])
         .addTo(mapReady)
 
-      markers.set(city.name, { marker, root, count })
+      markers.set(city.name, { marker, root, count, eventCount })
     })
 
     // Full marker teardown lives in the map-init effect so search/selection
