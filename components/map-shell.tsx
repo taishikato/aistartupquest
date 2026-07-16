@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { CompanyAddInvite } from "@/components/company-add-invite"
 import { PixelClouds } from "@/components/pixel-clouds"
+import { QuestHeraldSignup } from "@/components/quest-herald-signup"
 
 type MapShellProps = {
   companies: Company[]
@@ -171,6 +172,9 @@ export function MapShell({
       {mapReady && <PixelClouds map={mapReady} />}
       <CompanyAddInvite />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#fff3cf]/35 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-3 z-20 flex justify-start px-3 pr-14 sm:bottom-4 sm:px-4 lg:bottom-5">
+        <QuestHeraldSignup source="city_map_footer" />
+      </div>
       <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
         <Button
           type="button"
