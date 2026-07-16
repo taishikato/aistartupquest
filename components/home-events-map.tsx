@@ -20,6 +20,7 @@ import { useHomeMapUrlSync } from "@/components/home-events/use-home-map-url-syn
 import { useHomeWorldMap } from "@/components/home-events/use-home-world-map"
 import { useIdleGlobeRotation } from "@/components/home-events/use-idle-globe-rotation"
 import { QuestHeraldSignup } from "@/components/quest-herald-signup"
+import { SpaceBackdrop } from "@/components/space-backdrop"
 import { Button } from "@/components/ui/button"
 import { track } from "@/lib/analytics"
 import type { CityWithEvents, EventCity } from "@/lib/events"
@@ -194,9 +195,11 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
   }, [view])
 
   return (
-    <main className="relative h-dvh overflow-hidden bg-[#151527] text-[#1a1a2e]">
+    <main className="relative h-dvh overflow-hidden bg-[#0a0a1f] text-[#1a1a2e]">
       {/* MapLibre overrides the container's position, so size comes from a wrapper. */}
       <div className="absolute inset-0">
+        {/* Transparent map background reveals space sprites around the globe. */}
+        {view === "globe" ? <SpaceBackdrop /> : null}
         <div ref={containerRef} className="h-full w-full" />
       </div>
 
