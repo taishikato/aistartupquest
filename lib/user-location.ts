@@ -12,8 +12,40 @@ export type UserLocationStatus =
   | "unavailable"
   | "unsupported"
 
+/** Remembers that the explorer opted in so later visits can resume without a prompt. */
+export const USER_LOCATION_OPTED_IN_KEY = "asq:user-location-opted-in"
+
 export function isGeolocationSupported() {
   return typeof navigator !== "undefined" && "geolocation" in navigator
+}
+
+export function readUserLocationOptedIn() {
+  if (typeof window === "undefined") {
+    return false
+  }
+
+  try {
+    return window.localStorage.getItem(USER_LOCATION_OPTED_IN_KEY) === "1"
+  } catch {
+    return false
+  }
+}
+
+export function writeUserLocationOptedIn(optedIn: boolean) {
+  if (typeof window === "undefined") {
+    return
+  }
+
+  try {
+    if (optedIn) {
+      window.localStorage.setItem(USER_LOCATION_OPTED_IN_KEY, "1")
+      return
+    }
+
+    window.localStorage.removeItem(USER_LOCATION_OPTED_IN_KEY)
+  } catch {
+    // Private mode / blocked storage should not break locate.
+  }
 }
 
 export function toUserCoordinates(

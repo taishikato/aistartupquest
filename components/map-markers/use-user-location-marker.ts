@@ -38,15 +38,19 @@ export function useUserLocationMarker({
     if (!markerRef.current) {
       const element = document.createElement("div")
       element.setAttribute("aria-label", "Your location")
-      element.style.zIndex = "20"
       element.appendChild(createPlayerSprite())
 
-      markerRef.current = new maplibregl.Marker({
+      const marker = new maplibregl.Marker({
         element,
+        // Bottom of the beacon marks the exact coordinates.
         anchor: "bottom",
       })
         .setLngLat(lngLat)
         .addTo(map)
+
+      // Above city signs and active event markers (z-index 20).
+      marker.getElement().style.zIndex = "40"
+      markerRef.current = marker
       return
     }
 

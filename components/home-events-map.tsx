@@ -228,13 +228,16 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
       status: userLocationStatus,
     })
 
+    // Zoom only happens from this control - never from auto-resume on visit.
     if (userCoordinates && userLocationStatus === "tracking") {
       flyToUser(userCoordinates)
       return
     }
 
     pendingFlyToUserRef.current = true
-    requestLocation()
+    if (userLocationStatus !== "requesting") {
+      requestLocation()
+    }
   }
 
   const switchView = (nextView: WorldView) => {
@@ -437,6 +440,27 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
           }
         }
 
+        @keyframes player-beacon-pulse {
+          0%,
+          100% {
+            transform: scale(1);
+            opacity: 0.95;
+          }
+          50% {
+            transform: scale(1.55);
+            opacity: 0.35;
+          }
+        }
+
+        .player-location-marker__pulse {
+          position: absolute;
+          inset: 0;
+          border: 2px solid #342414;
+          background: #4ecdc4;
+          box-shadow: 2px 2px 0 #342414;
+          animation: player-beacon-pulse 1.35s steps(2) infinite;
+        }
+
         .quest-event-marker.is-active {
           transform: scale(1.2);
         }
@@ -452,6 +476,19 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
             100% {
               transform: translateY(0);
             }
+          }
+
+          @keyframes player-beacon-pulse {
+            0%,
+            100% {
+              transform: scale(1);
+              opacity: 0.85;
+            }
+          }
+
+          .player-location-marker__character,
+          .player-location-marker__pulse {
+            animation: none !important;
           }
         }
 

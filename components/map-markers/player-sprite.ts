@@ -1,188 +1,94 @@
 const OUTLINE = "#342414"
 const TEAL = "#4ecdc4"
 const TEAL_DEEP = "#2a9d96"
-const CREAM = "#f0f7e6"
 const YELLOW = "#ffe66d"
-const SKIN = "#f2c39a"
-const BOOT = "#5a3d24"
 
-function sd(styles: Partial<CSSStyleDeclaration>) {
-  const el = document.createElement("div")
-  Object.assign(el.style, styles)
-  return el
-}
+// Larger than quest pins (~42px), smaller than city signs (~70px).
+const PLAYER_SPRITE_HEIGHT = 48
+const PLAYER_SPRITE_WIDTH = 32
+// Lift the adventurer so the body clears wooden city-sign bottoms.
+const CHARACTER_BOTTOM_OFFSET = 28
 
 /**
- * Pixel adventurer marker for the signed-in explorer's geolocation.
- * Reads as "you" vs startup robot sprites / YC bosses.
+ * Beacon + floating adventurer for the explorer's geolocation.
+ * The pulse ring sits on the exact lng/lat; the character floats above it.
  */
 export function createPlayerSprite() {
-  const w = 36
-  const h = 48
+  const wrapper = document.createElement("div")
+  wrapper.className = "player-location-marker"
+  wrapper.style.display = "flex"
+  wrapper.style.flexDirection = "column"
+  wrapper.style.alignItems = "center"
+  wrapper.style.pointerEvents = "none"
+  wrapper.style.transformOrigin = "50% 100%"
+  wrapper.style.position = "relative"
 
-  const wrapper = sd({
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    pointerEvents: "none",
-  })
+  const characterStack = document.createElement("div")
+  characterStack.className = "player-location-marker__character"
+  characterStack.style.display = "flex"
+  characterStack.style.flexDirection = "column"
+  characterStack.style.alignItems = "center"
+  characterStack.style.marginBottom = `${CHARACTER_BOTTOM_OFFSET}px`
+  characterStack.style.animationName = "marker-float"
+  characterStack.style.animationDuration = "3.6s"
+  characterStack.style.animationTimingFunction = "ease-in-out"
+  characterStack.style.animationIterationCount = "infinite"
+  characterStack.style.willChange = "transform"
+  characterStack.style.filter = `drop-shadow(2px 2px 0 ${OUTLINE})`
 
-  const sprite = sd({
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    animationName: "marker-float",
-    animationDuration: "3.6s",
-    animationTimingFunction: "ease-in-out",
-    animationIterationCount: "infinite",
-    willChange: "transform",
-  })
-
-  const label = sd({
-    background: YELLOW,
-    border: `2px solid ${OUTLINE}`,
-    color: OUTLINE,
-    fontFamily: "var(--font-pixel), monospace",
-    fontSize: "9px",
-    letterSpacing: "0.04em",
-    lineHeight: "1",
-    padding: "3px 5px",
-    marginBottom: "4px",
-    boxShadow: `2px 2px 0 ${OUTLINE}`,
-    whiteSpace: "nowrap",
-  })
+  const label = document.createElement("span")
+  label.className = "player-location-marker__you"
   label.textContent = "YOU"
+  label.style.background = YELLOW
+  label.style.border = `2px solid ${OUTLINE}`
+  label.style.color = OUTLINE
+  label.style.fontFamily = "var(--font-pixel), monospace"
+  label.style.fontSize = "8px"
+  label.style.letterSpacing = "0.04em"
+  label.style.lineHeight = "1"
+  label.style.padding = "2px 4px"
+  label.style.marginBottom = "3px"
+  label.style.boxShadow = `2px 2px 0 ${OUTLINE}`
+  label.style.whiteSpace = "nowrap"
 
-  const hat = sd({
-    width: `${Math.round(w * 0.78)}px`,
-    height: "8px",
-    background: TEAL,
-    border: `2px solid ${OUTLINE}`,
-    boxShadow: `2px 2px 0 ${OUTLINE}`,
-    marginBottom: "-2px",
-    position: "relative",
-    zIndex: "2",
-  })
-  hat.appendChild(
-    sd({
-      position: "absolute",
-      top: "-6px",
-      left: "50%",
-      transform: "translateX(-50%)",
-      width: "8px",
-      height: "8px",
-      background: YELLOW,
-      border: `2px solid ${OUTLINE}`,
-    })
-  )
+  const image = document.createElement("img")
+  image.src = "/map-assets/player-marker.png"
+  image.alt = ""
+  image.draggable = false
+  image.style.display = "block"
+  image.style.width = `${PLAYER_SPRITE_WIDTH}px`
+  image.style.height = `${PLAYER_SPRITE_HEIGHT}px`
+  image.style.objectFit = "contain"
+  image.style.imageRendering = "pixelated"
 
-  const head = sd({
-    width: `${Math.round(w * 0.62)}px`,
-    height: `${Math.round(h * 0.28)}px`,
-    background: SKIN,
-    border: `2px solid ${OUTLINE}`,
-    boxShadow: `3px 3px 0 ${OUTLINE}`,
-    position: "relative",
-    zIndex: "1",
-  })
+  characterStack.append(label, image)
 
-  for (const side of ["left", "right"] as const) {
-    head.appendChild(
-      sd({
-        position: "absolute",
-        top: "5px",
-        [side]: "4px",
-        width: "5px",
-        height: "5px",
-        background: OUTLINE,
-      })
-    )
-  }
+  const beacon = document.createElement("div")
+  beacon.className = "player-location-marker__beacon"
+  beacon.style.position = "relative"
+  beacon.style.width = "18px"
+  beacon.style.height = "18px"
+  beacon.style.display = "flex"
+  beacon.style.alignItems = "center"
+  beacon.style.justifyContent = "center"
 
-  head.appendChild(
-    sd({
-      position: "absolute",
-      bottom: "3px",
-      left: "50%",
-      transform: "translateX(-50%)",
-      width: "10px",
-      height: "3px",
-      background: OUTLINE,
-    })
-  )
+  const pulse = document.createElement("span")
+  pulse.className = "player-location-marker__pulse"
+  pulse.setAttribute("aria-hidden", "true")
 
-  const body = sd({
-    width: `${Math.round(w * 0.72)}px`,
-    height: `${Math.round(h * 0.34)}px`,
-    background: TEAL,
-    border: `2px solid ${OUTLINE}`,
-    marginTop: "-1px",
-    boxShadow: `3px 3px 0 ${OUTLINE}`,
-    position: "relative",
-  })
+  const core = document.createElement("span")
+  core.className = "player-location-marker__core"
+  core.setAttribute("aria-hidden", "true")
+  core.style.width = "8px"
+  core.style.height = "8px"
+  core.style.background = TEAL
+  core.style.border = `2px solid ${OUTLINE}`
+  core.style.boxShadow = `2px 2px 0 ${OUTLINE}, inset 0 -2px 0 ${TEAL_DEEP}`
+  core.style.position = "relative"
+  core.style.zIndex = "1"
 
-  body.appendChild(
-    sd({
-      position: "absolute",
-      inset: "4px 6px auto 6px",
-      height: "5px",
-      background: CREAM,
-      border: `1px solid ${OUTLINE}`,
-    })
-  )
-
-  body.appendChild(
-    sd({
-      position: "absolute",
-      left: "-6px",
-      top: "4px",
-      width: "8px",
-      height: "14px",
-      background: TEAL_DEEP,
-      border: `2px solid ${OUTLINE}`,
-    })
-  )
-  body.appendChild(
-    sd({
-      position: "absolute",
-      right: "-6px",
-      top: "4px",
-      width: "8px",
-      height: "14px",
-      background: TEAL_DEEP,
-      border: `2px solid ${OUTLINE}`,
-    })
-  )
-
-  const legs = sd({
-    display: "flex",
-    gap: "6px",
-    marginTop: "-1px",
-  })
-  for (let i = 0; i < 2; i += 1) {
-    legs.appendChild(
-      sd({
-        width: "10px",
-        height: "12px",
-        background: BOOT,
-        border: `2px solid ${OUTLINE}`,
-        boxShadow: `2px 2px 0 ${OUTLINE}`,
-      })
-    )
-  }
-
-  sprite.append(label, hat, head, body, legs)
-  wrapper.appendChild(sprite)
-
-  wrapper.appendChild(
-    sd({
-      width: `${Math.round(w * 0.7)}px`,
-      height: "6px",
-      background: "rgba(52,36,20,0.35)",
-      marginTop: "2px",
-      boxShadow: "0 0 0 1px rgba(78,205,196,0.25)",
-    })
-  )
+  beacon.append(pulse, core)
+  wrapper.append(characterStack, beacon)
 
   return wrapper
 }

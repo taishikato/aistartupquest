@@ -1,9 +1,12 @@
-import { describe, expect, it } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 
 import {
   locateButtonLabel,
+  readUserLocationOptedIn,
   toUserCoordinates,
+  USER_LOCATION_OPTED_IN_KEY,
   userLocationErrorStatus,
+  writeUserLocationOptedIn,
 } from "@/lib/user-location"
 
 function makePosition(
@@ -68,5 +71,35 @@ describe("locateButtonLabel", () => {
   it("returns action copy for idle and tracking states", () => {
     expect(locateButtonLabel("idle")).toBe("Show my location")
     expect(locateButtonLabel("tracking")).toBe("Center on your location")
+  })
+})
+
+describe("user location opt-in storage", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it("round-trips the opted-in flag", () => {
+    const store = new Map<string, string>()
+
+    vi.stubGlobal("window", {
+      localStorage: {
+        getItem: (key: string) => store.get(key) ?? null,
+        setItem: (key: string, value: string) => {
+          store.set(key, value)
+        },
+        removeItem: (key: string) => {
+          store.delete(key)
+        },
+      },
+    })
+
+    writeUserLocationOptedIn(true)
+    expect(readUserLocationOptedIn()).toBe(true)
+    expect(store.get(USER_LOCATION_OPTED_IN_KEY)).toBe("1")
+
+    writeUserLocationOptedIn(false)
+    expect(readUserLocationOptedIn()).toBe(false)
+    expect(store.has(USER_LOCATION_OPTED_IN_KEY)).toBe(false)
   })
 })
