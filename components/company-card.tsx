@@ -2,6 +2,7 @@
 
 import { ArrowUpRight, MapPin } from "lucide-react"
 
+import { track } from "@/lib/analytics"
 import { type Company } from "@/lib/company"
 import { cn } from "@/lib/utils"
 import {
@@ -14,6 +15,18 @@ type CompanyCardProps = {
   active?: boolean
   compact?: boolean
   onSelect?: (slug: string) => void
+}
+
+function trackCompanySiteClick(
+  company: Company,
+  source: "card" | "card_compact"
+) {
+  track("company_site_click", {
+    company_slug: company.slug,
+    company_name: company.name,
+    city: company.city,
+    source,
+  })
 }
 
 export function CompanyCard({
@@ -53,6 +66,10 @@ export function CompanyCard({
               target="_blank"
               rel="noreferrer"
               aria-label={`Visit ${company.name}`}
+              onClick={(event) => {
+                event.stopPropagation()
+                trackCompanySiteClick(company, "card_compact")
+              }}
               className="inline-flex size-7 shrink-0 items-center justify-center border-2 border-[#3a3a5e] bg-[#2a2a4e] text-[#f0f7e6]/70 transition-colors hover:border-[#4ecdc4] hover:text-[#4ecdc4]"
             >
               <ArrowUpRight className="size-3" />
@@ -104,6 +121,7 @@ export function CompanyCard({
           target="_blank"
           rel="noreferrer"
           aria-label={`Visit ${company.name}`}
+          onClick={() => trackCompanySiteClick(company, "card")}
           className="inline-flex size-9 shrink-0 items-center justify-center border-2 border-[#3a3a5e] bg-[#2a2a4e] text-[#4ecdc4] transition-colors hover:border-[#4ecdc4] hover:bg-[#4ecdc4] hover:text-[#1a1a2e]"
         >
           <ArrowUpRight className="size-4" />

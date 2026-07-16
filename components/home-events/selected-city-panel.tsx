@@ -1,6 +1,17 @@
 import { format } from "date-fns"
 
+import { track } from "@/lib/analytics"
 import type { CursorCommunityEvent } from "@/lib/cursor-community-events"
+
+function trackEventRegisterClick(event: CursorCommunityEvent) {
+  track("event_register_click", {
+    event_id: event.id,
+    event_name: event.title,
+    city: event.city,
+    source_guild: event.company,
+    source: "city_panel",
+  })
+}
 
 export function SelectedCityPanel({
   selectedCity,
@@ -46,6 +57,7 @@ export function SelectedCityPanel({
                 href={event.url}
                 target="_blank"
                 rel="noreferrer"
+                onClick={() => trackEventRegisterClick(event)}
                 className="justify-self-start border-2 border-[#1a1a2e] bg-[#4ecdc4] px-2 py-1 text-xs font-bold text-[#1a1a2e] shadow-[2px_2px_0_#1a1a2e]"
               >
                 Register ↗

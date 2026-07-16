@@ -7,6 +7,7 @@ import {
   MapPin,
 } from "lucide-react"
 
+import { track } from "@/lib/analytics"
 import type { Company } from "@/lib/company"
 import { cn } from "@/lib/utils"
 import {
@@ -100,6 +101,14 @@ export function SelectedCompanyPanel({
                   target="_blank"
                   rel="noreferrer"
                   aria-label={`Visit ${company.name}`}
+                  onClick={() =>
+                    track("company_site_click", {
+                      company_slug: company.slug,
+                      company_name: company.name,
+                      city: company.city,
+                      source: "selected_panel",
+                    })
+                  }
                   className="inline-flex size-10 shrink-0 items-center justify-center border-2 border-[#3a3a5e] bg-[#23233b] text-[#4ecdc4] transition-colors hover:border-[#4ecdc4] hover:bg-[#4ecdc4] hover:text-[#1a1a2e]"
                 >
                   <ArrowUpRight className="size-4" />

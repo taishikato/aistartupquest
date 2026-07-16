@@ -18,6 +18,7 @@ import { SelectedCityPanel } from "@/components/home-events/selected-city-panel"
 import { useHomeMapUrlSync } from "@/components/home-events/use-home-map-url-sync"
 import { useHomeWorldMap } from "@/components/home-events/use-home-world-map"
 import { useIdleGlobeRotation } from "@/components/home-events/use-idle-globe-rotation"
+import { track } from "@/lib/analytics"
 import {
   getUpcomingCities,
   type CursorCommunityCity,
@@ -47,6 +48,7 @@ export function HomeEventsMap() {
     () => flattenUpcomingEvents(upcomingCities),
     [upcomingCities]
   )
+  const normalizedQuery = query.trim().toLocaleLowerCase()
   const filteredEvents = useMemo(
     () => filterEventsByQuery(allEvents, query),
     [allEvents, query]
@@ -100,6 +102,21 @@ export function HomeEventsMap() {
     stopIdleRotation,
   })
 
+  useEffect(() => {
+    if (normalizedQuery.length < 2) {
+      return
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      track("event_search", {
+        query: normalizedQuery,
+        result_count: filteredEvents.length,
+      })
+    }, 500)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [normalizedQuery, filteredEvents.length])
+
   const switchView = (nextView: WorldView) => {
     const map = mapRef.current
 
@@ -108,6 +125,7 @@ export function HomeEventsMap() {
     }
 
     stopIdleRotation()
+    track("map_view_toggle", { view: nextView })
     viewRef.current = nextView
     setView(nextView)
     applyHomeMapView(map, nextView, { easeToDefaultCamera: true })
