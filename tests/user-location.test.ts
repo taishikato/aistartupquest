@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest"
 
-import { toUserCoordinates, userLocationErrorStatus } from "@/lib/user-location"
+import {
+  locateButtonLabel,
+  toUserCoordinates,
+  userLocationErrorStatus,
+} from "@/lib/user-location"
 
 function makePosition(
   coords: Partial<GeolocationCoordinates> = {}
@@ -57,5 +61,12 @@ describe("userLocationErrorStatus", () => {
   it("returns unavailable for other errors", () => {
     expect(userLocationErrorStatus(makeError(2))).toBe("unavailable")
     expect(userLocationErrorStatus(makeError(3))).toBe("unavailable")
+  })
+})
+
+describe("locateButtonLabel", () => {
+  it("returns action copy for idle and tracking states", () => {
+    expect(locateButtonLabel("idle")).toBe("Show my location")
+    expect(locateButtonLabel("tracking")).toBe("Center on your location")
   })
 })

@@ -2,9 +2,16 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
-import { Volume2, VolumeX } from "lucide-react"
+import { Crosshair, Volume2, VolumeX } from "lucide-react"
 import type { Map as MapLibreMap } from "maplibre-gl"
 
+import { track } from "@/lib/analytics"
+import type { CityWithEvents, EventCity } from "@/lib/events"
+import { parseHomeMapView, type HomeMapView } from "@/lib/home-map-url"
+import { locateButtonLabel, type UserCoordinates } from "@/lib/user-location"
+import { cn } from "@/lib/utils"
+import { useUserLocation } from "@/hooks/use-user-location"
+import { Button } from "@/components/ui/button"
 import { applyHomeMapView } from "@/components/home-events/apply-home-map-view"
 import {
   filterCitiesByEvents,
@@ -19,13 +26,12 @@ import { SelectedCityPanel } from "@/components/home-events/selected-city-panel"
 import { useHomeMapUrlSync } from "@/components/home-events/use-home-map-url-sync"
 import { useHomeWorldMap } from "@/components/home-events/use-home-world-map"
 import { useIdleGlobeRotation } from "@/components/home-events/use-idle-globe-rotation"
+import { useUserLocationMarker } from "@/components/map-markers/use-user-location-marker"
 import { QuestHeraldSignup } from "@/components/quest-herald-signup"
 import { SpaceBackdrop } from "@/components/space-backdrop"
-import { Button } from "@/components/ui/button"
-import { track } from "@/lib/analytics"
-import type { CityWithEvents, EventCity } from "@/lib/events"
-import { parseHomeMapView, type HomeMapView } from "@/lib/home-map-url"
-import { cn } from "@/lib/utils"
+
+// Home world maxZoom is 5.5; zoom in enough to read the player sprite.
+const USER_LOCATION_ZOOM = 4.6
 
 type WorldView = HomeMapView
 
@@ -47,8 +53,14 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
   const [boardOpen, setBoardOpen] = useState(false)
   const [isAudioMuted, setIsAudioMuted] = useState(true)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const pendingFlyToUserRef = useRef(false)
   const { startIdleRotation, stopIdleRotation, rotationStoppedByUserRef } =
     useIdleGlobeRotation(mapRef, viewRef)
+  const {
+    status: userLocationStatus,
+    coordinates: userCoordinates,
+    requestLocation,
+  } = useUserLocation()
 
   const allEvents = useMemo(
     () => flattenUpcomingEvents(upcomingCities),
@@ -92,6 +104,39 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
     stopIdleRotation,
     rotationStoppedByUserRef,
   })
+
+  useUserLocationMarker({
+    mapReady,
+    coordinates: userCoordinates,
+  })
+
+  const flyToUser = useCallback(
+    (coordinates: UserCoordinates) => {
+      const map = mapRef.current
+      if (!map) {
+        return
+      }
+
+      rotationStoppedByUserRef.current = true
+      stopIdleRotation()
+      map.flyTo({
+        center: [coordinates.lng, coordinates.lat],
+        zoom: Math.max(map.getZoom(), USER_LOCATION_ZOOM),
+        duration: 900,
+        essential: true,
+      })
+    },
+    [rotationStoppedByUserRef, stopIdleRotation]
+  )
+
+  useEffect(() => {
+    if (!userCoordinates || !pendingFlyToUserRef.current) {
+      return
+    }
+
+    pendingFlyToUserRef.current = false
+    flyToUser(userCoordinates)
+  }, [flyToUser, userCoordinates])
 
   useHomeMapUrlSync({
     mapReady,
@@ -170,6 +215,26 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
         audio.muted = true
       }
     }
+  }
+
+  const handleLocateUser = () => {
+    if (userLocationStatus === "unsupported") {
+      return
+    }
+
+    track("user_locate_click", {
+      surface: "home_map",
+      view,
+      status: userLocationStatus,
+    })
+
+    if (userCoordinates && userLocationStatus === "tracking") {
+      flyToUser(userCoordinates)
+      return
+    }
+
+    pendingFlyToUserRef.current = true
+    requestLocation()
   }
 
   const switchView = (nextView: WorldView) => {
@@ -267,8 +332,8 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
         </div>
       ) : null}
 
-      {/* Mute toggle (same theme audio as city maps) */}
-      <div className="pointer-events-none absolute top-4 left-4 z-30 md:left-[calc(min(380px,calc(100vw-24px))+1rem)] md:top-6">
+      {/* Mute + locate (theme audio shared with city maps) */}
+      <div className="pointer-events-none absolute top-4 left-4 z-30 flex items-center gap-2 md:top-6 md:left-[calc(min(380px,calc(100vw-24px))+1rem)]">
         <Button
           type="button"
           onClick={handleToggleMute}
@@ -283,6 +348,31 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
           ) : (
             <Volume2 className="volume-unmuted-icon size-3.5" />
           )}
+        </Button>
+        <Button
+          type="button"
+          onClick={handleLocateUser}
+          disabled={
+            userLocationStatus === "unsupported" ||
+            userLocationStatus === "requesting"
+          }
+          aria-label={locateButtonLabel(userLocationStatus)}
+          title={locateButtonLabel(userLocationStatus)}
+          className={cn(
+            "pointer-events-auto size-10 border-[3px] border-[#342414] bg-[#f4ecd2] p-0 text-[#4c3926] shadow-[4px_4px_0px_#342414] hover:bg-[#e7d8ae]",
+            userLocationStatus === "tracking" &&
+              "border-[#2a9d96] bg-[#dff7f4] text-[#1a6f6a]",
+            (userLocationStatus === "denied" ||
+              userLocationStatus === "unavailable") &&
+              "text-[#9a4d30]"
+          )}
+        >
+          <Crosshair
+            className={cn(
+              "size-3.5",
+              userLocationStatus === "requesting" && "animate-pulse"
+            )}
+          />
         </Button>
       </div>
 
@@ -337,6 +427,16 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
           }
         }
 
+        @keyframes marker-float {
+          0%,
+          100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-4px);
+          }
+        }
+
         .quest-event-marker.is-active {
           transform: scale(1.2);
         }
@@ -344,6 +444,15 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
         .quest-event-marker:hover .quest-event-marker__body,
         .quest-event-marker.is-active .quest-event-marker__body {
           animation: quest-marker-bounce 0.5s steps(2) infinite;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          @keyframes marker-float {
+            0%,
+            100% {
+              transform: translateY(0);
+            }
+          }
         }
 
         @keyframes volume-unmuted-beat {
