@@ -1,25 +1,31 @@
 import { describe, expect, it } from "vitest"
 
-import {
-  toUserCoordinates,
-  userLocationErrorStatus,
-} from "@/lib/user-location"
+import { toUserCoordinates, userLocationErrorStatus } from "@/lib/user-location"
 
 function makePosition(
   coords: Partial<GeolocationCoordinates> = {}
 ): GeolocationPosition {
+  const resolved = {
+    latitude: 37.7749,
+    longitude: -122.4194,
+    accuracy: 12,
+    altitude: null,
+    altitudeAccuracy: null,
+    heading: null,
+    speed: null,
+    ...coords,
+  }
+
   return {
     coords: {
-      latitude: 37.7749,
-      longitude: -122.4194,
-      accuracy: 12,
-      altitude: null,
-      altitudeAccuracy: null,
-      heading: null,
-      speed: null,
-      ...coords,
+      ...resolved,
+      toJSON: () => resolved,
     },
     timestamp: Date.now(),
+    toJSON: () => ({
+      coords: resolved,
+      timestamp: Date.now(),
+    }),
   }
 }
 
