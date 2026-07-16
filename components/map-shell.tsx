@@ -1,24 +1,20 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Crosshair, Github, Volume2, VolumeX } from "lucide-react"
+import { Github, Volume2, VolumeX } from "lucide-react"
 import maplibregl, {
   type Map as MapLibreMap,
   type StyleSpecification,
 } from "maplibre-gl"
 
-import { track } from "@/lib/analytics"
 import type { CityMapConfig } from "@/lib/city-config"
 import { type Company } from "@/lib/company"
+import { useMapMarkers } from "@/components/map-markers/use-map-markers"
 import { logNonAbortError } from "@/lib/is-abort-error"
 import { addVoxelCityLayers, applyMinecraftStyle } from "@/lib/map-paint"
-import type { UserLocationStatus } from "@/lib/user-location"
 import { cn } from "@/lib/utils"
-import { useUserLocation } from "@/hooks/use-user-location"
 import { Button } from "@/components/ui/button"
 import { CompanyAddInvite } from "@/components/company-add-invite"
-import { useMapMarkers } from "@/components/map-markers/use-map-markers"
-import { useUserLocationMarker } from "@/components/map-markers/use-user-location-marker"
 import { PixelClouds } from "@/components/pixel-clouds"
 import { QuestHeraldSignup } from "@/components/quest-herald-signup"
 
@@ -63,15 +59,9 @@ export function MapShell({
   const containerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<MapLibreMap | null>(null)
   const hasInteractedRef = useRef(false)
-  const pendingFlyToUserRef = useRef(false)
   const initialCenterRef = useRef(config.mapCenter)
   const [mapReady, setMapReady] = useState<MapLibreMap | null>(null)
   const denseStartups = companies.length >= 60
-  const {
-    status: userLocationStatus,
-    coordinates: userCoordinates,
-    requestLocation,
-  } = useUserLocation()
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) {
@@ -140,30 +130,6 @@ export function MapShell({
     onSelectCompany,
   })
 
-  useUserLocationMarker({
-    mapReady,
-    coordinates: userCoordinates,
-  })
-
-  useEffect(() => {
-    const map = mapRef.current
-    if (!map || !userCoordinates || !pendingFlyToUserRef.current) {
-      return
-    }
-
-    pendingFlyToUserRef.current = false
-    hasInteractedRef.current = true
-    map.flyTo({
-      center: [userCoordinates.lng, userCoordinates.lat],
-      zoom: Math.max(map.getZoom(), 13.2),
-      pitch: MAP_PITCH,
-      bearing: MAP_BEARING,
-      speed: 0.7,
-      curve: 1.15,
-      essential: true,
-    })
-  }, [userCoordinates])
-
   useEffect(() => {
     const map = mapRef.current
     if (!map) {
@@ -185,39 +151,6 @@ export function MapShell({
       essential: true,
     })
   }, [selectedCompany])
-
-  const handleLocateUser = () => {
-    if (userLocationStatus === "unsupported") {
-      return
-    }
-
-    track("user_locate_click", {
-      city: config.city,
-      status: userLocationStatus,
-    })
-
-    if (userCoordinates && userLocationStatus === "tracking") {
-      const map = mapRef.current
-      if (!map) {
-        return
-      }
-
-      hasInteractedRef.current = true
-      map.flyTo({
-        center: [userCoordinates.lng, userCoordinates.lat],
-        zoom: Math.max(map.getZoom(), 13.2),
-        pitch: MAP_PITCH,
-        bearing: MAP_BEARING,
-        speed: 0.7,
-        curve: 1.15,
-        essential: true,
-      })
-      return
-    }
-
-    pendingFlyToUserRef.current = true
-    requestLocation()
-  }
 
   return (
     <div className="relative h-full min-h-0 overflow-hidden bg-[#cdb98b] lg:min-h-160">
@@ -257,31 +190,6 @@ export function MapShell({
           ) : (
             <Volume2 className="volume-unmuted-icon size-3.5" />
           )}
-        </Button>
-        <Button
-          type="button"
-          onClick={handleLocateUser}
-          disabled={
-            userLocationStatus === "unsupported" ||
-            userLocationStatus === "requesting"
-          }
-          aria-label={locateButtonLabel(userLocationStatus)}
-          title={locateButtonLabel(userLocationStatus)}
-          className={cn(
-            "size-10 border-[3px] border-[#342414] bg-[#f4ecd2] p-0 text-[#4c3926] shadow-[4px_4px_0px_#342414] hover:bg-[#e7d8ae]",
-            userLocationStatus === "tracking" &&
-              "border-[#2a9d96] bg-[#dff7f4] text-[#1a6f6a]",
-            (userLocationStatus === "denied" ||
-              userLocationStatus === "unavailable") &&
-              "text-[#9a4d30]"
-          )}
-        >
-          <Crosshair
-            className={cn(
-              "size-3.5",
-              userLocationStatus === "requesting" && "animate-pulse"
-            )}
-          />
         </Button>
         <a
           href={config.sourceHref}
@@ -402,21 +310,4 @@ export function MapShell({
       `}</style>
     </div>
   )
-}
-
-function locateButtonLabel(status: UserLocationStatus) {
-  switch (status) {
-    case "requesting":
-      return "Finding your location"
-    case "tracking":
-      return "Center on your location"
-    case "denied":
-      return "Location permission denied"
-    case "unavailable":
-      return "Location unavailable"
-    case "unsupported":
-      return "Location not supported"
-    default:
-      return "Show my location"
-  }
 }

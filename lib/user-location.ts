@@ -35,3 +35,20 @@ export function userLocationErrorStatus(
 
   return "unavailable"
 }
+
+export function locateButtonLabel(status: UserLocationStatus) {
+  switch (status) {
+    case "requesting":
+      return "Finding your location"
+    case "tracking":
+      return "Center on your location"
+    case "denied":
+      return "Location permission denied"
+    case "unavailable":
+      return "Location unavailable"
+    case "unsupported":
+      return "Location not supported"
+    default:
+      return "Show my location"
+  }
+}
