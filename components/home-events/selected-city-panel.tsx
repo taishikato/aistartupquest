@@ -1,9 +1,9 @@
 import { format } from "date-fns"
 
 import { track } from "@/lib/analytics"
-import type { CursorCommunityEvent } from "@/lib/cursor-community-events"
+import type { CommunityEvent } from "@/lib/events"
 
-function trackEventRegisterClick(event: CursorCommunityEvent) {
+function trackEventRegisterClick(event: CommunityEvent) {
   track("event_register_click", {
     event_id: event.id,
     event_name: event.title,
@@ -19,7 +19,7 @@ export function SelectedCityPanel({
   onClose,
 }: {
   selectedCity: string
-  events: CursorCommunityEvent[]
+  events: CommunityEvent[]
   onClose: () => void
 }) {
   return (

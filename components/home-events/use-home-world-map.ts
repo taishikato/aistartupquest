@@ -8,10 +8,7 @@ import {
   setEventMarkerActive,
   type EventMarkerEntry,
 } from "@/components/home-events/markers"
-import type {
-  CityWithEvents,
-  CursorCommunityCity,
-} from "@/lib/cursor-community-events"
+import type { CityWithEvents, EventCity } from "@/lib/events"
 import { logNonAbortError } from "@/lib/is-abort-error"
 import {
   applyRpgAtlasPaint,
@@ -24,7 +21,7 @@ type UseHomeWorldMapArgs = {
   mapRef: RefObject<MapLibreMap | null>
   filteredCities: CityWithEvents[]
   selectedCity: string | null
-  selectCity: (city: CursorCommunityCity) => void
+  selectCity: (city: EventCity) => void
   stopIdleRotation: () => void
   rotationStoppedByUserRef: RefObject<boolean>
 }

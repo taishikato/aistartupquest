@@ -20,16 +20,17 @@ import { useHomeWorldMap } from "@/components/home-events/use-home-world-map"
 import { useIdleGlobeRotation } from "@/components/home-events/use-idle-globe-rotation"
 import { QuestHeraldSignup } from "@/components/quest-herald-signup"
 import { track } from "@/lib/analytics"
-import {
-  getUpcomingCities,
-  type CursorCommunityCity,
-} from "@/lib/cursor-community-events"
+import type { CityWithEvents, EventCity } from "@/lib/events"
 import { parseHomeMapView, type HomeMapView } from "@/lib/home-map-url"
 import { cn } from "@/lib/utils"
 
 type WorldView = HomeMapView
 
-export function HomeEventsMap() {
+type HomeEventsMapProps = {
+  upcomingCities: CityWithEvents[]
+}
+
+export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const containerRef = useRef<HTMLDivElement | null>(null)
@@ -44,7 +45,6 @@ export function HomeEventsMap() {
   const { startIdleRotation, stopIdleRotation, rotationStoppedByUserRef } =
     useIdleGlobeRotation(mapRef, viewRef)
 
-  const upcomingCities = useMemo(() => getUpcomingCities(), [])
   const allEvents = useMemo(
     () => flattenUpcomingEvents(upcomingCities),
     [upcomingCities]
@@ -68,7 +68,7 @@ export function HomeEventsMap() {
     [selectedCity, upcomingCities]
   )
 
-  const selectCity = useCallback((city: CursorCommunityCity) => {
+  const selectCity = useCallback((city: EventCity) => {
     setSelectedCity(city.name)
     setBoardOpen(true)
     mapRef.current?.flyTo({

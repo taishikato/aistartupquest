@@ -1,7 +1,7 @@
 import type { Marker } from "maplibre-gl"
 
 import { track } from "@/lib/analytics"
-import type { CityWithEvents } from "@/lib/cursor-community-events"
+import type { CityWithEvents } from "@/lib/events"
 import type { WorldStageCity } from "@/lib/world-stage-cities"
 
 export type EventMarkerEntry = {

@@ -167,146 +167,104 @@ export type Database = {
         }
         Relationships: []
       }
-      meetup_submission_attempts: {
-        Row: {
-          created_at: string
-          id: number
-          ip_hash: string
-          payload_hash: string
-        }
-        Insert: {
-          created_at?: string
-          id?: never
-          ip_hash: string
-          payload_hash: string
-        }
-        Update: {
-          created_at?: string
-          id?: never
-          ip_hash?: string
-          payload_hash?: string
-        }
-        Relationships: []
-      }
-      meetups: {
+      events: {
         Row: {
           city: string
-          contact_email: string | null
+          company: string
           created_at: string
-          description: string
+          description: string | null
           event_date: string
+          event_timezone: string
           event_url: string
           id: number
           latitude: number
-          location_label: string
-          location_precision: string
           longitude: number
-          organizer_name: string | null
-          payload_hash: string | null
-          slug: string
+          payload_hash: string
           source: string
-          source_event_id: string | null
+          source_event_id: string
           status: string
           title: string
           updated_at: string
-          venue_name: string
         }
         Insert: {
           city: string
-          contact_email?: string | null
+          company: string
           created_at?: string
-          description: string
+          description?: string | null
           event_date: string
+          event_timezone: string
           event_url: string
           id?: never
           latitude: number
-          location_label: string
-          location_precision?: string
           longitude: number
-          organizer_name?: string | null
-          payload_hash?: string | null
-          slug: string
-          source?: string
-          source_event_id?: string | null
+          payload_hash: string
+          source: string
+          source_event_id: string
           status?: string
           title: string
           updated_at?: string
-          venue_name: string
         }
         Update: {
           city?: string
-          contact_email?: string | null
+          company?: string
           created_at?: string
-          description?: string
+          description?: string | null
           event_date?: string
+          event_timezone?: string
           event_url?: string
           id?: never
           latitude?: number
-          location_label?: string
-          location_precision?: string
           longitude?: number
-          organizer_name?: string | null
-          payload_hash?: string | null
-          slug?: string
+          payload_hash?: string
           source?: string
-          source_event_id?: string | null
+          source_event_id?: string
           status?: string
           title?: string
           updated_at?: string
-          venue_name?: string
         }
         Relationships: []
       }
     }
     Views: {
-      published_upcoming_meetups: {
+      published_upcoming_events: {
         Row: {
           city: string | null
+          company: string | null
           description: string | null
           event_date: string | null
+          event_timezone: string | null
           event_url: string | null
           latitude: number | null
-          location_label: string | null
-          location_precision: string | null
           longitude: number | null
-          organizer_name: string | null
-          slug: string | null
           source: string | null
-          status: string | null
+          source_event_id: string | null
           title: string | null
-          venue_name: string | null
         }
         Insert: {
           city?: string | null
+          company?: string | null
           description?: string | null
           event_date?: string | null
+          event_timezone?: string | null
           event_url?: string | null
           latitude?: number | null
-          location_label?: string | null
-          location_precision?: string | null
           longitude?: number | null
-          organizer_name?: string | null
-          slug?: string | null
           source?: string | null
-          status?: string | null
+          source_event_id?: string | null
           title?: string | null
-          venue_name?: string | null
         }
         Update: {
           city?: string | null
+          company?: string | null
           description?: string | null
           event_date?: string | null
+          event_timezone?: string | null
           event_url?: string | null
           latitude?: number | null
-          location_label?: string | null
-          location_precision?: string | null
           longitude?: number | null
-          organizer_name?: string | null
-          slug?: string | null
           source?: string | null
-          status?: string | null
+          source_event_id?: string | null
           title?: string | null
-          venue_name?: string | null
         }
         Relationships: []
       }

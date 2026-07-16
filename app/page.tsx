@@ -3,11 +3,12 @@ import { Suspense } from "react"
 
 import { HomeEventsMap } from "@/components/home-events-map"
 import { buildPageMetadata } from "@/lib/config"
-import cursorCommunityEvents from "@/lib/data/cursor-community-events.json"
 import {
-  buildEventItemListJsonLd,
-  selectUpcomingEvents,
-} from "@/lib/structured-data"
+  groupEventsByCity,
+  toCommunityEvent,
+} from "@/lib/events"
+import { getUpcomingEvents } from "@/lib/events-query"
+import { buildEventItemListJsonLd } from "@/lib/structured-data"
 
 export const metadata: Metadata = buildPageMetadata({
   title: "AI Startup Quest: AI Events & Startup World Map",
@@ -16,8 +17,10 @@ export const metadata: Metadata = buildPageMetadata({
   path: "/",
 })
 
-export default function Page() {
-  const upcomingEvents = selectUpcomingEvents(cursorCommunityEvents.events)
+export default async function Page() {
+  const eventRows = await getUpcomingEvents()
+  const upcomingCities = groupEventsByCity(eventRows)
+  const upcomingEvents = eventRows.slice(0, 20).map(toCommunityEvent)
   const jsonLd = buildEventItemListJsonLd(upcomingEvents)
 
   return (
@@ -27,7 +30,7 @@ export default function Page() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Suspense fallback={null}>
-        <HomeEventsMap />
+        <HomeEventsMap upcomingCities={upcomingCities} />
       </Suspense>
     </>
   )
