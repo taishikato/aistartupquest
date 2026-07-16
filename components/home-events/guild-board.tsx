@@ -56,6 +56,9 @@ export function GuildBoardHeader({
       <p className="mt-3 font-(family-name:--font-pixel) text-[8px] leading-4 text-[#95602f]">
         {eventCount} upcoming events in {cityCount} cities
       </p>
+      <p className="mt-1 font-(family-name:--font-pixel) text-[8px] leading-4 text-[#95602f]/80">
+        Updated daily at 10 AM ET
+      </p>
       <label className="mt-3 block">
         <span className="sr-only">Search events or cities</span>
         <input
