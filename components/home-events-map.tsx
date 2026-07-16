@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
+import { Volume2, VolumeX } from "lucide-react"
 import type { Map as MapLibreMap } from "maplibre-gl"
 
 import { applyHomeMapView } from "@/components/home-events/apply-home-map-view"
@@ -19,6 +20,7 @@ import { useHomeMapUrlSync } from "@/components/home-events/use-home-map-url-syn
 import { useHomeWorldMap } from "@/components/home-events/use-home-world-map"
 import { useIdleGlobeRotation } from "@/components/home-events/use-idle-globe-rotation"
 import { QuestHeraldSignup } from "@/components/quest-herald-signup"
+import { Button } from "@/components/ui/button"
 import { track } from "@/lib/analytics"
 import type { CityWithEvents, EventCity } from "@/lib/events"
 import { parseHomeMapView, type HomeMapView } from "@/lib/home-map-url"
@@ -42,6 +44,8 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
   const [query, setQuery] = useState("")
   const [selectedCity, setSelectedCity] = useState<string | null>(null)
   const [boardOpen, setBoardOpen] = useState(false)
+  const [isAudioMuted, setIsAudioMuted] = useState(true)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
   const { startIdleRotation, stopIdleRotation, rotationStoppedByUserRef } =
     useIdleGlobeRotation(mapRef, viewRef)
 
@@ -117,6 +121,55 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
 
     return () => window.clearTimeout(timeoutId)
   }, [normalizedQuery, filteredEvents.length])
+
+  useEffect(() => {
+    const audio = new Audio("/audio/sf-ai-startup-map-theme.mp3")
+    audio.loop = true
+    audio.preload = "auto"
+    audio.volume = 0.42
+    audio.muted = true
+    audioRef.current = audio
+
+    audio.play().catch(() => {
+      // Browsers usually allow muted autoplay, but failing closed is fine here.
+    })
+
+    return () => {
+      audio.pause()
+      audioRef.current = null
+    }
+  }, [])
+
+  useEffect(() => {
+    const audio = audioRef.current
+
+    if (!audio) {
+      return
+    }
+
+    audio.muted = isAudioMuted
+  }, [isAudioMuted])
+
+  const handleToggleMute = async () => {
+    const audio = audioRef.current
+
+    if (!audio) {
+      return
+    }
+
+    const nextMuted = !isAudioMuted
+    audio.muted = nextMuted
+    setIsAudioMuted(nextMuted)
+
+    if (!nextMuted) {
+      try {
+        await audio.play()
+      } catch {
+        setIsAudioMuted(true)
+        audio.muted = true
+      }
+    }
+  }
 
   const switchView = (nextView: WorldView) => {
     const map = mapRef.current
@@ -211,6 +264,25 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
         </div>
       ) : null}
 
+      {/* Mute toggle (same theme audio as city maps) */}
+      <div className="pointer-events-none absolute top-4 left-4 z-30 md:left-[calc(min(380px,calc(100vw-24px))+1rem)] md:top-6">
+        <Button
+          type="button"
+          onClick={handleToggleMute}
+          aria-label={isAudioMuted ? "Unmute audio" : "Mute audio"}
+          className={cn(
+            "pointer-events-auto size-10 border-[3px] border-[#342414] bg-[#f4ecd2] p-0 text-[#4c3926] shadow-[4px_4px_0px_#342414] hover:bg-[#e7d8ae]",
+            !isAudioMuted && "audio-unmuted-btn"
+          )}
+        >
+          {isAudioMuted ? (
+            <VolumeX className="size-3.5" />
+          ) : (
+            <Volume2 className="volume-unmuted-icon size-3.5" />
+          )}
+        </Button>
+      </div>
+
       {/* MAP / GLOBE toggle */}
       <div className="pointer-events-none absolute top-4 right-0 left-0 z-30 flex justify-center px-4 md:top-6 md:left-[min(380px,calc(100vw-24px))]">
         <div className="pointer-events-auto flex shadow-[3px_3px_0_#1a1a2e]">
@@ -269,6 +341,46 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
         .quest-event-marker:hover .quest-event-marker__body,
         .quest-event-marker.is-active .quest-event-marker__body {
           animation: quest-marker-bounce 0.5s steps(2) infinite;
+        }
+
+        @keyframes volume-unmuted-beat {
+          0%,
+          100% {
+            transform: scale(1);
+            opacity: 0.88;
+          }
+          55% {
+            transform: scale(1.08);
+            opacity: 1;
+          }
+        }
+
+        @keyframes audio-unmuted-ring {
+          0%,
+          100% {
+            box-shadow: 4px 4px 0 #342414;
+          }
+          50% {
+            box-shadow:
+              4px 4px 0 #342414,
+              0 0 0 2px rgba(154, 77, 48, 0.45);
+          }
+        }
+
+        .volume-unmuted-icon {
+          transform-origin: center;
+          animation: volume-unmuted-beat 1.1s ease-in-out infinite;
+        }
+
+        .audio-unmuted-btn {
+          animation: audio-unmuted-ring 1.1s ease-in-out infinite;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .volume-unmuted-icon,
+          .audio-unmuted-btn {
+            animation: none !important;
+          }
         }
       `}</style>
     </main>
