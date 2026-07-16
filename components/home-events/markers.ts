@@ -1,5 +1,6 @@
 import type { Marker } from "maplibre-gl"
 
+import { track } from "@/lib/analytics"
 import type { CityWithEvents } from "@/lib/events"
 import type { WorldStageCity } from "@/lib/world-stage-cities"
 
@@ -7,16 +8,20 @@ export type EventMarkerEntry = {
   marker: Marker
   root: HTMLButtonElement
   count: HTMLSpanElement
+  /** Kept in sync with the pin badge when guild-board search filters change. */
+  eventCount: { value: number }
 }
 
 export function createEventCityMarker({
   city,
   active,
   onSelectCity,
+  eventCount,
 }: {
   city: CityWithEvents
   active: boolean
   onSelectCity: (city: CityWithEvents) => void
+  eventCount: { value: number }
 }): { root: HTMLButtonElement; count: HTMLSpanElement } {
   const button = document.createElement("button")
   button.type = "button"
@@ -52,7 +57,7 @@ export function createEventCityMarker({
   image.style.height = "42px"
 
   const count = document.createElement("span")
-  count.textContent = String(city.events.length)
+  count.textContent = String(eventCount.value)
   count.style.position = "absolute"
   // Parchment sits in the middle ~50% of the art, slightly below vertical center.
   count.style.top = "56%"
@@ -66,7 +71,14 @@ export function createEventCityMarker({
 
   body.append(image, count)
   button.append(body)
-  button.addEventListener("click", () => onSelectCity(city))
+  button.addEventListener("click", () => {
+    track("event_view", {
+      city: city.name,
+      source: "map_pin",
+      event_count: eventCount.value,
+    })
+    onSelectCity(city)
+  })
 
   return { root: button, count }
 }

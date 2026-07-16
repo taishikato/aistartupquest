@@ -1,12 +1,33 @@
 import Image from "next/image"
 import { format } from "date-fns"
 
+import { track } from "@/lib/analytics"
 import type {
   CityWithEvents,
   CommunityEvent,
   EventCity,
 } from "@/lib/events"
 import { cn } from "@/lib/utils"
+
+function trackEventRegisterClick(event: CommunityEvent) {
+  track("event_register_click", {
+    event_id: event.id,
+    event_name: event.title,
+    city: event.city,
+    source_guild: event.company,
+    source: "board",
+  })
+}
+
+function trackBoardEventView(event: CommunityEvent) {
+  track("event_view", {
+    event_id: event.id,
+    event_name: event.title,
+    city: event.city,
+    source_guild: event.company,
+    source: "board",
+  })
+}
 
 export function GuildBoardHeader({
   eventCount,
@@ -34,6 +55,9 @@ export function GuildBoardHeader({
       </div>
       <p className="mt-3 font-(family-name:--font-pixel) text-[8px] leading-4 text-[#95602f]">
         {eventCount} upcoming events in {cityCount} cities
+      </p>
+      <p className="mt-1 font-(family-name:--font-pixel) text-[8px] leading-4 text-[#95602f]/80">
+        Updated daily at 10 AM ET
       </p>
       <label className="mt-3 block">
         <span className="sr-only">Search events or cities</span>
@@ -77,7 +101,12 @@ export function GuildBoardList({
             >
               <button
                 type="button"
-                onClick={() => city && onSelectCity(city)}
+                onClick={() => {
+                  trackBoardEventView(event)
+                  if (city) {
+                    onSelectCity(city)
+                  }
+                }}
                 className="block w-full text-left"
               >
                 <div className="flex items-start justify-between gap-2">
@@ -111,6 +140,7 @@ export function GuildBoardList({
                 href={event.url}
                 target="_blank"
                 rel="noreferrer"
+                onClick={() => trackEventRegisterClick(event)}
                 className="mt-3 inline-block border-2 border-[#1a1a2e] bg-[#4ecdc4] px-2 py-1 text-xs font-bold text-[#1a1a2e] shadow-[2px_2px_0_#1a1a2e]"
               >
                 Register ↗

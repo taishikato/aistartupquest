@@ -182,14 +182,17 @@ export function useHomeWorldMap({
       const existing = markers.get(city.name)
 
       if (existing) {
+        existing.eventCount.value = city.events.length
         existing.count.textContent = String(city.events.length)
         return
       }
 
+      const eventCount = { value: city.events.length }
       const { root, count } = createEventCityMarker({
         city,
         active: city.name === selectedCity,
         onSelectCity: selectCity,
+        eventCount,
       })
 
       const marker = new maplibregl.Marker({
@@ -200,7 +203,7 @@ export function useHomeWorldMap({
         .setLngLat([city.lon, city.lat])
         .addTo(mapReady)
 
-      markers.set(city.name, { marker, root, count })
+      markers.set(city.name, { marker, root, count, eventCount })
     })
 
     // Full marker teardown lives in the map-init effect so search/selection

@@ -12,6 +12,7 @@ import {
 import { usePathname, useSearchParams } from "next/navigation"
 
 import type { CityMapConfig } from "@/lib/city-config"
+import { track } from "@/lib/analytics"
 import { YC_BOSS_SLUG, type Company, type CompanyCategory } from "@/lib/company"
 import { cn } from "@/lib/utils"
 import { DiscoveryPanel } from "@/components/discovery-panel"
@@ -98,6 +99,10 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
 
     return [...base, boss]
   }, [allCompanies, filteredCompanies, selectedCompany])
+
+  useEffect(() => {
+    track("city_page_view", { city: config.city })
+  }, [config.city])
 
   useEffect(() => {
     const audio = new Audio("/audio/sf-ai-startup-map-theme.mp3")

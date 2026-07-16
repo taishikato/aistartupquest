@@ -18,6 +18,8 @@ import { SelectedCityPanel } from "@/components/home-events/selected-city-panel"
 import { useHomeMapUrlSync } from "@/components/home-events/use-home-map-url-sync"
 import { useHomeWorldMap } from "@/components/home-events/use-home-world-map"
 import { useIdleGlobeRotation } from "@/components/home-events/use-idle-globe-rotation"
+import { QuestHeraldSignup } from "@/components/quest-herald-signup"
+import { track } from "@/lib/analytics"
 import type { CityWithEvents, EventCity } from "@/lib/events"
 import { parseHomeMapView, type HomeMapView } from "@/lib/home-map-url"
 import { cn } from "@/lib/utils"
@@ -47,6 +49,7 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
     () => flattenUpcomingEvents(upcomingCities),
     [upcomingCities]
   )
+  const normalizedQuery = query.trim().toLocaleLowerCase()
   const filteredEvents = useMemo(
     () => filterEventsByQuery(allEvents, query),
     [allEvents, query]
@@ -100,6 +103,21 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
     stopIdleRotation,
   })
 
+  useEffect(() => {
+    if (normalizedQuery.length < 2) {
+      return
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      track("event_search", {
+        query: normalizedQuery,
+        result_count: filteredEvents.length,
+      })
+    }, 500)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [normalizedQuery, filteredEvents.length])
+
   const switchView = (nextView: WorldView) => {
     const map = mapRef.current
 
@@ -108,6 +126,7 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
     }
 
     stopIdleRotation()
+    track("map_view_toggle", { view: nextView })
     viewRef.current = nextView
     setView(nextView)
     applyHomeMapView(map, nextView, { easeToDefaultCamera: true })
@@ -148,6 +167,13 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
         />
       </aside>
 
+      {/* Mobile: quest herald above guild board toggle */}
+      {!boardOpen ? (
+        <div className="pointer-events-none absolute inset-x-0 bottom-16 z-30 flex justify-center px-3 md:hidden">
+          <QuestHeraldSignup source="home_map_footer_mobile" />
+        </div>
+      ) : null}
+
       {/* Mobile board toggle + bottom sheet */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40 md:hidden">
         <div className="pointer-events-auto flex justify-center p-3">
@@ -177,6 +203,13 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
           </div>
         ) : null}
       </div>
+
+      {/* Desktop quest herald footer */}
+      {!selectedCity ? (
+        <div className="pointer-events-none absolute bottom-6 left-[calc(min(380px,calc(100vw-24px))+1rem)] z-30 hidden md:block">
+          <QuestHeraldSignup source="home_map_footer" />
+        </div>
+      ) : null}
 
       {/* MAP / GLOBE toggle */}
       <div className="pointer-events-none absolute top-4 right-0 left-0 z-30 flex justify-center px-4 md:top-6 md:left-[min(380px,calc(100vw-24px))]">
