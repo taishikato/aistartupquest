@@ -83,7 +83,7 @@ export function QuestHeraldSignup({
               Quest Herald
             </p>
             <p className="mt-1 text-xs leading-4 text-[#1a1a2e] sm:text-sm sm:leading-5">
-              Get alerted when new AI startups and meetups land on the map.
+              Get alerted when new meetups and community events land on the map.
             </p>
           </div>
           <button
