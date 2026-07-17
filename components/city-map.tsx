@@ -5,16 +5,16 @@ import {
   useDeferredValue,
   useEffect,
   useMemo,
-  useRef,
   useState,
   useSyncExternalStore,
 } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
 
-import type { CityMapConfig } from "@/lib/city-config"
 import { track } from "@/lib/analytics"
+import type { CityMapConfig } from "@/lib/city-config"
 import { YC_BOSS_SLUG, type Company, type CompanyCategory } from "@/lib/company"
 import { cn } from "@/lib/utils"
+import { useThemeAudio } from "@/hooks/use-theme-audio"
 import { DiscoveryPanel } from "@/components/discovery-panel"
 import { MapShell } from "@/components/map-shell"
 import { SelectedCompanyPanel } from "@/components/selected-company-panel"
@@ -31,7 +31,7 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
   const searchParams = useSearchParams()
   const [search, setSearch] = useState("")
   const [category, setCategory] = useState<CompanyCategory | "All">("All")
-  const [isAudioMuted, setIsAudioMuted] = useState(true)
+  const { isAudioMuted, toggleMute } = useThemeAudio()
   const selectedPanelStorageKey = `selected-company-panel:${config.city}`
   const isSelectedPanelCollapsed = useSyncExternalStore(
     (onStoreChange) =>
@@ -42,7 +42,6 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
     () => readSelectedPanelPreference(selectedPanelStorageKey),
     () => false
   )
-  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const deferredSearch = useDeferredValue(search)
 
@@ -104,34 +103,6 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
     track("city_page_view", { city: config.city })
   }, [config.city])
 
-  useEffect(() => {
-    const audio = new Audio("/audio/sf-ai-startup-map-theme.mp3")
-    audio.loop = true
-    audio.preload = "auto"
-    audio.volume = 0.42
-    audio.muted = true
-    audioRef.current = audio
-
-    audio.play().catch(() => {
-      // Browsers usually allow muted autoplay, but failing closed is fine here.
-    })
-
-    return () => {
-      audio.pause()
-      audioRef.current = null
-    }
-  }, [])
-
-  useEffect(() => {
-    const audio = audioRef.current
-
-    if (!audio) {
-      return
-    }
-
-    audio.muted = isAudioMuted
-  }, [isAudioMuted])
-
   const handleToggleSelectedPanel = useCallback(() => {
     if (typeof window === "undefined") {
       return
@@ -145,27 +116,6 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
       })
     )
   }, [isSelectedPanelCollapsed, selectedPanelStorageKey])
-
-  const handleToggleMute = async () => {
-    const audio = audioRef.current
-
-    if (!audio) {
-      return
-    }
-
-    const nextMuted = !isAudioMuted
-    audio.muted = nextMuted
-    setIsAudioMuted(nextMuted)
-
-    if (!nextMuted) {
-      try {
-        await audio.play()
-      } catch {
-        setIsAudioMuted(true)
-        audio.muted = true
-      }
-    }
-  }
 
   const syncSelectionToUrl = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString())
@@ -260,7 +210,7 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
               config={config}
               onSelectCompany={updateCompanySlugInUrl}
               isAudioMuted={isAudioMuted}
-              onToggleMute={handleToggleMute}
+              onToggleMute={toggleMute}
             />
           </div>
         </div>

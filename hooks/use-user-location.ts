@@ -22,7 +22,6 @@ type UseUserLocationResult = {
   status: UserLocationStatus
   coordinates: UserCoordinates | null
   requestLocation: () => void
-  clearLocation: () => void
 }
 
 export function useUserLocation(): UseUserLocationResult {
@@ -41,12 +40,6 @@ export function useUserLocation(): UseUserLocationResult {
     navigator.geolocation.clearWatch(watchIdRef.current)
     watchIdRef.current = null
   }, [])
-
-  const clearLocation = useCallback(() => {
-    clearWatch()
-    setCoordinates(null)
-    setStatus(supportedRef.current ? "idle" : "unsupported")
-  }, [clearWatch])
 
   const requestLocation = useCallback(() => {
     if (!supportedRef.current || !isGeolocationSupported()) {
@@ -164,6 +157,5 @@ export function useUserLocation(): UseUserLocationResult {
     status,
     coordinates,
     requestLocation,
-    clearLocation,
   }
 }

@@ -10,6 +10,7 @@ import type { CityWithEvents, EventCity } from "@/lib/events"
 import { parseHomeMapView, type HomeMapView } from "@/lib/home-map-url"
 import { locateButtonLabel, type UserCoordinates } from "@/lib/user-location"
 import { cn } from "@/lib/utils"
+import { useThemeAudio } from "@/hooks/use-theme-audio"
 import { useUserLocation } from "@/hooks/use-user-location"
 import { Button } from "@/components/ui/button"
 import { applyHomeMapView } from "@/components/home-events/apply-home-map-view"
@@ -51,8 +52,7 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
   const [query, setQuery] = useState("")
   const [selectedCity, setSelectedCity] = useState<string | null>(null)
   const [boardOpen, setBoardOpen] = useState(false)
-  const [isAudioMuted, setIsAudioMuted] = useState(true)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const { isAudioMuted, toggleMute } = useThemeAudio()
   const pendingFlyToUserRef = useRef(false)
   const { startIdleRotation, stopIdleRotation, rotationStoppedByUserRef } =
     useIdleGlobeRotation(mapRef, viewRef)
@@ -168,55 +168,6 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
     return () => window.clearTimeout(timeoutId)
   }, [normalizedQuery, filteredEvents.length])
 
-  useEffect(() => {
-    const audio = new Audio("/audio/sf-ai-startup-map-theme.mp3")
-    audio.loop = true
-    audio.preload = "auto"
-    audio.volume = 0.42
-    audio.muted = true
-    audioRef.current = audio
-
-    audio.play().catch(() => {
-      // Browsers usually allow muted autoplay, but failing closed is fine here.
-    })
-
-    return () => {
-      audio.pause()
-      audioRef.current = null
-    }
-  }, [])
-
-  useEffect(() => {
-    const audio = audioRef.current
-
-    if (!audio) {
-      return
-    }
-
-    audio.muted = isAudioMuted
-  }, [isAudioMuted])
-
-  const handleToggleMute = async () => {
-    const audio = audioRef.current
-
-    if (!audio) {
-      return
-    }
-
-    const nextMuted = !isAudioMuted
-    audio.muted = nextMuted
-    setIsAudioMuted(nextMuted)
-
-    if (!nextMuted) {
-      try {
-        await audio.play()
-      } catch {
-        setIsAudioMuted(true)
-        audio.muted = true
-      }
-    }
-  }
-
   const handleLocateUser = () => {
     if (userLocationStatus === "unsupported") {
       return
@@ -267,7 +218,7 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
       {/* MapLibre overrides the container's position, so size comes from a wrapper.
           Isolate stacking so marker z-index (e.g. player at 40) cannot paint above
           the guild board and other chrome (z-30+). */}
-      <div className="absolute inset-0 z-0 isolate">
+      <div className="absolute inset-0 isolate z-0">
         {/* Transparent map background reveals space sprites around the globe. */}
         {view === "globe" ? <SpaceBackdrop /> : null}
         <div ref={containerRef} className="h-full w-full" />
@@ -341,7 +292,7 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
       <div className="pointer-events-none absolute top-4 left-4 z-30 flex items-center gap-2 md:top-6 md:left-[calc(min(380px,calc(100vw-24px))+1rem)]">
         <Button
           type="button"
-          onClick={handleToggleMute}
+          onClick={toggleMute}
           aria-label={isAudioMuted ? "Unmute audio" : "Mute audio"}
           className={cn(
             "pointer-events-auto size-10 border-[3px] border-[#342414] bg-[#f4ecd2] p-0 text-[#4c3926] shadow-[4px_4px_0px_#342414] hover:bg-[#e7d8ae]",
