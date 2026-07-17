@@ -441,24 +441,29 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
         }
 
         @keyframes player-beacon-pulse {
-          0%,
-          100% {
-            transform: scale(1);
-            opacity: 0.95;
+          0% {
+            transform: scale(0.85);
+            opacity: 0.9;
           }
-          50% {
-            transform: scale(1.55);
-            opacity: 0.35;
+          70% {
+            transform: scale(1.7);
+            opacity: 0.25;
+          }
+          100% {
+            transform: scale(1.9);
+            opacity: 0;
           }
         }
 
         .player-location-marker__pulse {
           position: absolute;
-          inset: 0;
-          border: 2px solid #342414;
-          background: #4ecdc4;
-          box-shadow: 2px 2px 0 #342414;
-          animation: player-beacon-pulse 1.35s steps(2) infinite;
+          inset: 1px;
+          border-radius: 50%;
+          box-sizing: border-box;
+          background: transparent;
+          border: 2px solid #4ecdc4;
+          box-shadow: 0 0 0 1px #342414;
+          animation: player-beacon-pulse 1.8s steps(3) infinite;
         }
 
         .quest-event-marker.is-active {
@@ -478,17 +483,14 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
             }
           }
 
-          @keyframes player-beacon-pulse {
-            0%,
-            100% {
-              transform: scale(1);
-              opacity: 0.85;
-            }
-          }
-
           .player-location-marker__character,
           .player-location-marker__pulse {
             animation: none !important;
+          }
+
+          .player-location-marker__pulse {
+            opacity: 0.45;
+            transform: scale(1.15);
           }
         }
 

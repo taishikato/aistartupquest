@@ -66,28 +66,43 @@ export function createPlayerSprite() {
   const beacon = document.createElement("div")
   beacon.className = "player-location-marker__beacon"
   beacon.style.position = "relative"
-  beacon.style.width = "18px"
-  beacon.style.height = "18px"
+  beacon.style.width = "16px"
+  beacon.style.height = "16px"
   beacon.style.display = "flex"
   beacon.style.alignItems = "center"
   beacon.style.justifyContent = "center"
 
+  // Hollow expanding ring - no fill so quest pins stay readable underneath.
   const pulse = document.createElement("span")
   pulse.className = "player-location-marker__pulse"
   pulse.setAttribute("aria-hidden", "true")
 
+  const ring = document.createElement("span")
+  ring.className = "player-location-marker__ring"
+  ring.setAttribute("aria-hidden", "true")
+  ring.style.width = "12px"
+  ring.style.height = "12px"
+  ring.style.borderRadius = "50%"
+  ring.style.boxSizing = "border-box"
+  ring.style.background = "transparent"
+  ring.style.border = `2px solid ${TEAL}`
+  ring.style.boxShadow = `0 0 0 2px ${OUTLINE}`
+  ring.style.position = "relative"
+  ring.style.zIndex = "1"
+
   const core = document.createElement("span")
   core.className = "player-location-marker__core"
   core.setAttribute("aria-hidden", "true")
-  core.style.width = "8px"
-  core.style.height = "8px"
+  core.style.width = "4px"
+  core.style.height = "4px"
+  core.style.borderRadius = "50%"
   core.style.background = TEAL
-  core.style.border = `2px solid ${OUTLINE}`
-  core.style.boxShadow = `2px 2px 0 ${OUTLINE}, inset 0 -2px 0 ${TEAL_DEEP}`
-  core.style.position = "relative"
-  core.style.zIndex = "1"
+  core.style.border = `1px solid ${OUTLINE}`
+  core.style.boxShadow = `1px 1px 0 ${TEAL_DEEP}`
+  core.style.position = "absolute"
+  core.style.zIndex = "2"
 
-  beacon.append(pulse, core)
+  beacon.append(pulse, ring, core)
   wrapper.append(characterStack, beacon)
 
   return wrapper
