@@ -7,7 +7,10 @@ import type { Map as MapLibreMap } from "maplibre-gl"
 import { track } from "@/lib/analytics"
 import type { CityWithEvents, EventCity } from "@/lib/events"
 import { parseHomeMapView, type HomeMapView } from "@/lib/home-map-url"
-import { useThemeAudio } from "@/hooks/use-theme-audio"
+import {
+  GLOBE_THEME_AUDIO_SRC,
+  useThemeAudio,
+} from "@/hooks/use-theme-audio"
 import { applyHomeMapView } from "@/components/home-events/apply-home-map-view"
 import { HomeMapControls } from "@/components/home-events/home-map-controls"
 import { HomeMapGuildShell } from "@/components/home-events/home-map-guild-shell"
@@ -38,7 +41,10 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
   )
   const [selectedCity, setSelectedCity] = useState<string | null>(null)
   const [boardOpen, setBoardOpen] = useState(false)
-  const { isAudioMuted, toggleMute } = useThemeAudio()
+  const { isAudioMuted, toggleMute } = useThemeAudio({
+    src: GLOBE_THEME_AUDIO_SRC,
+    enabled: view === "globe",
+  })
   const { startIdleRotation, stopIdleRotation, rotationStoppedByUserRef } =
     useIdleGlobeRotation(mapRef, viewRef)
   const { query, setQuery, allEvents, filteredEvents, filteredCities } =

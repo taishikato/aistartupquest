@@ -2,33 +2,46 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 
-const THEME_AUDIO_SRC = "/audio/sf-ai-startup-map-theme.mp3"
+const CITY_THEME_AUDIO_SRC = "/audio/sf-ai-startup-map-theme.mp3"
+export const GLOBE_THEME_AUDIO_SRC = "/audio/orbit-drift.mp3"
 const THEME_AUDIO_VOLUME = 0.42
 
+type UseThemeAudioOptions = {
+  src?: string
+  /** When false, the loop is paused (e.g. home mercator view). */
+  enabled?: boolean
+}
+
 /**
- * Shared muted-by-default theme loop for city maps and the home world map.
+ * Muted-by-default theme loop.
+ * City maps use the default track; the home globe passes Orbit Drift and
+ * enables playback only while the globe view is active.
  */
-export function useThemeAudio() {
+export function useThemeAudio({
+  src = CITY_THEME_AUDIO_SRC,
+  enabled = true,
+}: UseThemeAudioOptions = {}) {
   const [isAudioMuted, setIsAudioMuted] = useState(true)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const mutedRef = useRef(true)
 
   useEffect(() => {
-    const audio = new Audio(THEME_AUDIO_SRC)
+    mutedRef.current = isAudioMuted
+  }, [isAudioMuted])
+
+  useEffect(() => {
+    const audio = new Audio(src)
     audio.loop = true
     audio.preload = "auto"
     audio.volume = THEME_AUDIO_VOLUME
-    audio.muted = true
+    audio.muted = mutedRef.current
     audioRef.current = audio
-
-    audio.play().catch(() => {
-      // Browsers usually allow muted autoplay, but failing closed is fine here.
-    })
 
     return () => {
       audio.pause()
       audioRef.current = null
     }
-  }, [])
+  }, [src])
 
   useEffect(() => {
     const audio = audioRef.current
@@ -37,8 +50,16 @@ export function useThemeAudio() {
       return
     }
 
+    if (!enabled) {
+      audio.pause()
+      return
+    }
+
     audio.muted = isAudioMuted
-  }, [isAudioMuted])
+    audio.play().catch(() => {
+      // Browsers usually allow muted autoplay, but failing closed is fine here.
+    })
+  }, [enabled, isAudioMuted])
 
   const toggleMute = useCallback(async () => {
     const audio = audioRef.current
@@ -51,7 +72,7 @@ export function useThemeAudio() {
     audio.muted = nextMuted
     setIsAudioMuted(nextMuted)
 
-    if (!nextMuted) {
+    if (!nextMuted && enabled) {
       try {
         await audio.play()
       } catch {
@@ -59,7 +80,7 @@ export function useThemeAudio() {
         audio.muted = true
       }
     }
-  }, [isAudioMuted])
+  }, [enabled, isAudioMuted])
 
   return { isAudioMuted, toggleMute }
 }
