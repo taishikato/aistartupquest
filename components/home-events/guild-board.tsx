@@ -19,13 +19,13 @@ function trackEventRegisterClick(event: CommunityEvent) {
   })
 }
 
-function trackBoardEventView(event: CommunityEvent) {
-  track("event_view", {
+function trackBoardCitySelect(event: CommunityEvent) {
+  track("event_city_select", {
+    city: event.city,
+    source: "board_card",
     event_id: event.id,
     event_name: event.title,
-    city: event.city,
     source_guild: event.company,
-    source: "board",
   })
 }
 
@@ -102,7 +102,7 @@ export function GuildBoardList({
               <button
                 type="button"
                 onClick={() => {
-                  trackBoardEventView(event)
+                  trackBoardCitySelect(event)
                   if (city) {
                     onSelectCity(city)
                   }

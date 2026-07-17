@@ -72,9 +72,9 @@ export function createEventCityMarker({
   body.append(image, count)
   button.append(body)
   button.addEventListener("click", () => {
-    track("event_view", {
+    track("event_city_select", {
       city: city.name,
-      source: "map_pin",
+      source: "map_marker",
       event_count: eventCount.value,
     })
     onSelectCity(city)

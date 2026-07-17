@@ -156,15 +156,24 @@ export function CompanyCard({
     return cardBody
   }
 
+  const handleSelect = () => {
+    track("company_card_click", {
+      company_slug: company.slug,
+      company_name: company.name,
+      city: company.city,
+    })
+    onSelect(company.slug)
+  }
+
   return (
     <div
       role="button"
       tabIndex={0}
-      onClick={() => onSelect(company.slug)}
+      onClick={handleSelect}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault()
-          onSelect(company.slug)
+          handleSelect()
         }
       }}
       className="w-full text-left outline-none"
