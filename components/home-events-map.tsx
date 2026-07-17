@@ -264,8 +264,10 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
 
   return (
     <main className="relative h-dvh overflow-hidden bg-[#0a0a1f] text-[#1a1a2e]">
-      {/* MapLibre overrides the container's position, so size comes from a wrapper. */}
-      <div className="absolute inset-0">
+      {/* MapLibre overrides the container's position, so size comes from a wrapper.
+          Isolate stacking so marker z-index (e.g. player at 40) cannot paint above
+          the guild board and other chrome (z-30+). */}
+      <div className="absolute inset-0 z-0 isolate">
         {/* Transparent map background reveals space sprites around the globe. */}
         {view === "globe" ? <SpaceBackdrop /> : null}
         <div ref={containerRef} className="h-full w-full" />
