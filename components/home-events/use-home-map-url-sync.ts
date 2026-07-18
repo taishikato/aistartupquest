@@ -51,6 +51,8 @@ export function useHomeMapUrlSync({
     urlHydratedRef.current = true
 
     const urlView = parseHomeMapView(searchParams.get("view"))
+    const cityName = parseHomeMapCity(searchParams.get("city"), upcomingCities)
+
     if (urlView === "globe") {
       // Map always boots mercator; force projection even when React state is already globe.
       const map = mapRef.current
@@ -58,13 +60,15 @@ export function useHomeMapUrlSync({
         stopIdleRotation()
         viewRef.current = "globe"
         setView("globe")
-        // Do NOT easeTo default globe camera when a city will flyTo next.
-        applyHomeMapView(map, "globe", { easeToDefaultCamera: false })
+        // Skip default camera when a city flyTo follows; otherwise jump so
+        // GLOBE_CAMERA.zoom applies on hard reload of ?view=globe.
+        applyHomeMapView(map, "globe", {
+          defaultCamera: cityName ? false : "jump",
+        })
         startIdleRotation()
       }
     }
 
-    const cityName = parseHomeMapCity(searchParams.get("city"), upcomingCities)
     if (cityName) {
       const matched = upcomingCities.find((city) => city.name === cityName)
       if (matched) {

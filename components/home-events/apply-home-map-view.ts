@@ -3,10 +3,15 @@ import type { Map as MapLibreMap } from "maplibre-gl"
 import { FLAT_CAMERA, GLOBE_CAMERA } from "@/components/home-events/cameras"
 import type { HomeMapView } from "@/lib/home-map-url"
 
+type ApplyHomeMapViewOptions = {
+  /** How to move to the view's default camera. Skip when a city flyTo follows. */
+  defaultCamera?: "ease" | "jump" | false
+}
+
 export function applyHomeMapView(
   map: MapLibreMap,
   view: HomeMapView,
-  { easeToDefaultCamera }: { easeToDefaultCamera: boolean }
+  { defaultCamera = false }: ApplyHomeMapViewOptions = {}
 ) {
   const camera = view === "globe" ? GLOBE_CAMERA : FLAT_CAMERA
 
@@ -15,11 +20,19 @@ export function applyHomeMapView(
   map.dragRotate.disable()
   map.setMinZoom(camera.minZoom)
 
-  if (easeToDefaultCamera) {
+  if (defaultCamera === "ease") {
     map.easeTo({
       center: camera.center,
       zoom: camera.zoom,
       duration: 700,
+    })
+    return
+  }
+
+  if (defaultCamera === "jump") {
+    map.jumpTo({
+      center: camera.center,
+      zoom: camera.zoom,
     })
   }
 }

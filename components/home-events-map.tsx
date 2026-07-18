@@ -113,7 +113,7 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
     track("map_view_toggle", { view: nextView })
     viewRef.current = nextView
     setView(nextView)
-    applyHomeMapView(map, nextView, { easeToDefaultCamera: true })
+    applyHomeMapView(map, nextView, { defaultCamera: "ease" })
 
     if (nextView === "globe") {
       startIdleRotation()
