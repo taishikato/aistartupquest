@@ -1,8 +1,11 @@
+import { XLogoLink } from "@/components/x-logo-link"
+
 const X_PROFILE_URL = "https://x.com/taishik_"
 
 export function CompanyAddInvite() {
   return (
-    <div className="absolute top-4 right-4 z-20">
+    <div className="absolute top-4 right-4 z-20 flex items-start gap-2">
+      <XLogoLink />
       <a
         href={X_PROFILE_URL}
         target="_blank"

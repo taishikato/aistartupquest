@@ -23,6 +23,7 @@ import { useHomeMapUrlSync } from "@/components/home-events/use-home-map-url-syn
 import { useHomeWorldMap } from "@/components/home-events/use-home-world-map"
 import { useIdleGlobeRotation } from "@/components/home-events/use-idle-globe-rotation"
 import { SpaceBackdrop } from "@/components/space-backdrop"
+import { XLogoLink } from "@/components/x-logo-link"
 
 type WorldView = HomeMapView
 
@@ -153,6 +154,10 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
       />
 
       <HomeMapViewToggle view={view} onSwitchView={switchView} />
+
+      <div className="absolute top-4 right-4 z-30 md:top-6 md:right-6">
+        <XLogoLink />
+      </div>
 
       {selectedCity ? (
         <SelectedCityPanel

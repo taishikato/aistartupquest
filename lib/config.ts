@@ -2,6 +2,8 @@ import type { Metadata } from "next"
 
 export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
 
+export const xProfileUrl = "https://x.com/aistartupquest"
+
 export const pageTitle = "AI Startup Map: Explore AI Native Startups"
 
 export const pageDescription =
