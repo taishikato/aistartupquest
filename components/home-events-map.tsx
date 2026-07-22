@@ -43,7 +43,6 @@ export function HomeEventsMap({ upcomingCities }: HomeEventsMapProps) {
   const [boardOpen, setBoardOpen] = useState(false)
   const { isAudioMuted, toggleMute } = useThemeAudio({
     src: GLOBE_THEME_AUDIO_SRC,
-    enabled: view === "globe",
   })
   const { startIdleRotation, stopIdleRotation, rotationStoppedByUserRef } =
     useIdleGlobeRotation(mapRef, viewRef)

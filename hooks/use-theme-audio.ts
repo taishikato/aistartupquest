@@ -8,14 +8,13 @@ const THEME_AUDIO_VOLUME = 0.42
 
 type UseThemeAudioOptions = {
   src?: string
-  /** When false, the loop is paused (e.g. home mercator view). */
+  /** When false, the loop is paused. */
   enabled?: boolean
 }
 
 /**
  * Muted-by-default theme loop.
- * City maps use the default track; the home globe passes Orbit Drift and
- * enables playback only while the globe view is active.
+ * City maps use the default track; the home map passes Orbit Drift.
  */
 export function useThemeAudio({
   src = CITY_THEME_AUDIO_SRC,
