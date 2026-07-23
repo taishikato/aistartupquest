@@ -9,6 +9,8 @@ type QuestHeraldPreference = {
   until: number
 }
 
+export type QuestHeraldStatus = "visible" | "dismissed" | "subscribed"
+
 function parsePreference(raw: string | null): QuestHeraldPreference | null {
   if (!raw) {
     return null
@@ -47,20 +49,46 @@ function readActivePreference(): QuestHeraldPreference | null {
   return preference
 }
 
-export function readQuestHeraldHidden(): boolean {
+export function readQuestHeraldStatus(): QuestHeraldStatus {
   if (typeof window === "undefined") {
-    return true
+    return "dismissed"
   }
 
-  return readActivePreference() !== null
+  const preference = readActivePreference()
+  if (!preference) {
+    return "visible"
+  }
+
+  return preference.status === "subscribed" ? "subscribed" : "dismissed"
+}
+
+export function readQuestHeraldHidden(): boolean {
+  return readQuestHeraldStatus() !== "visible"
 }
 
 export function readQuestHeraldSubscribed(): boolean {
-  if (typeof window === "undefined") {
+  return readQuestHeraldStatus() === "subscribed"
+}
+
+export function shouldHideQuestHeraldSignup(
+  status: QuestHeraldStatus,
+  {
+    forceVisible = false,
+    succeeded = false,
+  }: {
+    forceVisible?: boolean
+    succeeded?: boolean
+  } = {}
+): boolean {
+  if (succeeded) {
     return false
   }
 
-  return readActivePreference()?.status === "subscribed"
+  if (forceVisible) {
+    return status === "subscribed"
+  }
+
+  return status !== "visible"
 }
 
 function writePreference(preference: QuestHeraldPreference) {
