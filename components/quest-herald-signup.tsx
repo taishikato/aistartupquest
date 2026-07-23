@@ -13,6 +13,7 @@ import {
   dismissQuestHerald,
   markQuestHeraldSubscribed,
   readQuestHeraldHidden,
+  readQuestHeraldSubscribed,
   subscribeToQuestHeraldPreference,
 } from "@/lib/quest-herald-preference"
 import { cn } from "@/lib/utils"
@@ -23,6 +24,8 @@ type QuestHeraldSignupProps = {
   className?: string
   heading?: string
   compact?: boolean
+  /** Show even after dismiss; still hides when already subscribed. */
+  forceVisible?: boolean
   onDismiss?: () => void
 }
 
@@ -31,6 +34,7 @@ export function QuestHeraldSignup({
   className,
   heading = "Get alerted when new meetups and community events land on the map.",
   compact = false,
+  forceVisible = false,
   onDismiss,
 }: QuestHeraldSignupProps) {
   const isHidden = useSyncExternalStore(
@@ -38,12 +42,18 @@ export function QuestHeraldSignup({
     readQuestHeraldHidden,
     () => true
   )
+  const isSubscribed = useSyncExternalStore(
+    subscribeToQuestHeraldPreference,
+    readQuestHeraldSubscribed,
+    () => false
+  )
   const [email, setEmail] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [succeeded, setSucceeded] = useState(false)
   const [isPending, startTransition] = useTransition()
 
-  if (isHidden && !succeeded) {
+  const shouldHide = forceVisible ? isSubscribed : isHidden
+  if (shouldHide && !succeeded) {
     return null
   }
 

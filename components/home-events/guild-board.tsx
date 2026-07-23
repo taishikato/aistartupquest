@@ -6,7 +6,6 @@ import { format } from "date-fns"
 
 import { track } from "@/lib/analytics"
 import type { CityWithEvents, CommunityEvent, EventCity } from "@/lib/events"
-import { reopenQuestHerald } from "@/lib/quest-herald-preference"
 import { cn } from "@/lib/utils"
 import { QuestHeraldSignup } from "@/components/quest-herald-signup"
 
@@ -44,14 +43,6 @@ export function GuildBoardHeader({
   const [signupOpen, setSignupOpen] = useState(false)
   const signupId = useId()
 
-  const handleSignupToggle = () => {
-    if (!signupOpen) {
-      reopenQuestHerald()
-    }
-
-    setSignupOpen((open) => !open)
-  }
-
   return (
     <header className="shrink-0 border-b-[3px] border-[#1a1a2e] bg-[#ead9ab] p-4">
       <div className="flex items-center gap-3">
@@ -73,7 +64,7 @@ export function GuildBoardHeader({
       </p>
       <button
         type="button"
-        onClick={handleSignupToggle}
+        onClick={() => setSignupOpen((open) => !open)}
         className="mt-2 border-2 border-[#1a1a2e] bg-[#fff7dd] px-2 py-1 font-(family-name:--font-pixel) text-[7px] leading-4 text-[#8b6914] shadow-[2px_2px_0_#1a1a2e] hover:bg-[#ffe66d]"
         aria-expanded={signupOpen}
         aria-controls={signupId}
@@ -85,6 +76,7 @@ export function GuildBoardHeader({
           <QuestHeraldSignup
             source="board_header"
             compact
+            forceVisible
             onDismiss={() => setSignupOpen(false)}
           />
         </div>

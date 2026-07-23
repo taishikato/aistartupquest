@@ -29,22 +29,38 @@ function parsePreference(raw: string | null): QuestHeraldPreference | null {
   return null
 }
 
+function readActivePreference(): QuestHeraldPreference | null {
+  if (typeof window === "undefined") {
+    return null
+  }
+
+  const preference = parsePreference(window.localStorage.getItem(STORAGE_KEY))
+  if (!preference) {
+    return null
+  }
+
+  if (Date.now() >= preference.until) {
+    window.localStorage.removeItem(STORAGE_KEY)
+    return null
+  }
+
+  return preference
+}
+
 export function readQuestHeraldHidden(): boolean {
   if (typeof window === "undefined") {
     return true
   }
 
-  const preference = parsePreference(window.localStorage.getItem(STORAGE_KEY))
-  if (!preference) {
+  return readActivePreference() !== null
+}
+
+export function readQuestHeraldSubscribed(): boolean {
+  if (typeof window === "undefined") {
     return false
   }
 
-  if (Date.now() >= preference.until) {
-    window.localStorage.removeItem(STORAGE_KEY)
-    return false
-  }
-
-  return true
+  return readActivePreference()?.status === "subscribed"
 }
 
 function writePreference(preference: QuestHeraldPreference) {
@@ -53,17 +69,6 @@ function writePreference(preference: QuestHeraldPreference) {
   }
 
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(preference))
-  window.dispatchEvent(
-    new CustomEvent(STORAGE_EVENT, { detail: { key: STORAGE_KEY } })
-  )
-}
-
-export function reopenQuestHerald() {
-  if (typeof window === "undefined") {
-    return
-  }
-
-  window.localStorage.removeItem(STORAGE_KEY)
   window.dispatchEvent(
     new CustomEvent(STORAGE_EVENT, { detail: { key: STORAGE_KEY } })
   )

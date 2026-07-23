@@ -1,33 +1,62 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
 
-import { reopenQuestHerald } from "@/lib/quest-herald-preference"
+import {
+  dismissQuestHerald,
+  markQuestHeraldSubscribed,
+  readQuestHeraldHidden,
+  readQuestHeraldSubscribed,
+} from "@/lib/quest-herald-preference"
 
-describe("reopenQuestHerald", () => {
+describe("quest herald preference visibility", () => {
   afterEach(() => {
     vi.unstubAllGlobals()
+    vi.useRealTimers()
   })
 
-  it("clears the stored preference and notifies subscribers", () => {
-    const removeItem = vi.fn()
-    const dispatchEvent = vi.fn()
+  it("keeps the form hidden after dismiss without clearing preference", () => {
+    const store = new Map<string, string>()
     vi.stubGlobal("window", {
-      localStorage: { removeItem },
-      dispatchEvent,
+      localStorage: {
+        getItem: (key: string) => store.get(key) ?? null,
+        setItem: (key: string, value: string) => {
+          store.set(key, value)
+        },
+        removeItem: (key: string) => {
+          store.delete(key)
+        },
+      },
+      dispatchEvent: vi.fn(),
     })
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date("2026-07-22T12:00:00.000Z"))
 
-    reopenQuestHerald()
+    dismissQuestHerald()
 
-    expect(removeItem).toHaveBeenCalledWith("quest-herald-signup")
-    expect(dispatchEvent).toHaveBeenCalledTimes(1)
-
-    const event = dispatchEvent.mock.calls[0]?.[0] as CustomEvent<{
-      key: string
-    }>
-    expect(event.type).toBe("quest-herald-signup-storage")
-    expect(event.detail).toEqual({ key: "quest-herald-signup" })
+    expect(readQuestHeraldHidden()).toBe(true)
+    expect(readQuestHeraldSubscribed()).toBe(false)
+    expect(store.has("quest-herald-signup")).toBe(true)
   })
 
-  it("is a no-op on the server", () => {
-    expect(() => reopenQuestHerald()).not.toThrow()
+  it("treats subscribed status separately from dismissed", () => {
+    const store = new Map<string, string>()
+    vi.stubGlobal("window", {
+      localStorage: {
+        getItem: (key: string) => store.get(key) ?? null,
+        setItem: (key: string, value: string) => {
+          store.set(key, value)
+        },
+        removeItem: (key: string) => {
+          store.delete(key)
+        },
+      },
+      dispatchEvent: vi.fn(),
+    })
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date("2026-07-22T12:00:00.000Z"))
+
+    markQuestHeraldSubscribed()
+
+    expect(readQuestHeraldHidden()).toBe(true)
+    expect(readQuestHeraldSubscribed()).toBe(true)
   })
 })
