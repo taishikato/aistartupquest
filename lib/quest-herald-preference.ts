@@ -58,6 +58,17 @@ function writePreference(preference: QuestHeraldPreference) {
   )
 }
 
+export function reopenQuestHerald() {
+  if (typeof window === "undefined") {
+    return
+  }
+
+  window.localStorage.removeItem(STORAGE_KEY)
+  window.dispatchEvent(
+    new CustomEvent(STORAGE_EVENT, { detail: { key: STORAGE_KEY } })
+  )
+}
+
 export function dismissQuestHerald() {
   writePreference({
     status: "dismissed",

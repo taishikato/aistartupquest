@@ -2,6 +2,7 @@ import { format } from "date-fns"
 
 import { track } from "@/lib/analytics"
 import type { CommunityEvent } from "@/lib/events"
+import { QuestHeraldSignup } from "@/components/quest-herald-signup"
 
 function trackEventRegisterClick(event: CommunityEvent) {
   track("event_register_click", {
@@ -65,6 +66,12 @@ export function SelectedCityPanel({
             </article>
           ))}
         </div>
+        <QuestHeraldSignup
+          source="city_panel"
+          heading={`New quests in ${selectedCity}? Get alerted.`}
+          compact
+          className="mt-4"
+        />
       </div>
     </section>
   )

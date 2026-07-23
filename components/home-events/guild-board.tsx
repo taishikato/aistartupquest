@@ -1,13 +1,14 @@
+"use client"
+
+import { useId, useState } from "react"
 import Image from "next/image"
 import { format } from "date-fns"
 
 import { track } from "@/lib/analytics"
-import type {
-  CityWithEvents,
-  CommunityEvent,
-  EventCity,
-} from "@/lib/events"
+import type { CityWithEvents, CommunityEvent, EventCity } from "@/lib/events"
+import { reopenQuestHerald } from "@/lib/quest-herald-preference"
 import { cn } from "@/lib/utils"
+import { QuestHeraldSignup } from "@/components/quest-herald-signup"
 
 function trackEventRegisterClick(event: CommunityEvent) {
   track("event_register_click", {
@@ -40,6 +41,17 @@ export function GuildBoardHeader({
   query: string
   onQueryChange: (value: string) => void
 }) {
+  const [signupOpen, setSignupOpen] = useState(false)
+  const signupId = useId()
+
+  const handleSignupToggle = () => {
+    if (!signupOpen) {
+      reopenQuestHerald()
+    }
+
+    setSignupOpen((open) => !open)
+  }
+
   return (
     <header className="shrink-0 border-b-[3px] border-[#1a1a2e] bg-[#ead9ab] p-4">
       <div className="flex items-center gap-3">
@@ -59,6 +71,24 @@ export function GuildBoardHeader({
       <p className="mt-1 font-(family-name:--font-pixel) text-[8px] leading-4 text-[#95602f]/80">
         Updated daily at 10 AM ET
       </p>
+      <button
+        type="button"
+        onClick={handleSignupToggle}
+        className="mt-2 border-2 border-[#1a1a2e] bg-[#fff7dd] px-2 py-1 font-(family-name:--font-pixel) text-[7px] leading-4 text-[#8b6914] shadow-[2px_2px_0_#1a1a2e] hover:bg-[#ffe66d]"
+        aria-expanded={signupOpen}
+        aria-controls={signupId}
+      >
+        {signupOpen ? "Close alerts" : "Event alerts"}
+      </button>
+      {signupOpen ? (
+        <div id={signupId} className="mt-3">
+          <QuestHeraldSignup
+            source="board_header"
+            compact
+            onDismiss={() => setSignupOpen(false)}
+          />
+        </div>
+      ) : null}
       <label className="mt-3 block">
         <span className="sr-only">Search events or cities</span>
         <input

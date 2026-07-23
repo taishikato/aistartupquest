@@ -8,7 +8,6 @@ import {
 } from "react"
 import { X } from "lucide-react"
 
-import { subscribeEmail } from "@/app/actions/subscribe-email"
 import { track } from "@/lib/analytics"
 import {
   dismissQuestHerald,
@@ -17,15 +16,22 @@ import {
   subscribeToQuestHeraldPreference,
 } from "@/lib/quest-herald-preference"
 import { cn } from "@/lib/utils"
+import { subscribeEmail } from "@/app/actions/subscribe-email"
 
 type QuestHeraldSignupProps = {
   source?: string
   className?: string
+  heading?: string
+  compact?: boolean
+  onDismiss?: () => void
 }
 
 export function QuestHeraldSignup({
   source = "map_footer",
   className,
+  heading = "Get alerted when new meetups and community events land on the map.",
+  compact = false,
+  onDismiss,
 }: QuestHeraldSignupProps) {
   const isHidden = useSyncExternalStore(
     subscribeToQuestHeraldPreference,
@@ -44,6 +50,7 @@ export function QuestHeraldSignup({
   const handleDismiss = () => {
     track("quest_herald_dismiss", { source })
     dismissQuestHerald()
+    onDismiss?.()
   }
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -72,18 +79,29 @@ export function QuestHeraldSignup({
   return (
     <div
       className={cn(
-        "pointer-events-auto w-full max-w-[min(420px,calc(100vw-1.5rem))]",
+        "pointer-events-auto w-full",
+        compact ? "max-w-none" : "max-w-[min(420px,calc(100vw-1.5rem))]",
         className
       )}
     >
-      <div className="border-[3px] border-[#342414] bg-[#ead9ab] shadow-[4px_4px_0_#342414]">
+      <div
+        className={cn(
+          "border-[3px] border-[#342414] bg-[#ead9ab]",
+          compact ? "shadow-[3px_3px_0_#342414]" : "shadow-[4px_4px_0_#342414]"
+        )}
+      >
         <div className="flex items-start justify-between gap-2 border-b-2 border-[#95602f]/40 px-3 py-2">
           <div className="min-w-0">
             <p className="font-(family-name:--font-pixel) text-[9px] leading-4 text-[#8b6914]">
               Quest Herald
             </p>
-            <p className="mt-1 text-xs leading-4 text-[#1a1a2e] sm:text-sm sm:leading-5">
-              Get alerted when new meetups and community events land on the map.
+            <p
+              className={cn(
+                "mt-1 text-xs leading-4 text-[#1a1a2e]",
+                !compact && "sm:text-sm sm:leading-5"
+              )}
+            >
+              {heading}
             </p>
           </div>
           <button
@@ -103,7 +121,12 @@ export function QuestHeraldSignup({
         ) : (
           <form
             onSubmit={handleSubmit}
-            className="flex flex-col gap-2 px-3 py-3 sm:flex-row sm:items-stretch"
+            className={cn(
+              "flex gap-2 px-3 py-3",
+              compact
+                ? "flex-row items-stretch"
+                : "flex-col sm:flex-row sm:items-stretch"
+            )}
           >
             <label className="min-w-0 flex-1">
               <span className="sr-only">Email</span>
