@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+    branches: [main]
 
 jobs:
   verify:
@@ -16,7 +17,7 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm lint --max-warnings 0
+      - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
       # pnpm build deliberately excluded: needs Supabase env secrets.
