@@ -2,7 +2,7 @@ import Image from "next/image"
 
 export const adventurersLogComments = [
   {
-    insertionAfter: 3,
+    insertionAfter: 2,
     quote: "this is fun, thanks for making it Taishi!",
     name: "Ben Lang",
     handle: "@benln",
@@ -10,7 +10,7 @@ export const adventurersLogComments = [
     href: "https://x.com/benln/status/2079107571131015228",
   },
   {
-    insertionAfter: 10,
+    insertionAfter: 9,
     quote:
       "Taishi and I were talking about this a while back, wow awesome to see it",
     name: "Tibor (Tee)",
