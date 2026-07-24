@@ -79,7 +79,6 @@ export function useHomeMapUrlSync({
     // Mark after applying URL selection so the write effect cannot strip
     // ?city= before selectedCity state catches up. This setState is the gate
     // that re-runs the URL writer on the post-hydration render.
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional hydration barrier
     setHasHydratedUrl(true)
   }, [
     mapReady,
