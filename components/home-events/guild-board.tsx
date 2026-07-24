@@ -7,6 +7,7 @@ import { format } from "date-fns"
 import { track } from "@/lib/analytics"
 import type { CityWithEvents, CommunityEvent, EventCity } from "@/lib/events"
 import { cn } from "@/lib/utils"
+import { AdventurersLog } from "@/components/home-events/adventurers-log"
 import { QuestHeraldSignup } from "@/components/quest-herald-signup"
 
 function trackEventRegisterClick(event: CommunityEvent) {
@@ -177,6 +178,8 @@ export function GuildBoardList({
           No matching quests found.
         </p>
       ) : null}
+
+      <AdventurersLog />
     </div>
   )
 }
