@@ -2,7 +2,16 @@ import type { MetadataRoute } from "next"
 
 import { siteUrl } from "@/lib/config"
 
-const ROUTES = ["/", "/sf", "/toronto", "/ny", "/london", "/vancouver", "/tokyo"]
+const ROUTES = [
+  "/",
+  "/sf",
+  "/toronto",
+  "/ny",
+  "/london",
+  "/vancouver",
+  "/tokyo",
+  "/bengaluru",
+]
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = siteUrl ?? ""

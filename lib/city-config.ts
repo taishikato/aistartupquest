@@ -1,4 +1,11 @@
-export type CityId = "sf" | "toronto" | "ny" | "london" | "vancouver" | "tokyo"
+export type CityId =
+  | "sf"
+  | "toronto"
+  | "ny"
+  | "london"
+  | "vancouver"
+  | "tokyo"
+  | "bengaluru"
 
 export type CitySwitchOption = {
   city: CityId
@@ -57,6 +64,12 @@ export const sfMapConfig: CityMapConfig = {
       label: "TKY",
       ariaLabel: "Open Tokyo AI Startup Map",
     },
+    {
+      city: "bengaluru",
+      href: "/bengaluru",
+      label: "BLR",
+      ariaLabel: "Open Bengaluru AI Startup Map",
+    },
   ],
 }
 
@@ -98,6 +111,12 @@ export const torontoMapConfig: CityMapConfig = {
       href: "/tokyo",
       label: "TKY",
       ariaLabel: "Open Tokyo AI Startup Map",
+    },
+    {
+      city: "bengaluru",
+      href: "/bengaluru",
+      label: "BLR",
+      ariaLabel: "Open Bengaluru AI Startup Map",
     },
   ],
 }
@@ -141,6 +160,12 @@ export const nyMapConfig: CityMapConfig = {
       label: "TKY",
       ariaLabel: "Open Tokyo AI Startup Map",
     },
+    {
+      city: "bengaluru",
+      href: "/bengaluru",
+      label: "BLR",
+      ariaLabel: "Open Bengaluru AI Startup Map",
+    },
   ],
 }
 
@@ -182,6 +207,12 @@ export const londonMapConfig: CityMapConfig = {
       href: "/tokyo",
       label: "TKY",
       ariaLabel: "Open Tokyo AI Startup Map",
+    },
+    {
+      city: "bengaluru",
+      href: "/bengaluru",
+      label: "BLR",
+      ariaLabel: "Open Bengaluru AI Startup Map",
     },
   ],
 }
@@ -225,6 +256,12 @@ export const vancouverMapConfig: CityMapConfig = {
       label: "TKY",
       ariaLabel: "Open Tokyo AI Startup Map",
     },
+    {
+      city: "bengaluru",
+      href: "/bengaluru",
+      label: "BLR",
+      ariaLabel: "Open Bengaluru AI Startup Map",
+    },
   ],
 }
 
@@ -266,6 +303,62 @@ export const tokyoMapConfig: CityMapConfig = {
       href: "/vancouver",
       label: "VAN",
       ariaLabel: "Open Vancouver AI Startup Map",
+    },
+    {
+      city: "bengaluru",
+      href: "/bengaluru",
+      label: "BLR",
+      ariaLabel: "Open Bengaluru AI Startup Map",
+    },
+  ],
+}
+
+export const bengaluruMapConfig: CityMapConfig = {
+  city: "bengaluru",
+  titleLines: ["Bengaluru AI", "Startup Map"],
+  emptyStateTitle: "Bengaluru AI Startup Map",
+  searchPlaceholder: "Sarvam, agents, fintech...",
+  initialSelectedSlug: "sarvam-ai",
+  // Centroid of the seeded companies (tech belt east of the old city centre)
+  // so the first viewport covers the markers rather than administrative downtown.
+  mapCenter: [77.625, 12.9713],
+  sourceHref: "https://github.com/taishikato/aistartupquest",
+  switchOptions: [
+    {
+      city: "sf",
+      href: "/sf",
+      label: "SF",
+      ariaLabel: "Open SF AI Startup Map",
+    },
+    {
+      city: "toronto",
+      href: "/toronto",
+      label: "TO",
+      ariaLabel: "Open Toronto AI Startup Map",
+    },
+    {
+      city: "ny",
+      href: "/ny",
+      label: "NY",
+      ariaLabel: "Open New York AI Startup Map",
+    },
+    {
+      city: "london",
+      href: "/london",
+      label: "LDN",
+      ariaLabel: "Open London AI Startup Map",
+    },
+    {
+      city: "vancouver",
+      href: "/vancouver",
+      label: "VAN",
+      ariaLabel: "Open Vancouver AI Startup Map",
+    },
+    {
+      city: "tokyo",
+      href: "/tokyo",
+      label: "TKY",
+      ariaLabel: "Open Tokyo AI Startup Map",
     },
   ],
 }
