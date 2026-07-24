@@ -1,7 +1,8 @@
 import Image from "next/image"
 
-const comments = [
+export const adventurersLogComments = [
   {
+    insertionAfter: 3,
     quote: "this is fun, thanks for making it Taishi!",
     name: "Ben Lang",
     handle: "@benln",
@@ -9,6 +10,7 @@ const comments = [
     href: "https://x.com/benln/status/2079107571131015228",
   },
   {
+    insertionAfter: 10,
     quote:
       "Taishi and I were talking about this a while back, wow awesome to see it",
     name: "Tibor (Tee)",
@@ -18,46 +20,41 @@ const comments = [
   },
 ] as const
 
-export function AdventurersLog() {
+export type AdventurersLogComment = (typeof adventurersLogComments)[number]
+
+export function AdventurersLogCard({
+  comment,
+}: {
+  comment: AdventurersLogComment
+}) {
   return (
-    <section aria-label="Adventurer's log" className="mt-5">
-      <h2 className="font-(family-name:--font-pixel) text-[8px] leading-4 text-[#8b6914]">
+    <figure className="border-2 border-[#95602f] bg-[#ead9ab] p-3 shadow-[3px_3px_0_#1a1a2e]">
+      <p className="font-(family-name:--font-pixel) text-[7px] leading-4 text-[#8b6914]">
         Adventurer&apos;s log
-      </h2>
-      <div className="mt-2 grid gap-3">
-        {comments.map((comment) => (
-          <figure
-            key={comment.href}
-            className="border-2 border-[#95602f] bg-[#ead9ab] p-3 shadow-[3px_3px_0_#1a1a2e]"
-          >
-            <blockquote>
-              <p className="text-xs leading-5 text-[#1a1a2e]">
-                {comment.quote}
-              </p>
-            </blockquote>
-            <figcaption className="mt-2 flex items-center gap-2">
-              <Image
-                src={comment.avatar}
-                alt={comment.name}
-                width={36}
-                height={36}
-                className="size-9 shrink-0 border-2 border-[#95602f] object-cover"
-              />
-              <a
-                href={comment.href}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex flex-wrap items-center gap-x-1.5 text-xs font-bold text-[#8b6914] underline decoration-2 underline-offset-2 hover:text-[#1a1a2e]"
-              >
-                <span>{comment.name}</span>
-                <span className="font-(family-name:--font-pixel) text-[7px] leading-4">
-                  {comment.handle}
-                </span>
-              </a>
-            </figcaption>
-          </figure>
-        ))}
-      </div>
-    </section>
+      </p>
+      <blockquote className="mt-1">
+        <p className="text-xs leading-5 text-[#1a1a2e]">{comment.quote}</p>
+      </blockquote>
+      <figcaption className="mt-2 flex items-center gap-2">
+        <Image
+          src={comment.avatar}
+          alt={comment.name}
+          width={36}
+          height={36}
+          className="size-9 shrink-0 border-2 border-[#95602f] object-cover"
+        />
+        <a
+          href={comment.href}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex flex-wrap items-center gap-x-1.5 text-xs font-bold text-[#8b6914] underline decoration-2 underline-offset-2 hover:text-[#1a1a2e]"
+        >
+          <span>{comment.name}</span>
+          <span className="font-(family-name:--font-pixel) text-[7px] leading-4">
+            {comment.handle}
+          </span>
+        </a>
+      </figcaption>
+    </figure>
   )
 }
