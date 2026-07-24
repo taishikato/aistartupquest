@@ -10,7 +10,7 @@ export const adventurersLogComments = [
     href: "https://x.com/benln/status/2079107571131015228",
   },
   {
-    insertionAfter: 9,
+    insertionAfter: 8,
     quote:
       "Taishi and I were talking about this a while back, wow awesome to see it",
     name: "Tibor (Tee)",

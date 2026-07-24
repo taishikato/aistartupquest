@@ -35,7 +35,7 @@ function renderGuildBoard(events: CommunityEvent[]) {
 }
 
 describe("GuildBoardList", () => {
-  it("inserts Ben after the second event and Tibor after the ninth event", () => {
+  it("inserts Ben after the second event and Tibor after the eighth event", () => {
     const html = renderGuildBoard(createEvents(12))
 
     expect(html.indexOf("Quest 2")).toBeLessThan(
@@ -44,7 +44,7 @@ describe("GuildBoardList", () => {
     expect(
       html.indexOf("this is fun, thanks for making it Taishi!")
     ).toBeLessThan(html.indexOf("Quest 3"))
-    expect(html.indexOf("Quest 9")).toBeLessThan(
+    expect(html.indexOf("Quest 8")).toBeLessThan(
       html.indexOf(
         "Taishi and I were talking about this a while back, wow awesome to see it"
       )
@@ -53,7 +53,7 @@ describe("GuildBoardList", () => {
       html.indexOf(
         "Taishi and I were talking about this a while back, wow awesome to see it"
       )
-    ).toBeLessThan(html.indexOf("Quest 10"))
+    ).toBeLessThan(html.indexOf("Quest 9"))
   })
 
   it("appends testimonials whose insertion points exceed the event count", () => {
