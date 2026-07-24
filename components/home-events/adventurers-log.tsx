@@ -1,8 +1,11 @@
+import Image from "next/image"
+
 const comments = [
   {
     quote: "this is fun, thanks for making it Taishi!",
     name: "Ben Lang",
     handle: "@benln",
+    avatar: "/testimonials/benln.jpg",
     href: "https://x.com/benln/status/2079107571131015228",
   },
   {
@@ -10,6 +13,7 @@ const comments = [
       "Taishi and I were talking about this a while back, wow awesome to see it",
     name: "Tibor (Tee)",
     handle: "@tibor_tee",
+    avatar: "/testimonials/tibor_tee.jpg",
     href: "https://x.com/tibor_tee/status/2078920423161679926",
   },
 ] as const
@@ -31,7 +35,14 @@ export function AdventurersLog() {
                 {comment.quote}
               </p>
             </blockquote>
-            <figcaption className="mt-2">
+            <figcaption className="mt-2 flex items-center gap-2">
+              <Image
+                src={comment.avatar}
+                alt={comment.name}
+                width={36}
+                height={36}
+                className="size-9 shrink-0 border-2 border-[#95602f] object-cover"
+              />
               <a
                 href={comment.href}
                 target="_blank"
