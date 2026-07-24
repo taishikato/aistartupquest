@@ -211,7 +211,7 @@ export function SpaceBackdrop({ className }: SpaceBackdropProps) {
       <div className="sq-space-shoot-late absolute top-[30%] left-[36%] h-[2px] w-[10px] bg-[#dff7ff]" />
 
       <div className="sq-space-wander absolute right-[10%] bottom-[12%]">
-        {/* eslint-disable-next-line @next/next/no-img-element -- Decorative pixel sprite should render as a raw img. */}
+        {/* Decorative pixel sprite should render as a raw img. */}
         <img
           src="/map-assets/startup-robot-monster.png"
           alt=""

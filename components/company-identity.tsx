@@ -80,7 +80,6 @@ export function CompanyLogoBadge({
         </span>
       ) : (
         // External logo hosts vary by company; plain img keeps fallback behavior stable.
-        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={getCompanyLogoUrl(company)}
           alt={`${company.name} logo`}
