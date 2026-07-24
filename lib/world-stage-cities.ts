@@ -111,4 +111,18 @@ export const WORLD_STAGE_CITIES: WorldStageCity[] = [
     artLat: 25.1,
     accent: "#f472b6",
   },
+  {
+    id: "bengaluru",
+    href: "/bengaluru",
+    stage: "Stage 07",
+    code: "BLR",
+    name: "Bengaluru",
+    region: "India",
+    tagline: "Model labs, devtools, applied AI",
+    lat: 12.9716,
+    lon: 77.5946,
+    artLon: 77.5946,
+    artLat: 12.9716,
+    accent: "#fb923c",
+  },
 ]
