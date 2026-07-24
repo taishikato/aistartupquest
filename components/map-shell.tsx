@@ -9,12 +9,12 @@ import maplibregl, {
 
 import type { CityMapConfig } from "@/lib/city-config"
 import { type Company } from "@/lib/company"
-import { useMapMarkers } from "@/components/map-markers/use-map-markers"
 import { logNonAbortError } from "@/lib/is-abort-error"
 import { addVoxelCityLayers, applyMinecraftStyle } from "@/lib/map-paint"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { CompanyAddInvite } from "@/components/company-add-invite"
+import { useMapMarkers } from "@/components/map-markers/use-map-markers"
 import { PixelClouds } from "@/components/pixel-clouds"
 import { QuestHeraldSignup } from "@/components/quest-herald-signup"
 
@@ -175,7 +175,7 @@ export function MapShell({
       <div className="pointer-events-none absolute inset-x-0 bottom-3 z-20 flex justify-start px-3 pr-14 sm:bottom-4 sm:px-4 lg:bottom-5">
         <QuestHeraldSignup source="city_map_footer" />
       </div>
-      <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
+      <div className="absolute top-4 left-4 z-10 flex max-w-[calc(100vw-2rem)] flex-wrap items-center gap-2">
         <Button
           type="button"
           onClick={onToggleMute}
