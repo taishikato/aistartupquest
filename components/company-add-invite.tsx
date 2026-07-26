@@ -12,7 +12,7 @@ export function CompanyAddInvite() {
         rel="noopener noreferrer"
         className="inline-block border-2 border-[#1a1a2e] bg-[#ead9ab] px-3 py-2 font-(family-name:--font-pixel) text-[9px] leading-4 text-[#1a1a2e] shadow-[3px_3px_0_#1a1a2e] transition-colors hover:bg-[#ffe66d]"
       >
-        Want to add your startup? DM me on X!
+        Want to add your startup? Reply on X!
       </a>
     </div>
   )
