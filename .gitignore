@@ -40,6 +40,10 @@ next-env.d.ts
 
 # supabase
 supabase/.temp/
+supabase/migrations/
+
+# scripts (local only)
+scripts/
 
 # codex
 .codex/
